@@ -1,0 +1,981 @@
+commit 4c74e4e7117ce994d6160c7ee2f4df4ba363e908
+Author: Yiheng Liu <yiheng-liu@uiowa.edu>
+Date:   Mon Jan 30 14:01:39 2017 -0600
+
+    Delete HW1.tar.gz
+
+diff --git a/HW1.tar.gz b/HW1.tar.gz
+deleted file mode 100644
+index f7664e6..0000000
+Binary files a/HW1.tar.gz and /dev/null differ
+
+commit 609d75cb162242c04dd9252e203a1e9f40e36ce5
+Author: Yiheng Liu <yiheng-liu@uiowa.edu>
+Date:   Mon Jan 30 13:54:31 2017 -0600
+
+    Add Problem 2 Files
+
+diff --git a/HW2/.Rhistory b/HW2/.Rhistory
+new file mode 100644
+index 0000000..f67e848
+--- /dev/null
++++ b/HW2/.Rhistory
+@@ -0,0 +1,401 @@
++? dgamma
++? dpareto
++log(0)
++exp(log(0))
++? ifelse
++a <- c(1:5)
++a
++b <- c(3,3,3,3,3)
++b
++ifelse(a>b,TRUE,FALSE)
++library(formatR)
++? tidy_source
++tidy_source
++tidy_source()
++tidy_source()
++tidy_source("dpareto.r")
++tidy_source("dpareto.R")
++tidy_source("dpareto.R")
++tidy_source("dpareto.R")
++tidy_source("dpareto.r")
++setwd("/mnt/nfs/netapp2/grad/yliu255/s7400/STAT7400/HW2")
++tidy_source("dpareto.R")
++log(0)
++exp(log(0))
++exp(-Inf)
++? ifelse
++c(0,1,2,3,NaN)
++a <- c(0,1,2,3,NaN)
++a
++exp(a)
++dpareto <- function(x, a, b, log = FALSE) {
++nx <- length(x)
++na <- length(a)
++nb <- length(b)
++n <- max(nx, na, nb)
++if (nx < n) x <- rep(x, length.out = n)
++if (na < n) a <- rep(a, length.out = n)
++if (nb < n) b <- rep(b, length.out = n)
++ld <- ifelse(a > 0 & b > 0,
++ifelse(x > a,
++log(b) + b * log(a) - (b + 1) * log(x),
++log(0)),
++NaN)
++if (log) ld
++else exp(ld)
++}
++dpareto(2,-1,3)
++? dgamma
++dgamma(1,-2)
++dpareto <- function(x, alpha, beta, log = FALSE) {
++# Calculate the maximum length of inputs
++L <- max(length(x), length(alpha), length(beta))
++# Align all the inputs
++x <- rep(x, length.out = L)
++alpha <- rep(alpha, length.out = L)
++beta <- rep(beta, length.out = L)
++# Initialize the log densities with NaN
++logdens <- rep(NaN, length.out = L)
++for (i in 1:L) {
++if (alpha[i] <= 0 || beta[i] <= 0) {
++warning("NaNs produced")
++next
++} else if (x[i] < alpha[i]) {
++logdens[i] <- log(0)
++} else {
++logdens[i] <- log(beta[i]) + beta[i]*log(alpha[i])-(beta[i]+1)*log(alpha[i])
++}
++}
++if (log) logdens else exp(logdens)
++}
++dpaerto(1:3,2,4)
++dpareto(1:3,2,4)
++dpareto(1:3,2,4,TRUE)
++stopifnot(all.equal(dpareto(3,2,1), 0.2222222222))
++dpareto(3,-2,1)
++dpareto(3,-2,1,TRUE)
++dpareto(3,2,-1,TRUE)
++dpareto(3,2,-1)
++dpareto(1,2,3)
++dpareto(3,2,1)
++dpareto(3,2,1)
++dpareto <- function(x, alpha, beta, log = FALSE) {
++# Calculate the maximum length of inputs
++L <- max(length(x), length(alpha), length(beta))
++# Align all the inputs
++x <- rep(x, length.out = L)
++alpha <- rep(alpha, length.out = L)
++beta <- rep(beta, length.out = L)
++# Initialize the log densities with NaN
++logdens <- rep(NaN, length.out = L)
++for (i in 1:L) {
++if (alpha[i] <= 0 || beta[i] <= 0) {
++warning("NaNs produced")
++next
++} else if (x[i] < alpha[i]) {
++logdens[i] <- log(0)
++} else {
++logdens[i] <- log(beta[i]) + beta[i]*log(alpha[i])-(beta[i]+1)*log(x[i])
++}
++}
++if (log) logdens else exp(logdens)
++}
++dpareto(3,2,1)
++dpareto(3:5,2,1)
++dpareto(1:5,2,1)
++dpareto(6,2:4,1)
++log(dpareto(1:5,2,1))-dpareto(1:5,2,1,TRUE)
++all.equal
++all.equal(log(dpareto(1:5,2,1)),dpareto(1:5,2,1,TRUE))
++dpareto(1:6,1:2,1)
++dpareto(1,1,1)
++dpareto(1,1,1)
++dpareto <- function(x, alpha, beta, log = FALSE) {
++# Calculate the maximum length of inputs
++L <- max(length(x), length(alpha), length(beta))
++# Align all the inputs
++x <- rep(x, length.out = L)
++alpha <- rep(alpha, length.out = L)
++beta <- rep(beta, length.out = L)
++# Initialize the log densities with NaN
++logdens <- rep(NaN, length.out = L)
++for (i in 1:L) {
++if (alpha[i] <= 0 || beta[i] <= 0) {
++warning("NaNs produced")
++next
++} else if (x[i] <= alpha[i]) {
++logdens[i] <- log(0)
++} else {
++logdens[i] <- log(beta[i]) + beta[i]*log(alpha[i])-(beta[i]+1)*log(x[i])
++}
++}
++if (log) logdens else exp(logdens)
++}
++dpareto(3,-2, 1) # bad parameter
++dpareto(3,2, -1) # bar parameter
++stopifnot(all.equal(dpareto(3,2,1), 0.2222222222))
++stopifnot(all.equal(dpareto(1,2,3), 0.0))
++stopifnot(all.equal(dpareto(3:5,2, 1), c(0.2222222222, 0.1250000, 0.0800000)))
++stopifnot(all.equal(dpareto(1:5,2, 1), c(0.0, 0.0, 0.2222222222, 0.1250000, 0.0800000)))
++stopifnot(all.equal(dpareto(6,2:4, 1), c(0.05555555556, 0.08333333333, 0.11111111111)))
++stopifnot(all.equal(log(dpareto(1:5,2, 1)), dpareto(1:5,2, 1, log = TRUE)))
++stopifnot(all.equal(dpareto(1:6,1:2, 1),
++c(0.0, 0.0, 0.11111111111, 0.125, 0.04, 0.05555555556)))
++stopifnot(all.equal(dpareto(1, 2, 1:2), c(0, 0)))
++dpareto(3,-2, 1) # bad parameter
++dpareto(3,2, -1) # bar parameter
++stopifnot(all.equal(dpareto(3,2,1), 0.2222222222))
++stopifnot(all.equal(dpareto(1,2,3), 0.0))
++stopifnot(all.equal(dpareto(3:5,2, 1), c(0.2222222222, 0.1250000, 0.0800000)))
++stopifnot(all.equal(dpareto(1:5,2, 1), c(0.0, 0.0, 0.2222222222, 0.1250000, 0.0800000)))
++stopifnot(all.equal(dpareto(6,2:4, 1), c(0.05555555556, 0.08333333333, 0.11111111111)))
++stopifnot(all.equal(log(dpareto(1:5,2, 1)), dpareto(1:5,2, 1, log = TRUE)))
++stopifnot(all.equal(dpareto(1:6,1:2, 1),
++c(0.0, 0.0, 0.11111111111, 0.125, 0.04, 0.05555555556)))
++stopifnot(all.equal(dpareto(1, 2, 1:2), c(0, 1)))
++dpareto(3,-2, 1) # bad parameter
++dpareto(3,2, -1) # bar parameter
++stopifnot(all.equal(dpareto(3,2,1), 0.2222222222))
++stopifnot(all.equal(dpareto(1,2,3), 0.0))
++stopifnot(all.equal(dpareto(3:5,2, 1), c(0.2222222222, 0.1250000, 0.0800000)))
++stopifnot(all.equal(dpareto(1:5,2, 1), c(0.0, 0.0, 0.2222222222, 0.1250000, 0.0800000)))
++stopifnot(all.equal(dpareto(6,2:4, 1), c(0.05555555556, 0.08333333333, 0.11111111111)))
++stopifnot(all.equal(log(dpareto(1:5,2, 1)), dpareto(1:5,2, 1, log = TRUE)))
++stopifnot(all.equal(dpareto(1:6,1:2, 1),
++c(0.0, 0.0, 0.11111111111, 0.115, 0.04, 0.05555555556)))
++stopifnot(all.equal(dpareto(1, 2, 1:2), c(0, 0)))
++x <- 0
++x <- ifelse(TRUE,warning("test",99))
++x
++ifelse(TRUE,warning("test",99))
++ifelse(TRUE,warning("test"),99)
++ifelse(TRUE,warning("test"),99)
++? ifelse
++? dgamma
++dgamma
++dpareto(,3,3)
++dpareto(,-3,3)
++dpareto(1,-3,3)
++dpareto(1:1000,3,3)
++dpareto(1:1000,c(-1,1),3)
++dgamma(1:1000,c(-1,1),3)
++? all.equal
++all.equal(1,1)
++all.equal(1,2)
++is.nan(1)
++is.nan(c(1,2))
++is.nan(c(1,NaN))
++? is.na.numeric_version
++Inf
++Inf
++-Inf
++Inf-Inf
++-Inf-Inf
++is.nan(NaN)
++is.nan(Inf)
++dpareto <- function(x, alpha, beta, log = FALSE) {
++# Calculate the maximum length of inputs
++L <- max(length(x), length(alpha), length(beta))
++# Align all the inputs
++x <- rep(x, length.out = L)
++alpha <- rep(alpha, length.out = L)
++beta <- rep(beta, length.out = L)
++logdens <- ifelse(alpha<=0 || beta<=0,
++NaN,
++ifelse(x<=alpha,
++log(0),
++log(beta) + beta*log(alpha)-(beta+1)*log(x))
++)
++#Check whether NaN exists
++if (sum(is.nan(logdens))) warning("NaNs produced")
++if (log) logdens else exp(logdens)
++}
++dpareto(3,-2, 1) # bad parameter
++dpareto(3,2, -1) # bar parameter
++stopifnot(all.equal(dpareto(3,2,1), 0.2222222222))
++stopifnot(all.equal(dpareto(1,2,3), 0.0))
++stopifnot(all.equal(dpareto(3:5,2, 1), c(0.2222222222, 0.1250000, 0.0800000)))
++stopifnot(all.equal(dpareto(1:5,2, 1), c(0.0, 0.0, 0.2222222222, 0.1250000, 0.0800000)))
++stopifnot(all.equal(dpareto(6,2:4, 1), c(0.05555555556, 0.08333333333, 0.11111111111)))
++stopifnot(all.equal(log(dpareto(1:5,2, 1)), dpareto(1:5,2, 1, log = TRUE)))
++stopifnot(all.equal(dpareto(1:6,1:2, 1),
++c(0.0, 0.0, 0.11111111111, 0.125, 0.04, 0.05555555556)))
++stopifnot(all.equal(dpareto(1, 2, 1:2), c(0, 0)))
++dpareto(3:5,2,1)
++dpareto <- function(x, a, b, log = FALSE) {
++nx <- length(x)
++na <- length(a)
++nb <- length(b)
++n <- max(nx, na, nb)
++if (nx < n) x <- rep(x, length.out = n)
++if (na < n) a <- rep(a, length.out = n)
++if (nb < n) b <- rep(b, length.out = n)
++ld <- ifelse(a > 0 & b > 0,
++ifelse(x > a,
++log(b) + b * log(a) - (b + 1) * log(x),
++log(0)),
++NaN)
++if (log) ld
++else exp(ld)
++}
++dpareto(3,-2, 1) # bad parameter
++dpareto(3,2, -1) # bar parameter
++stopifnot(all.equal(dpareto(3,2,1), 0.2222222222))
++stopifnot(all.equal(dpareto(1,2,3), 0.0))
++stopifnot(all.equal(dpareto(3:5,2, 1), c(0.2222222222, 0.1250000, 0.0800000)))
++stopifnot(all.equal(dpareto(1:5,2, 1), c(0.0, 0.0, 0.2222222222, 0.1250000, 0.0800000)))
++stopifnot(all.equal(dpareto(6,2:4, 1), c(0.05555555556, 0.08333333333, 0.11111111111)))
++stopifnot(all.equal(log(dpareto(1:5,2, 1)), dpareto(1:5,2, 1, log = TRUE)))
++stopifnot(all.equal(dpareto(1:6,1:2, 1),
++c(0.0, 0.0, 0.11111111111, 0.125, 0.04, 0.05555555556)))
++stopifnot(all.equal(dpareto(1, 2, 1:2), c(0, 0)))
++dpareto <- function(x, alpha, beta, log = FALSE) {
++# Calculate the maximum length of inputs
++L <- max(length(x), length(alpha), length(beta))
++# Align all the inputs
++x <- rep(x, length.out = L)
++alpha <- rep(alpha, length.out = L)
++beta <- rep(beta, length.out = L)
++logdens <- ifelse(alpha<=0 || beta<=0,
++NaN,
++ifelse(x<=alpha,
++log(0),
++log(beta) + beta*log(alpha)-(beta+1)*log(x))
++)
++#Check whether NaN exists
++if (sum(is.nan(logdens))) warning("NaNs produced")
++if (log) logdens else exp(logdens)
++}
++dpareto(2,-1,2)
++dpareto(2,1:2,2)
++dpareto(2,1,2)
++a <- 1:5
++a
++b <- c(3,3,3,3,3)
++ifelse(a<b,TRUE.FALSE)
++ifelse(a<b,TRUE,FALSE)
++dpareto(3,2,1)
++dpareto(4,2,1)
++dpareto(5,2,1)
++dpareto(3:5,2,1)
++dpareto(3:5,2,1.TRUE)
++dpareto(3:5,2,1,TRUE)
++? ifelse
++dpareto <- function(x, alpha, beta, log = FALSE) {
++# Calculate the maximum length of inputs
++L <- max(length(x), length(alpha), length(beta))
++# Align all the inputs
++x <- rep(x, length.out = L)
++alpha <- rep(alpha, length.out = L)
++beta <- rep(beta, length.out = L)
++logdens <- ifelse(alpha<=0 | beta<=0,
++NaN,
++ifelse(x<=alpha,
++log(0),
++log(beta) + beta*log(alpha)-(beta+1)*log(x))
++)
++#Check whether NaN exists
++if (sum(is.nan(logdens))) warning("NaNs produced")
++if (log) logdens else exp(logdens)
++}
++dpareto(3,-2, 1) # bad parameter
++dpareto(3,2, -1) # bar parameter
++stopifnot(all.equal(dpareto(3,2,1), 0.2222222222))
++stopifnot(all.equal(dpareto(1,2,3), 0.0))
++stopifnot(all.equal(dpareto(3:5,2, 1), c(0.2222222222, 0.1250000, 0.0800000)))
++stopifnot(all.equal(dpareto(1:5,2, 1), c(0.0, 0.0, 0.2222222222, 0.1250000, 0.0800000)))
++stopifnot(all.equal(dpareto(6,2:4, 1), c(0.05555555556, 0.08333333333, 0.11111111111)))
++stopifnot(all.equal(log(dpareto(1:5,2, 1)), dpareto(1:5,2, 1, log = TRUE)))
++stopifnot(all.equal(dpareto(1:6,1:2, 1),
++c(0.0, 0.0, 0.11111111111, 0.125, 0.04, 0.05555555556)))
++stopifnot(all.equal(dpareto(1, 2, 1:2), c(0, 0)))
++dpareto(3:5,2,1)
++tidy_source()
++tidy_source()
++tidy_source("dpareto.R")
++dpareto <- function(x, alpha, beta, log = FALSE) {
++# Calculate the maximum length of inputs
++L <- max(length(x), length(alpha), length(beta))
++# Align all the inputs
++x <- rep(x, length.out = L)
++alpha <- rep(alpha, length.out = L)
++beta <- rep(beta, length.out = L)
++logdens <- ifelse(alpha <= 0 | beta <= 0,
++NaN,
++ifelse(x <= alpha,
++log(0),
++log(beta) + beta * log(alpha) - (beta + 1) * log(x)))
++# Check whether NaN exists
++if (sum(is.nan(logdens)))
++warning("NaNs produced")
++if (log) logdens else exp(logdens)
++}
++dpareto(3,-2, 1) # bad parameter
++dpareto(3,2, -1) # bar parameter
++stopifnot(all.equal(dpareto(3,2,1), 0.2222222222))
++stopifnot(all.equal(dpareto(1,2,3), 0.0))
++stopifnot(all.equal(dpareto(3:5,2, 1), c(0.2222222222, 0.1250000, 0.0800000)))
++stopifnot(all.equal(dpareto(1:5,2, 1), c(0.0, 0.0, 0.2222222222, 0.1250000, 0.0800000)))
++stopifnot(all.equal(dpareto(6,2:4, 1), c(0.05555555556, 0.08333333333, 0.11111111111)))
++stopifnot(all.equal(log(dpareto(1:5,2, 1)), dpareto(1:5,2, 1, log = TRUE)))
++stopifnot(all.equal(dpareto(1:6,1:2, 1),
++c(0.0, 0.0, 0.11111111111, 0.125, 0.04, 0.05555555556)))
++stopifnot(all.equal(dpareto(1, 2, 1:2), c(0, 0)))
++dpareto(3, 2, 1)
++dpareto(1, 2, 3)
++dpareto(3, -2, 1)
++dpareto(3, 2, -1)
++dpareto(3 : 5, 2, 1)
++dpareto(1 : 5, 2, 1)
++dpareto(6, 2 : 4, 1)
++dpareto(3, 2, 1, log = TRUE)
++? plot.stepfun
++example(plot.stepfun)
++x <- seq(-5,5,length=1001)
++y = 1/x
++lines(x,y)
++plot.new()
++plot.window(xlim=c(-4, 4), ylim=c(-4, 4))
++lines(x, y)
++plot(x,y)
++plot(x,y,type="l")
++x <- seq(0,10,length=100)
++x <- seq(0,10,length=1000)
++x <- seq(0,10,length=1001)
++y <- dpareto(x,1,1)
++plot(x,y)
++plot(x,y,type="l")
++? seq
++x1 <- seq(0,1,0.01)
++x2 <- seq(1.01,10,0.01)
++y1 <- dpareto(x1,1,1)
++y2 <- dpareto(x2,1,1)
++plot(x1,y1,tyoe="l")
++x1 <- seq(0,1,0.01)
++x2 <- seq(1.01,10,0.01)
++y1 <- dpareto(x1,1,1)
++y2 <- dpareto(x2,1,1)
++plot(x1,y1,type="l")
++x1 <- seq(0,1,0.01)
++x2 <- seq(1.01,10,0.01)
++y1 <- dpareto(x1,1,1)
++y2 <- dpareto(x2,1,1)
++plot(x1,y1,type="l")
++x1 <- seq(0,1,0.01)
++x2 <- seq(1.01,10,0.01)
++y1 <- dpareto(x1,1,1)
++y2 <- dpareto(x2,1,1)
++plot(x1,y1,type="l")
++range(x1)
++x1 <- seq(0,1,0.01)
++x2 <- seq(1.01,10,0.01)
++y1 <- dpareto(x1,1,1)
++y2 <- dpareto(x2,1,1)
++plot(x1,y1,xlim=range(c(x1,x2)),ylim=range(c(y1,y2)),type="l")
++lines(x2,y2)
++x1 <- seq(0,1,0.01)
++x2 <- seq(1.01,10,0.01)
++y1 <- dpareto(x1,1,1)
++y2 <- dpareto(x2,1,1)
++plot(x1,y1,xlim=range(c(x1,x2)),ylim=range(c(y1,y2)),type="l")
++lines(x2,y2)
+diff --git a/HW2/HW2.docx b/HW2/HW2.docx
+new file mode 100644
+index 0000000..e910bb4
+Binary files /dev/null and b/HW2/HW2.docx differ
+diff --git a/HW2/HW2.pdf b/HW2/HW2.pdf
+new file mode 100644
+index 0000000..f38ffd3
+Binary files /dev/null and b/HW2/HW2.pdf differ
+diff --git a/HW2/HW2_plot.R b/HW2/HW2_plot.R
+new file mode 100644
+index 0000000..2eaf006
+--- /dev/null
++++ b/HW2/HW2_plot.R
+@@ -0,0 +1,16 @@
++x1 <- seq(0,1,0.01)
++x2 <- seq(1.01,10,0.01)
++y1 <- dpareto(x1,1,1)
++y2 <- dpareto(x2,1,1)
++
++x3 <- seq(0,2,0.01)
++x4 <- seq(2.01,10,0.01)
++y3 <- dpareto(x3,2,3)
++y4 <- dpareto(x4,2,3)
++
++
++plot(x1,y1,xlim=range(c(x1,x2,x3,x4)),ylim=range(c(y1,y2,y3,y4)),type="l",col="red",xlab="x",ylab="density",main="Pareto Distribution")
++lines(x2,y2,col="red")
++lines(x3,y3,col="blue",lty=2)
++lines(x4,y4,col="blue",lty=2)
++legend("topright",legend=c("scale=1,shape=1","scale=2,shape=3"),lty=c(1,2),col=c("red","blue"))
+diff --git a/HW2/pareto.png b/HW2/pareto.png
+new file mode 100644
+index 0000000..81ac030
+Binary files /dev/null and b/HW2/pareto.png differ
+diff --git a/HW2/paretodensDotC.R b/HW2/paretodensDotC.R
+new file mode 100644
+index 0000000..2df9396
+--- /dev/null
++++ b/HW2/paretodensDotC.R
+@@ -0,0 +1,13 @@
++paretodensDotC <- function(x, alpha, beta, log = FALSE) {
++    nx <- length(x)
++    nalpha <- length(alpha)
++    nbeta <- length(beta)
++    n <- max(nx, nalpha, nbeta)
++    
++    result <- .C("paretodensDotC",
++                 as.double(x), as.integer(nx),
++                 as.double(alpha), as.integer(nalpha), 
++                 as.double(beta), as.integer(nbeta),
++                 dens = double(n), as.integer(log))
++    result$dens
++}
+\ No newline at end of file
+diff --git a/HW2/paretodensDotC.c b/HW2/paretodensDotC.c
+new file mode 100644
+index 0000000..895c044
+--- /dev/null
++++ b/HW2/paretodensDotC.c
+@@ -0,0 +1,48 @@
++#include <math.h>
++#include <R.h>
++#ifndef max
++#define max( a, b ) ( ((a) > (b)) ? (a) : (b) )
++#endif
++
++/*Define parto density function*/
++void paretodensDotC(double *x, int *nx, double *alpha, int *nalpha,
++                    double *beta, int *nbeta, double *dens, int *lg)
++{
++    /*Calculate the maximum input length */
++    int i, n = max(max(nx[0], nalpha[0]), nbeta[0]), flag = 0, ind[3];
++    double ldens[n];
++
++    for (i = 0; i < n; i++) {
++        ind[0] = i % nx[0];
++        ind[1] = i % nalpha[0];
++        ind[2] = i % nbeta[0];
++
++        /*Calculate whether alpha and beta are meaningful */
++        if (alpha[ind[1]] <= 0 || beta[ind[2]] <= 0) {
++            ldens[i] = NAN;
++            flag++;
++        }
++        /*Check whether x is greater than alpha */
++        else if (x[ind[0]] <= alpha[ind[1]]) {
++            ldens[i] = log(0);
++        }
++        else {
++            ldens[i] =
++                log(beta[ind[2]]) + beta[ind[2]] * log(alpha[ind[1]]) -
++                (beta[ind[2]] + 1) * log(x[ind[0]]);
++        }
++
++        if (lg[0] == 0) {
++            dens[i] = exp(ldens[i]);
++        }
++        else {
++            dens[i] = ldens[i];
++        }
++
++    }
++    /*Check whether NaNs exist */
++    if (flag > 0) {
++        warning("NaNs produced");
++    }
++
++}
+diff --git a/HW2/paretodensDotC.o b/HW2/paretodensDotC.o
+new file mode 100644
+index 0000000..0b10e72
+Binary files /dev/null and b/HW2/paretodensDotC.o differ
+diff --git a/HW2/paretodensDotC.so b/HW2/paretodensDotC.so
+new file mode 100755
+index 0000000..cd3bea7
+Binary files /dev/null and b/HW2/paretodensDotC.so differ
+
+commit eb3a3b5dbdd8ff1dcc816dab90c8a406f28e365f
+Author: Yiheng Liu <yiheng-liu@uiowa.edu>
+Date:   Sun Jan 29 21:34:05 2017 -0600
+
+    Files deleted
+
+diff --git a/HW2/HW1.docx b/HW2/HW1.docx
+deleted file mode 100644
+index 9a20ea8..0000000
+Binary files a/HW2/HW1.docx and /dev/null differ
+
+commit d1916d561c23328c9804daf189927d3b4bb10392
+Author: Yiheng Liu <yiheng-liu@uiowa.edu>
+Date:   Sun Jan 29 21:31:13 2017 -0600
+
+    Add dpareto.R in HW2
+
+diff --git a/HW1.tar.gz b/HW1.tar.gz
+new file mode 100644
+index 0000000..f7664e6
+Binary files /dev/null and b/HW1.tar.gz differ
+diff --git a/HW2/HW1.docx b/HW2/HW1.docx
+new file mode 100644
+index 0000000..9a20ea8
+Binary files /dev/null and b/HW2/HW1.docx differ
+diff --git a/HW2/dpareto.R b/HW2/dpareto.R
+new file mode 100644
+index 0000000..e601dd3
+--- /dev/null
++++ b/HW2/dpareto.R
+@@ -0,0 +1,22 @@
++dpareto <- function(x, alpha, beta, log = FALSE) {
++    
++    # Calculate the maximum length of inputs
++    L <- max(length(x), length(alpha), length(beta))
++    
++    # Align all the inputs
++    x <- rep(x, length.out = L)
++    alpha <- rep(alpha, length.out = L)
++    beta <- rep(beta, length.out = L)
++    
++    logdens <- ifelse(alpha <= 0 | beta <= 0,
++                      NaN,
++                      ifelse(x <= alpha,
++                             log(0),
++                             log(beta) + beta * log(alpha) - (beta + 1) * log(x)))
++    
++    # Check whether NaNs exist
++    if (sum(is.nan(logdens))) 
++        warning("NaNs produced")
++    
++    if (log) logdens else exp(logdens)
++}
+\ No newline at end of file
+
+commit bd7cf525dbc5f5fe76c4b945f393f69956870d76
+Author: Yiheng Liu <yiheng-liu@uiowa.edu>
+Date:   Mon Jan 23 15:16:07 2017 -0600
+
+    Add git log files
+
+diff --git a/HW1/hw1-gitlog.txt b/HW1/hw1-gitlog.txt
+new file mode 100644
+index 0000000..933527a
+--- /dev/null
++++ b/HW1/hw1-gitlog.txt
+@@ -0,0 +1,186 @@
++commit 0702cc2782a0134bf34e8982cea447fc3b478d8b
++Author: Yiheng Liu <yiheng-liu@uiowa.edu>
++Date:   Mon Jan 23 15:08:41 2017 -0600
++
++    Add HW1 writeup
++
++diff --git a/HW1/HW1.docx b/HW1/HW1.docx
++new file mode 100644
++index 0000000..9a20ea8
++Binary files /dev/null and b/HW1/HW1.docx differ
++diff --git a/HW1/HW1.pdf b/HW1/HW1.pdf
++new file mode 100644
++index 0000000..14c506a
++Binary files /dev/null and b/HW1/HW1.pdf differ
++
++commit 03f5add2b9186e44dc5f8f821004600e632d0abf
++Author: Yiheng Liu <yiheng-liu@uiowa.edu>
++Date:   Mon Jan 23 14:58:37 2017 -0600
++
++    Add dpareto function
++
++diff --git a/HW1/dpareto.r b/HW1/dpareto.r
++new file mode 100644
++index 0000000..7dccd9e
++--- /dev/null
+++++ b/HW1/dpareto.r
++@@ -0,0 +1,27 @@
+++dpareto <- function(x,alpha,beta){
+++  
+++  #Calculate the maximum length of inputs
+++  L <- max(length(x), length(alpha), length(beta))
+++  
+++  #Align all the inputs
+++  x <- rep(x,length.out = L)
+++  alpha <- rep(alpha,length.out = L)
+++  beta <- rep(beta,length.out = L)
+++  
+++  #Initialize the densities with NaN
+++  dens <- rep(NaN, length.out = L)
+++
+++  for (i in 1:L){
+++    if (alpha[i] <= 0 || beta[i] <= 0){
+++      warning("NaNs produced")
+++      next
+++    } else if (x[i] < alpha[i]){
+++      dens[i] <- 0
+++    } else{
+++      dens[i] <- beta[i]*alpha[i]^beta[i]/x[i]^(beta[i]+1)
+++    }
+++  }
+++  return(dens)
+++}
+++
+++
++
++commit e11a24425f04f2a7df586c0640bd45e3ba555dbb
++Author: Yiheng Liu <yiheng-liu@uiowa.edu>
++Date:   Sun Jan 22 21:58:51 2017 -0600
++
++    Add pareto density function programmed by C
++
++diff --git a/HW1/paretodens b/HW1/paretodens
++new file mode 100755
++index 0000000..1f49c22
++Binary files /dev/null and b/HW1/paretodens differ
++diff --git a/HW1/paretodens.c b/HW1/paretodens.c
++new file mode 100644
++index 0000000..4d5713d
++--- /dev/null
+++++ b/HW1/paretodens.c
++@@ -0,0 +1,34 @@
+++#include <stdio.h>
+++#include <math.h>
+++
+++/*Define parto density function*/
+++double paretodens(double x, double alpha, double beta) {
+++    /*Check whether alpha and beta are positve*/
+++    if (alpha <=0 || beta <= 0){
+++        printf("Warning message: The parameters are not meaningful! NaN produced!\n");
+++        return NAN;
+++    }
+++    /*Check whether x is greater than alpha*/
+++    else if (x < alpha){
+++        return 0;
+++    }
+++    else {
+++        return beta*pow(alpha,beta)/pow(x,beta+1);
+++    }
+++}
+++
+++int main() {
+++    double x,alpha,beta;
+++
+++    printf("Input x:\n");
+++    scanf("%lf",&x);
+++
+++    printf("Input alpha:\n");
+++    scanf("%lf",&alpha);
+++
+++    printf("Input beta:\n");
+++    scanf("%lf",&beta);
+++
+++    printf("The density is %lf.\n", paretodens(x,alpha,beta));
+++    return 0;
+++}
++diff --git a/HW1/paretodens.o b/HW1/paretodens.o
++new file mode 100644
++index 0000000..07ef60d
++Binary files /dev/null and b/HW1/paretodens.o differ
++
++commit 5f64ebb53b7436bb773fc116688642a2bd92cca8
++Author: Yiheng Liu <yiheng-liu@uiowa.edu>
++Date:   Sun Jan 22 18:59:30 2017 -0600
++
++     Update
++
++diff --git a/code.r b/code.r
++deleted file mode 100644
++index 49ec3f8..0000000
++--- a/code.r
+++++ /dev/null
++@@ -1,2 +0,0 @@
++-hello
++-c world
++\ No newline at end of file
++diff --git a/doc.txt b/doc.txt
++deleted file mode 100644
++index 7f33c13..0000000
++--- a/doc.txt
+++++ /dev/null
++@@ -1 +0,0 @@
++-This file documents the code for this project.
++\ No newline at end of file
++
++commit 1c9eca2d8c5c766b08402d4ad6a06e63c4a77734
++Merge: 8c388ae 388af1d
++Author: Yiheng Liu <yiheng-liu@uiowa.edu>
++Date:   Thu Jan 19 16:04:26 2017 -0600
++
++    Add documenttaion file
++
++commit 388af1d2bc5db748845edc1cf05b6b1d280ef088
++Author: Yiheng Liu <yiheng-liu@uiowa.edu>
++Date:   Thu Jan 19 15:53:59 2017 -0600
++
++    Add documentation file
++
++diff --git a/doc.txt b/doc.txt
++new file mode 100644
++index 0000000..7f33c13
++--- /dev/null
+++++ b/doc.txt
++@@ -0,0 +1 @@
+++This file documents the code for this project.
++\ No newline at end of file
++
++commit 8c388ae15e8b8e97b2b933c10ad46d286925624d
++Author: Yiheng Liu <yiheng-liu@uiowa.edu>
++Date:   Thu Jan 19 15:42:15 2017 -0600
++
++    hello
++
++diff --git a/code.r b/code.r
++new file mode 100644
++index 0000000..49ec3f8
++--- /dev/null
+++++ b/code.r
++@@ -0,0 +1,2 @@
+++hello
+++c world
++\ No newline at end of file
++
++commit 9fe14bce78f820ff396be39b549bc46903d44191
++Author: Tierney, Luke <luke-tierney@uiowa.edu>
++Date:   Thu Jan 19 10:54:54 2017 -0600
++
++    Initial commit
++
++diff --git a/README.md b/README.md
++new file mode 100644
++index 0000000..dab0a03
++--- /dev/null
+++++ b/README.md
++@@ -0,0 +1 @@
+++# yliu255
++\ No newline at end of file
+
+commit 0702cc2782a0134bf34e8982cea447fc3b478d8b
+Author: Yiheng Liu <yiheng-liu@uiowa.edu>
+Date:   Mon Jan 23 15:08:41 2017 -0600
+
+    Add HW1 writeup
+
+diff --git a/HW1/HW1.docx b/HW1/HW1.docx
+new file mode 100644
+index 0000000..9a20ea8
+Binary files /dev/null and b/HW1/HW1.docx differ
+diff --git a/HW1/HW1.pdf b/HW1/HW1.pdf
+new file mode 100644
+index 0000000..14c506a
+Binary files /dev/null and b/HW1/HW1.pdf differ
+
+commit 03f5add2b9186e44dc5f8f821004600e632d0abf
+Author: Yiheng Liu <yiheng-liu@uiowa.edu>
+Date:   Mon Jan 23 14:58:37 2017 -0600
+
+    Add dpareto function
+
+diff --git a/HW1/dpareto.r b/HW1/dpareto.r
+new file mode 100644
+index 0000000..7dccd9e
+--- /dev/null
++++ b/HW1/dpareto.r
+@@ -0,0 +1,27 @@
++dpareto <- function(x,alpha,beta){
++  
++  #Calculate the maximum length of inputs
++  L <- max(length(x), length(alpha), length(beta))
++  
++  #Align all the inputs
++  x <- rep(x,length.out = L)
++  alpha <- rep(alpha,length.out = L)
++  beta <- rep(beta,length.out = L)
++  
++  #Initialize the densities with NaN
++  dens <- rep(NaN, length.out = L)
++
++  for (i in 1:L){
++    if (alpha[i] <= 0 || beta[i] <= 0){
++      warning("NaNs produced")
++      next
++    } else if (x[i] < alpha[i]){
++      dens[i] <- 0
++    } else{
++      dens[i] <- beta[i]*alpha[i]^beta[i]/x[i]^(beta[i]+1)
++    }
++  }
++  return(dens)
++}
++
++
+
+commit e11a24425f04f2a7df586c0640bd45e3ba555dbb
+Author: Yiheng Liu <yiheng-liu@uiowa.edu>
+Date:   Sun Jan 22 21:58:51 2017 -0600
+
+    Add pareto density function programmed by C
+
+diff --git a/HW1/paretodens b/HW1/paretodens
+new file mode 100755
+index 0000000..1f49c22
+Binary files /dev/null and b/HW1/paretodens differ
+diff --git a/HW1/paretodens.c b/HW1/paretodens.c
+new file mode 100644
+index 0000000..4d5713d
+--- /dev/null
++++ b/HW1/paretodens.c
+@@ -0,0 +1,34 @@
++#include <stdio.h>
++#include <math.h>
++
++/*Define parto density function*/
++double paretodens(double x, double alpha, double beta) {
++    /*Check whether alpha and beta are positve*/
++    if (alpha <=0 || beta <= 0){
++        printf("Warning message: The parameters are not meaningful! NaN produced!\n");
++        return NAN;
++    }
++    /*Check whether x is greater than alpha*/
++    else if (x < alpha){
++        return 0;
++    }
++    else {
++        return beta*pow(alpha,beta)/pow(x,beta+1);
++    }
++}
++
++int main() {
++    double x,alpha,beta;
++
++    printf("Input x:\n");
++    scanf("%lf",&x);
++
++    printf("Input alpha:\n");
++    scanf("%lf",&alpha);
++
++    printf("Input beta:\n");
++    scanf("%lf",&beta);
++
++    printf("The density is %lf.\n", paretodens(x,alpha,beta));
++    return 0;
++}
+diff --git a/HW1/paretodens.o b/HW1/paretodens.o
+new file mode 100644
+index 0000000..07ef60d
+Binary files /dev/null and b/HW1/paretodens.o differ
+
+commit 5f64ebb53b7436bb773fc116688642a2bd92cca8
+Author: Yiheng Liu <yiheng-liu@uiowa.edu>
+Date:   Sun Jan 22 18:59:30 2017 -0600
+
+     Update
+
+diff --git a/code.r b/code.r
+deleted file mode 100644
+index 49ec3f8..0000000
+--- a/code.r
++++ /dev/null
+@@ -1,2 +0,0 @@
+-hello
+-c world
+\ No newline at end of file
+diff --git a/doc.txt b/doc.txt
+deleted file mode 100644
+index 7f33c13..0000000
+--- a/doc.txt
++++ /dev/null
+@@ -1 +0,0 @@
+-This file documents the code for this project.
+\ No newline at end of file
+
+commit 1c9eca2d8c5c766b08402d4ad6a06e63c4a77734
+Merge: 8c388ae 388af1d
+Author: Yiheng Liu <yiheng-liu@uiowa.edu>
+Date:   Thu Jan 19 16:04:26 2017 -0600
+
+    Add documenttaion file
+
+commit 388af1d2bc5db748845edc1cf05b6b1d280ef088
+Author: Yiheng Liu <yiheng-liu@uiowa.edu>
+Date:   Thu Jan 19 15:53:59 2017 -0600
+
+    Add documentation file
+
+diff --git a/doc.txt b/doc.txt
+new file mode 100644
+index 0000000..7f33c13
+--- /dev/null
++++ b/doc.txt
+@@ -0,0 +1 @@
++This file documents the code for this project.
+\ No newline at end of file
+
+commit 8c388ae15e8b8e97b2b933c10ad46d286925624d
+Author: Yiheng Liu <yiheng-liu@uiowa.edu>
+Date:   Thu Jan 19 15:42:15 2017 -0600
+
+    hello
+
+diff --git a/code.r b/code.r
+new file mode 100644
+index 0000000..49ec3f8
+--- /dev/null
++++ b/code.r
+@@ -0,0 +1,2 @@
++hello
++c world
+\ No newline at end of file
+
+commit 9fe14bce78f820ff396be39b549bc46903d44191
+Author: Tierney, Luke <luke-tierney@uiowa.edu>
+Date:   Thu Jan 19 10:54:54 2017 -0600
+
+    Initial commit
+
+diff --git a/README.md b/README.md
+new file mode 100644
+index 0000000..dab0a03
+--- /dev/null
++++ b/README.md
+@@ -0,0 +1 @@
++# yliu255
+\ No newline at end of file
