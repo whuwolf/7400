@@ -1,0 +1,5024 @@
+commit a5d70de1164aeee29f64496e32e815993445ba95
+Author: Yiheng Liu <yiheng-liu@uiowa.edu>
+Date:   Mon Feb 6 15:09:47 2017 -0600
+
+    Modify HW3 files
+
+diff --git a/.Rhistory b/.Rhistory
+new file mode 100644
+index 0000000..8e97f8a
+--- /dev/null
++++ b/.Rhistory
+@@ -0,0 +1,5 @@
++install.packages("~/s7400/STAT7400/pareto_1.0-1.tar.gz", repos = NULL, type = "source")
++library(pareto)
++? dpareto
++dpareto(1:5, 2, 1)
++dpareto(1:5, 2, 1, log = TRUE)
+diff --git a/HW3/.~lock.HW3.docx# b/HW3/.~lock.HW3.docx#
+deleted file mode 100644
+index 5eb5a63..0000000
+--- a/HW3/.~lock.HW3.docx#
++++ /dev/null
+@@ -1 +0,0 @@
+-,yliu255,r-lnx401.stat.uiowa.edu,06.02.2017 13:33,file:///mnt/nfs/netapp2/grad/yliu255/.config/libreoffice/4;
+\ No newline at end of file
+diff --git a/HW3/HW3.docx b/HW3/HW3.docx
+index 0e3b3c0..b674aa1 100644
+Binary files a/HW3/HW3.docx and b/HW3/HW3.docx differ
+diff --git a/HW3/HW3.pdf b/HW3/HW3.pdf
+new file mode 100644
+index 0000000..cb13b5f
+Binary files /dev/null and b/HW3/HW3.pdf differ
+diff --git a/pareto.Rcheck/00_pkg_src/pareto/DESCRIPTION b/pareto.Rcheck/00_pkg_src/pareto/DESCRIPTION
+new file mode 100644
+index 0000000..764dd47
+--- /dev/null
++++ b/pareto.Rcheck/00_pkg_src/pareto/DESCRIPTION
+@@ -0,0 +1,11 @@
++Package: pareto
++Type: Package
++Title: Density Function for Pareto Distribution
++Version: 1.0-1
++Date: 2017-02-04
++Author: Yiheng Liu
++Maintainer: Yiheng Liu <yiheng-liu@uiowa.edu>
++Description: Density function for the pareto distribution with scale equal to alpha and shape equal to beta.
++License: GPL (>=2)
++NeedsCompilation: no
++Packaged: 2017-02-06 20:46:20 UTC; yliu255
+diff --git a/pareto.Rcheck/00_pkg_src/pareto/NAMESPACE b/pareto.Rcheck/00_pkg_src/pareto/NAMESPACE
+new file mode 100644
+index 0000000..5aec65d
+--- /dev/null
++++ b/pareto.Rcheck/00_pkg_src/pareto/NAMESPACE
+@@ -0,0 +1 @@
++export(dpareto)
+diff --git a/pareto.Rcheck/00_pkg_src/pareto/R/dpareto.R b/pareto.Rcheck/00_pkg_src/pareto/R/dpareto.R
+new file mode 100644
+index 0000000..e601dd3
+--- /dev/null
++++ b/pareto.Rcheck/00_pkg_src/pareto/R/dpareto.R
+@@ -0,0 +1,22 @@
++dpareto <- function(x, alpha, beta, log = FALSE) {
++    
++    # Calculate the maximum length of inputs
++    L <- max(length(x), length(alpha), length(beta))
++    
++    # Align all the inputs
++    x <- rep(x, length.out = L)
++    alpha <- rep(alpha, length.out = L)
++    beta <- rep(beta, length.out = L)
++    
++    logdens <- ifelse(alpha <= 0 | beta <= 0,
++                      NaN,
++                      ifelse(x <= alpha,
++                             log(0),
++                             log(beta) + beta * log(alpha) - (beta + 1) * log(x)))
++    
++    # Check whether NaNs exist
++    if (sum(is.nan(logdens))) 
++        warning("NaNs produced")
++    
++    if (log) logdens else exp(logdens)
++}
+\ No newline at end of file
+diff --git a/pareto.Rcheck/00_pkg_src/pareto/README b/pareto.Rcheck/00_pkg_src/pareto/README
+new file mode 100644
+index 0000000..8033359
+--- /dev/null
++++ b/pareto.Rcheck/00_pkg_src/pareto/README
+@@ -0,0 +1 @@
++This is a simple package with a function to calcualte the density of pareto distribtuion.
+diff --git a/pareto.Rcheck/00_pkg_src/pareto/man/dpareto.Rd b/pareto.Rcheck/00_pkg_src/pareto/man/dpareto.Rd
+new file mode 100644
+index 0000000..be4016a
+--- /dev/null
++++ b/pareto.Rcheck/00_pkg_src/pareto/man/dpareto.Rd
+@@ -0,0 +1,51 @@
++\name{dpareto}
++\alias{dpareto}
++%- Also NEED an '\alias' for EACH other topic documented here.
++\title{The Pareto Distribution}
++\description{
++  Density function for the pareto distribution with scale equal to \code{alpha} and shape equal to \code{beta}.
++}
++\usage{
++dpareto(x, alpha, beta, log = FALSE)
++}
++%- maybe also 'usage' for other objects documented here.
++\arguments{
++  \item{x}{
++  vector of quantiles.
++}
++  \item{alpha}{
++  scale parameters. Must be positive.
++}
++  \item{beta}{
++  shape parameters. Must be positive.
++}
++  \item{log}{
++  logical; if TRUE, probabilities \code{p} are given as \code{log(p)}.
++}
++}
++\details{
++  The pareto distribution has density
++    \deqn{f(x) = \frac{\beta \alpha^{\beta}}{x^{\beta+1}}}{%
++    f(x) = \beta \alpha^\beta/x^(\beta+1)}
++  where \eqn{0 < \alpha < x} and \eqn{\beta > 0}.
++}
++\value{
++  \code{dpareto} gives the density.\cr
++
++  Invalid arguments will result in return value NaN, with a warning.\cr
++
++  The length of the result is the maximum of the lengths of the numerical arguments.\cr
++
++  The numerical arguments are recycled to the length of the result. Only the first element of the logical argument is used.
++}
++
++\author{Yiheng Liu}
++
++\examples{
++dpareto(4, 2, 1)
++dpareto(1:5, 2, 1)
++dpareto(1:5, 2, 1, log = TRUE)
++}
++% Add one or more standard keywords, see file 'KEYWORDS' in the
++% R documentation directory.
++\keyword{distribution}
+diff --git a/pareto.Rcheck/00_pkg_src/pareto/tests/tests.R b/pareto.Rcheck/00_pkg_src/pareto/tests/tests.R
+new file mode 100644
+index 0000000..049ceb2
+--- /dev/null
++++ b/pareto.Rcheck/00_pkg_src/pareto/tests/tests.R
+@@ -0,0 +1,11 @@
++library(pareto)
++stopifnot(all.equal(dpareto(3, -2, 1), NaN))
++stopifnot(all.equal(dpareto(3, 2, -1), NaN))
++stopifnot(all.equal(dpareto(3, 2, 1), 0.2222222222))
++stopifnot(all.equal(dpareto(1, 2, 3), 0))
++stopifnot(all.equal(dpareto(3:5, 2, 1), c(0.2222222222, 0.125, 0.08)))
++stopifnot(all.equal(dpareto(1:5, 2, 1), c(0, 0, 0.2222222222, 0.125, 0.08)))
++stopifnot(all.equal(dpareto(6, 2:4, 1), c(0.05555555556, 0.08333333333, 0.11111111111)))
++stopifnot(all.equal(log(dpareto(1:5, 2, 1)), dpareto(1:5, 2, 1, log = TRUE)))
++stopifnot(all.equal(dpareto(1:6, 1:2, 1), c(0, 0, 0.11111111111, 0.125, 0.04, 0.05555555556)))
++stopifnot(all.equal(dpareto(1, 2, 1:2), c(0, 0)))
+\ No newline at end of file
+diff --git a/pareto.Rcheck/00check.log b/pareto.Rcheck/00check.log
+new file mode 100644
+index 0000000..d32b13c
+--- /dev/null
++++ b/pareto.Rcheck/00check.log
+@@ -0,0 +1,51 @@
++* using log directory ‘/mnt/nfs/netapp2/grad/yliu255/s7400/STAT7400/pareto.Rcheck’
++* using R version 3.3.1 (2016-06-21)
++* using platform: x86_64-redhat-linux-gnu (64-bit)
++* using session charset: UTF-8
++* checking for file ‘pareto/DESCRIPTION’ ... OK
++* checking extension type ... Package
++* this is package ‘pareto’ version ‘1.0-1’
++* checking package namespace information ... OK
++* checking package dependencies ... OK
++* checking if this is a source package ... OK
++* checking if there is a namespace ... OK
++* checking for executable files ... OK
++* checking for hidden files and directories ... OK
++* checking for portable file names ... OK
++* checking for sufficient/correct file permissions ... OK
++* checking whether package ‘pareto’ can be installed ... OK
++* checking installed package size ... OK
++* checking package directory ... OK
++* checking DESCRIPTION meta-information ... OK
++* checking top-level files ... OK
++* checking for left-over files ... OK
++* checking index information ... OK
++* checking package subdirectories ... OK
++* checking R files for non-ASCII characters ... OK
++* checking R files for syntax errors ... OK
++* checking whether the package can be loaded ... OK
++* checking whether the package can be loaded with stated dependencies ... OK
++* checking whether the package can be unloaded cleanly ... OK
++* checking whether the namespace can be loaded with stated dependencies ... OK
++* checking whether the namespace can be unloaded cleanly ... OK
++* checking loading without being on the library search path ... OK
++* checking dependencies in R code ... OK
++* checking S3 generic/method consistency ... OK
++* checking replacement functions ... OK
++* checking foreign function calls ... OK
++* checking R code for possible problems ... OK
++* checking Rd files ... OK
++* checking Rd metadata ... OK
++* checking Rd cross-references ... OK
++* checking for missing documentation entries ... OK
++* checking for code/documentation mismatches ... OK
++* checking Rd \usage sections ... OK
++* checking Rd contents ... OK
++* checking for unstated dependencies in examples ... OK
++* checking examples ... OK
++* checking for unstated dependencies in ‘tests’ ... OK
++* checking tests ... OK
++  Running ‘tests.R’
++* checking PDF version of manual ... OK
++* DONE
++Status: OK
+diff --git a/pareto.Rcheck/00install.out b/pareto.Rcheck/00install.out
+new file mode 100644
+index 0000000..878fcc6
+--- /dev/null
++++ b/pareto.Rcheck/00install.out
+@@ -0,0 +1,8 @@
++* installing *source* package ‘pareto’ ...
++** R
++** preparing package for lazy loading
++** help
++*** installing help indices
++** building package indices
++** testing if installed package can be loaded
++* DONE (pareto)
+diff --git a/pareto.Rcheck/Rdlatex.log b/pareto.Rcheck/Rdlatex.log
+new file mode 100644
+index 0000000..d13615b
+--- /dev/null
++++ b/pareto.Rcheck/Rdlatex.log
+@@ -0,0 +1,416 @@
++Hmm ... looks like a package
++
++This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2016/dev) (preloaded format=pdflatex)
++ restricted \write18 enabled.
++entering extended mode
++LaTeX2e <2015/01/01> patch level 2
++Babel <3.9m> and hyphenation patterns for 79 languages loaded.
++(./Rd2.tex
++(/usr/share/texlive/texmf-dist/tex/latex/base/book.cls
++Document Class: book 2014/09/29 v1.4h Standard LaTeX document class
++(/usr/share/texlive/texmf-dist/tex/latex/base/bk10.clo))
++(/usr/share/R/texmf/tex/latex/Rd.sty
++(/usr/share/texlive/texmf-dist/tex/latex/base/ifthen.sty)
++(/usr/share/texlive/texmf-dist/tex/latex/tools/longtable.sty)
++(/usr/share/texlive/texmf-dist/tex/latex/tools/bm.sty)
++(/usr/share/texlive/texmf-dist/tex/latex/base/alltt.sty)
++(/usr/share/texlive/texmf-dist/tex/latex/tools/verbatim.sty)
++(/usr/share/texlive/texmf-dist/tex/latex/url/url.sty)
++(/usr/share/texlive/texmf-dist/tex/latex/base/textcomp.sty
++(/usr/share/texlive/texmf-dist/tex/latex/base/ts1enc.def))
++(/usr/share/texlive/texmf-dist/tex/latex/base/fontenc.sty
++(/usr/share/texlive/texmf-dist/tex/latex/base/t1enc.def))
++(/usr/share/texlive/texmf-dist/tex/latex/psnfss/times.sty)
++(/usr/share/texlive/texmf-dist/tex/latex/inconsolata/zi4.sty
++`inconsolata-zi4' v1.05, 2014/06/22 Text macros for Inconsolata (msharpe)
++(/usr/share/texlive/texmf-dist/tex/latex/graphics/keyval.sty))
++(/usr/share/texlive/texmf-dist/tex/latex/graphics/color.sty
++(/usr/share/texlive/texmf-dist/tex/latex/latexconfig/color.cfg)
++(/usr/share/texlive/texmf-dist/tex/latex/pdftex-def/pdftex.def
++(/usr/share/texlive/texmf-dist/tex/generic/oberdiek/infwarerr.sty)
++(/usr/share/texlive/texmf-dist/tex/generic/oberdiek/ltxcmds.sty)))
++(/usr/share/texlive/texmf-dist/tex/latex/hyperref/hyperref.sty
++(/usr/share/texlive/texmf-dist/tex/generic/oberdiek/hobsub-hyperref.sty
++(/usr/share/texlive/texmf-dist/tex/generic/oberdiek/hobsub-generic.sty))
++(/usr/share/texlive/texmf-dist/tex/generic/ifxetex/ifxetex.sty)
++(/usr/share/texlive/texmf-dist/tex/latex/oberdiek/auxhook.sty)
++(/usr/share/texlive/texmf-dist/tex/latex/oberdiek/kvoptions.sty)
++(/usr/share/texlive/texmf-dist/tex/latex/hyperref/pd1enc.def)
++(/usr/share/texlive/texmf-dist/tex/latex/latexconfig/hyperref.cfg))
++
++Package hyperref Message: Driver (autodetected): hpdftex.
++
++(/usr/share/texlive/texmf-dist/tex/latex/hyperref/hpdftex.def
++(/usr/share/texlive/texmf-dist/tex/latex/oberdiek/rerunfilecheck.sty))
++
++Package hyperref Warning: Option `hyperindex' has already been used,
++(hyperref)                setting the option has no effect on input line 366.
++
++
++Package hyperref Warning: Option `pagebackref' has already been used,
++(hyperref)                setting the option has no effect on input line 366.
++
++) (/usr/share/texlive/texmf-dist/tex/latex/base/makeidx.sty)
++(/usr/share/texlive/texmf-dist/tex/latex/base/inputenc.sty
++(/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def
++(/usr/share/texlive/texmf-dist/tex/latex/base/t1enc.dfu)
++(/usr/share/texlive/texmf-dist/tex/latex/base/ot1enc.dfu)
++(/usr/share/texlive/texmf-dist/tex/latex/base/omsenc.dfu)
++(/usr/share/texlive/texmf-dist/tex/latex/base/ts1enc.dfu))
++(/usr/share/texlive/texmf-dist/tex/latex/base/latin1.def))
++Writing index file Rd2.idx
++No file Rd2.aux.
++(/usr/share/texlive/texmf-dist/tex/latex/base/ts1cmr.fd)
++(/usr/share/texlive/texmf-dist/tex/latex/psnfss/t1ptm.fd)
++(/usr/share/texlive/texmf-dist/tex/context/base/supp-pdf.mkii
++[Loading MPS to PDF converter (version 2006.09.02).]
++) (/usr/share/texlive/texmf-dist/tex/latex/hyperref/nameref.sty
++(/usr/share/texlive/texmf-dist/tex/generic/oberdiek/gettitlestring.sty))
++(/usr/share/texlive/texmf-dist/tex/latex/inconsolata/t1zi4.fd)
++(/usr/share/texlive/texmf-dist/tex/latex/psnfss/t1phv.fd)
++(/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [1{/usr/share/texlive/t
++exmf-dist/fonts/map/pdftex/updmap/pdftex.map}]
++Underfull \hbox (badness 10000) in paragraph at lines 65--66
++
++
++Underfull \hbox (badness 10000) in paragraph at lines 67--68
++
++
++Underfull \hbox (badness 10000) in paragraph at lines 69--70
++
++No file Rd2.ind.
++[2] (/tmp/RtmpdegcEq/Rd2pdf39604595c9da/Rd2.aux)
++
++Package rerunfilecheck Warning: File `Rd2.out' has changed.
++(rerunfilecheck)                Rerun to get outlines right
++(rerunfilecheck)                or use package `bookmark'.
++
++ )
++(see the transcript file for additional information){/usr/share/texlive/texmf-d
++ist/fonts/enc/dvips/base/8r.enc}{/usr/share/texlive/texmf-dist/fonts/enc/dvips/
++inconsolata/i4-t1-0.enc}</usr/share/texlive/texmf-dist/fonts/type1/public/incon
++solata/Inconsolata-zi4r.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/a
++msfonts/cm/cmmi10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfont
++s/cm/cmmi7.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cm
++r10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb>
++</usr/share/texlive/texmf-dist/fonts/type1/urw/helvetic/uhvr8a.pfb></usr/share/
++texlive/texmf-dist/fonts/type1/urw/times/utmb8a.pfb></usr/share/texlive/texmf-d
++ist/fonts/type1/urw/times/utmr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1
++/urw/times/utmr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmr
++i8a.pfb>
++Output written on Rd2.pdf (2 pages, 87232 bytes).
++Transcript written on Rd2.log.
++This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2016/dev) (preloaded format=pdflatex)
++ restricted \write18 enabled.
++entering extended mode
++LaTeX2e <2015/01/01> patch level 2
++Babel <3.9m> and hyphenation patterns for 79 languages loaded.
++(./Rd2.tex
++(/usr/share/texlive/texmf-dist/tex/latex/base/book.cls
++Document Class: book 2014/09/29 v1.4h Standard LaTeX document class
++(/usr/share/texlive/texmf-dist/tex/latex/base/bk10.clo))
++(/usr/share/R/texmf/tex/latex/Rd.sty
++(/usr/share/texlive/texmf-dist/tex/latex/base/ifthen.sty)
++(/usr/share/texlive/texmf-dist/tex/latex/tools/longtable.sty)
++(/usr/share/texlive/texmf-dist/tex/latex/tools/bm.sty)
++(/usr/share/texlive/texmf-dist/tex/latex/base/alltt.sty)
++(/usr/share/texlive/texmf-dist/tex/latex/tools/verbatim.sty)
++(/usr/share/texlive/texmf-dist/tex/latex/url/url.sty)
++(/usr/share/texlive/texmf-dist/tex/latex/base/textcomp.sty
++(/usr/share/texlive/texmf-dist/tex/latex/base/ts1enc.def))
++(/usr/share/texlive/texmf-dist/tex/latex/base/fontenc.sty
++(/usr/share/texlive/texmf-dist/tex/latex/base/t1enc.def))
++(/usr/share/texlive/texmf-dist/tex/latex/psnfss/times.sty)
++(/usr/share/texlive/texmf-dist/tex/latex/inconsolata/zi4.sty
++`inconsolata-zi4' v1.05, 2014/06/22 Text macros for Inconsolata (msharpe)
++(/usr/share/texlive/texmf-dist/tex/latex/graphics/keyval.sty))
++(/usr/share/texlive/texmf-dist/tex/latex/graphics/color.sty
++(/usr/share/texlive/texmf-dist/tex/latex/latexconfig/color.cfg)
++(/usr/share/texlive/texmf-dist/tex/latex/pdftex-def/pdftex.def
++(/usr/share/texlive/texmf-dist/tex/generic/oberdiek/infwarerr.sty)
++(/usr/share/texlive/texmf-dist/tex/generic/oberdiek/ltxcmds.sty)))
++(/usr/share/texlive/texmf-dist/tex/latex/hyperref/hyperref.sty
++(/usr/share/texlive/texmf-dist/tex/generic/oberdiek/hobsub-hyperref.sty
++(/usr/share/texlive/texmf-dist/tex/generic/oberdiek/hobsub-generic.sty))
++(/usr/share/texlive/texmf-dist/tex/generic/ifxetex/ifxetex.sty)
++(/usr/share/texlive/texmf-dist/tex/latex/oberdiek/auxhook.sty)
++(/usr/share/texlive/texmf-dist/tex/latex/oberdiek/kvoptions.sty)
++(/usr/share/texlive/texmf-dist/tex/latex/hyperref/pd1enc.def)
++(/usr/share/texlive/texmf-dist/tex/latex/latexconfig/hyperref.cfg))
++
++Package hyperref Message: Driver (autodetected): hpdftex.
++
++(/usr/share/texlive/texmf-dist/tex/latex/hyperref/hpdftex.def
++(/usr/share/texlive/texmf-dist/tex/latex/oberdiek/rerunfilecheck.sty))
++
++Package hyperref Warning: Option `hyperindex' has already been used,
++(hyperref)                setting the option has no effect on input line 366.
++
++
++Package hyperref Warning: Option `pagebackref' has already been used,
++(hyperref)                setting the option has no effect on input line 366.
++
++) (/usr/share/texlive/texmf-dist/tex/latex/base/makeidx.sty)
++(/usr/share/texlive/texmf-dist/tex/latex/base/inputenc.sty
++(/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def
++(/usr/share/texlive/texmf-dist/tex/latex/base/t1enc.dfu)
++(/usr/share/texlive/texmf-dist/tex/latex/base/ot1enc.dfu)
++(/usr/share/texlive/texmf-dist/tex/latex/base/omsenc.dfu)
++(/usr/share/texlive/texmf-dist/tex/latex/base/ts1enc.dfu))
++(/usr/share/texlive/texmf-dist/tex/latex/base/latin1.def))
++Writing index file Rd2.idx
++(/tmp/RtmpdegcEq/Rd2pdf39604595c9da/Rd2.aux)
++(/usr/share/texlive/texmf-dist/tex/latex/base/ts1cmr.fd)
++(/usr/share/texlive/texmf-dist/tex/latex/psnfss/t1ptm.fd)
++(/usr/share/texlive/texmf-dist/tex/context/base/supp-pdf.mkii
++[Loading MPS to PDF converter (version 2006.09.02).]
++) (/usr/share/texlive/texmf-dist/tex/latex/hyperref/nameref.sty
++(/usr/share/texlive/texmf-dist/tex/generic/oberdiek/gettitlestring.sty))
++(/tmp/RtmpdegcEq/Rd2pdf39604595c9da/Rd2.out)
++(/tmp/RtmpdegcEq/Rd2pdf39604595c9da/Rd2.out)
++(/usr/share/texlive/texmf-dist/tex/latex/inconsolata/t1zi4.fd)
++(/usr/share/texlive/texmf-dist/tex/latex/psnfss/t1phv.fd)
++(/tmp/RtmpdegcEq/Rd2pdf39604595c9da/Rd2.toc)
++(/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [1{/usr/share/texlive/t
++exmf-dist/fonts/map/pdftex/updmap/pdftex.map}]
++Underfull \hbox (badness 10000) in paragraph at lines 65--66
++
++
++Underfull \hbox (badness 10000) in paragraph at lines 67--68
++
++
++Underfull \hbox (badness 10000) in paragraph at lines 69--70
++
++No file Rd2.ind.
++[2] (/tmp/RtmpdegcEq/Rd2pdf39604595c9da/Rd2.aux) )
++(see the transcript file for additional information){/usr/share/texlive/texmf-d
++ist/fonts/enc/dvips/base/8r.enc}{/usr/share/texlive/texmf-dist/fonts/enc/dvips/
++inconsolata/i4-t1-0.enc}</usr/share/texlive/texmf-dist/fonts/type1/public/incon
++solata/Inconsolata-zi4r.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/a
++msfonts/cm/cmmi10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfont
++s/cm/cmmi7.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cm
++r10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb>
++</usr/share/texlive/texmf-dist/fonts/type1/urw/helvetic/uhvr8a.pfb></usr/share/
++texlive/texmf-dist/fonts/type1/urw/times/utmb8a.pfb></usr/share/texlive/texmf-d
++ist/fonts/type1/urw/times/utmr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1
++/urw/times/utmr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmr
++i8a.pfb>
++Output written on Rd2.pdf (2 pages, 87437 bytes).
++Transcript written on Rd2.log.
++This is makeindex, version 2.15 [TeX Live 2016/dev] (kpathsea + Thai support).
++Scanning input file Rd2.idx....done (2 entries accepted, 0 rejected).
++Sorting entries....done (2 comparisons).
++Generating output file Rd2.ind....done (10 lines written, 0 warnings).
++Output written in Rd2.ind.
++Transcript written in Rd2.ilg.
++This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2016/dev) (preloaded format=pdflatex)
++ restricted \write18 enabled.
++entering extended mode
++LaTeX2e <2015/01/01> patch level 2
++Babel <3.9m> and hyphenation patterns for 79 languages loaded.
++(./Rd2.tex
++(/usr/share/texlive/texmf-dist/tex/latex/base/book.cls
++Document Class: book 2014/09/29 v1.4h Standard LaTeX document class
++(/usr/share/texlive/texmf-dist/tex/latex/base/bk10.clo))
++(/usr/share/R/texmf/tex/latex/Rd.sty
++(/usr/share/texlive/texmf-dist/tex/latex/base/ifthen.sty)
++(/usr/share/texlive/texmf-dist/tex/latex/tools/longtable.sty)
++(/usr/share/texlive/texmf-dist/tex/latex/tools/bm.sty)
++(/usr/share/texlive/texmf-dist/tex/latex/base/alltt.sty)
++(/usr/share/texlive/texmf-dist/tex/latex/tools/verbatim.sty)
++(/usr/share/texlive/texmf-dist/tex/latex/url/url.sty)
++(/usr/share/texlive/texmf-dist/tex/latex/base/textcomp.sty
++(/usr/share/texlive/texmf-dist/tex/latex/base/ts1enc.def))
++(/usr/share/texlive/texmf-dist/tex/latex/base/fontenc.sty
++(/usr/share/texlive/texmf-dist/tex/latex/base/t1enc.def))
++(/usr/share/texlive/texmf-dist/tex/latex/psnfss/times.sty)
++(/usr/share/texlive/texmf-dist/tex/latex/inconsolata/zi4.sty
++`inconsolata-zi4' v1.05, 2014/06/22 Text macros for Inconsolata (msharpe)
++(/usr/share/texlive/texmf-dist/tex/latex/graphics/keyval.sty))
++(/usr/share/texlive/texmf-dist/tex/latex/graphics/color.sty
++(/usr/share/texlive/texmf-dist/tex/latex/latexconfig/color.cfg)
++(/usr/share/texlive/texmf-dist/tex/latex/pdftex-def/pdftex.def
++(/usr/share/texlive/texmf-dist/tex/generic/oberdiek/infwarerr.sty)
++(/usr/share/texlive/texmf-dist/tex/generic/oberdiek/ltxcmds.sty)))
++(/usr/share/texlive/texmf-dist/tex/latex/hyperref/hyperref.sty
++(/usr/share/texlive/texmf-dist/tex/generic/oberdiek/hobsub-hyperref.sty
++(/usr/share/texlive/texmf-dist/tex/generic/oberdiek/hobsub-generic.sty))
++(/usr/share/texlive/texmf-dist/tex/generic/ifxetex/ifxetex.sty)
++(/usr/share/texlive/texmf-dist/tex/latex/oberdiek/auxhook.sty)
++(/usr/share/texlive/texmf-dist/tex/latex/oberdiek/kvoptions.sty)
++(/usr/share/texlive/texmf-dist/tex/latex/hyperref/pd1enc.def)
++(/usr/share/texlive/texmf-dist/tex/latex/latexconfig/hyperref.cfg))
++
++Package hyperref Message: Driver (autodetected): hpdftex.
++
++(/usr/share/texlive/texmf-dist/tex/latex/hyperref/hpdftex.def
++(/usr/share/texlive/texmf-dist/tex/latex/oberdiek/rerunfilecheck.sty))
++
++Package hyperref Warning: Option `hyperindex' has already been used,
++(hyperref)                setting the option has no effect on input line 366.
++
++
++Package hyperref Warning: Option `pagebackref' has already been used,
++(hyperref)                setting the option has no effect on input line 366.
++
++) (/usr/share/texlive/texmf-dist/tex/latex/base/makeidx.sty)
++(/usr/share/texlive/texmf-dist/tex/latex/base/inputenc.sty
++(/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def
++(/usr/share/texlive/texmf-dist/tex/latex/base/t1enc.dfu)
++(/usr/share/texlive/texmf-dist/tex/latex/base/ot1enc.dfu)
++(/usr/share/texlive/texmf-dist/tex/latex/base/omsenc.dfu)
++(/usr/share/texlive/texmf-dist/tex/latex/base/ts1enc.dfu))
++(/usr/share/texlive/texmf-dist/tex/latex/base/latin1.def))
++Writing index file Rd2.idx
++(/tmp/RtmpdegcEq/Rd2pdf39604595c9da/Rd2.aux)
++(/usr/share/texlive/texmf-dist/tex/latex/base/ts1cmr.fd)
++(/usr/share/texlive/texmf-dist/tex/latex/psnfss/t1ptm.fd)
++(/usr/share/texlive/texmf-dist/tex/context/base/supp-pdf.mkii
++[Loading MPS to PDF converter (version 2006.09.02).]
++) (/usr/share/texlive/texmf-dist/tex/latex/hyperref/nameref.sty
++(/usr/share/texlive/texmf-dist/tex/generic/oberdiek/gettitlestring.sty))
++(/tmp/RtmpdegcEq/Rd2pdf39604595c9da/Rd2.out)
++(/tmp/RtmpdegcEq/Rd2pdf39604595c9da/Rd2.out)
++(/usr/share/texlive/texmf-dist/tex/latex/inconsolata/t1zi4.fd)
++(/usr/share/texlive/texmf-dist/tex/latex/psnfss/t1phv.fd)
++(/tmp/RtmpdegcEq/Rd2pdf39604595c9da/Rd2.toc)
++(/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [1{/usr/share/texlive/t
++exmf-dist/fonts/map/pdftex/updmap/pdftex.map}]
++Underfull \hbox (badness 10000) in paragraph at lines 65--66
++
++
++Underfull \hbox (badness 10000) in paragraph at lines 67--68
++
++
++Underfull \hbox (badness 10000) in paragraph at lines 69--70
++
++(/tmp/RtmpdegcEq/Rd2pdf39604595c9da/Rd2.ind [2] [3])
++(/tmp/RtmpdegcEq/Rd2pdf39604595c9da/Rd2.aux)
++
++Package rerunfilecheck Warning: File `Rd2.out' has changed.
++(rerunfilecheck)                Rerun to get outlines right
++(rerunfilecheck)                or use package `bookmark'.
++
++ )
++(see the transcript file for additional information){/usr/share/texlive/texmf-d
++ist/fonts/enc/dvips/base/8r.enc}{/usr/share/texlive/texmf-dist/fonts/enc/dvips/
++inconsolata/i4-t1-0.enc}</usr/share/texlive/texmf-dist/fonts/type1/public/incon
++solata/Inconsolata-zi4r.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/a
++msfonts/cm/cmmi10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfont
++s/cm/cmmi7.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cm
++r10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb>
++</usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/
++share/texlive/texmf-dist/fonts/type1/urw/helvetic/uhvr8a.pfb></usr/share/texliv
++e/texmf-dist/fonts/type1/urw/times/utmb8a.pfb></usr/share/texlive/texmf-dist/fo
++nts/type1/urw/times/utmr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/t
++imes/utmr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmri8a.pf
++b>
++Output written on Rd2.pdf (3 pages, 95513 bytes).
++Transcript written on Rd2.log.
++This is makeindex, version 2.15 [TeX Live 2016/dev] (kpathsea + Thai support).
++Scanning input file Rd2.idx....done (2 entries accepted, 0 rejected).
++Sorting entries....done (2 comparisons).
++Generating output file Rd2.ind....done (10 lines written, 0 warnings).
++Output written in Rd2.ind.
++Transcript written in Rd2.ilg.
++This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2016/dev) (preloaded format=pdflatex)
++ restricted \write18 enabled.
++entering extended mode
++LaTeX2e <2015/01/01> patch level 2
++Babel <3.9m> and hyphenation patterns for 79 languages loaded.
++(./Rd2.tex
++(/usr/share/texlive/texmf-dist/tex/latex/base/book.cls
++Document Class: book 2014/09/29 v1.4h Standard LaTeX document class
++(/usr/share/texlive/texmf-dist/tex/latex/base/bk10.clo))
++(/usr/share/R/texmf/tex/latex/Rd.sty
++(/usr/share/texlive/texmf-dist/tex/latex/base/ifthen.sty)
++(/usr/share/texlive/texmf-dist/tex/latex/tools/longtable.sty)
++(/usr/share/texlive/texmf-dist/tex/latex/tools/bm.sty)
++(/usr/share/texlive/texmf-dist/tex/latex/base/alltt.sty)
++(/usr/share/texlive/texmf-dist/tex/latex/tools/verbatim.sty)
++(/usr/share/texlive/texmf-dist/tex/latex/url/url.sty)
++(/usr/share/texlive/texmf-dist/tex/latex/base/textcomp.sty
++(/usr/share/texlive/texmf-dist/tex/latex/base/ts1enc.def))
++(/usr/share/texlive/texmf-dist/tex/latex/base/fontenc.sty
++(/usr/share/texlive/texmf-dist/tex/latex/base/t1enc.def))
++(/usr/share/texlive/texmf-dist/tex/latex/psnfss/times.sty)
++(/usr/share/texlive/texmf-dist/tex/latex/inconsolata/zi4.sty
++`inconsolata-zi4' v1.05, 2014/06/22 Text macros for Inconsolata (msharpe)
++(/usr/share/texlive/texmf-dist/tex/latex/graphics/keyval.sty))
++(/usr/share/texlive/texmf-dist/tex/latex/graphics/color.sty
++(/usr/share/texlive/texmf-dist/tex/latex/latexconfig/color.cfg)
++(/usr/share/texlive/texmf-dist/tex/latex/pdftex-def/pdftex.def
++(/usr/share/texlive/texmf-dist/tex/generic/oberdiek/infwarerr.sty)
++(/usr/share/texlive/texmf-dist/tex/generic/oberdiek/ltxcmds.sty)))
++(/usr/share/texlive/texmf-dist/tex/latex/hyperref/hyperref.sty
++(/usr/share/texlive/texmf-dist/tex/generic/oberdiek/hobsub-hyperref.sty
++(/usr/share/texlive/texmf-dist/tex/generic/oberdiek/hobsub-generic.sty))
++(/usr/share/texlive/texmf-dist/tex/generic/ifxetex/ifxetex.sty)
++(/usr/share/texlive/texmf-dist/tex/latex/oberdiek/auxhook.sty)
++(/usr/share/texlive/texmf-dist/tex/latex/oberdiek/kvoptions.sty)
++(/usr/share/texlive/texmf-dist/tex/latex/hyperref/pd1enc.def)
++(/usr/share/texlive/texmf-dist/tex/latex/latexconfig/hyperref.cfg))
++
++Package hyperref Message: Driver (autodetected): hpdftex.
++
++(/usr/share/texlive/texmf-dist/tex/latex/hyperref/hpdftex.def
++(/usr/share/texlive/texmf-dist/tex/latex/oberdiek/rerunfilecheck.sty))
++
++Package hyperref Warning: Option `hyperindex' has already been used,
++(hyperref)                setting the option has no effect on input line 366.
++
++
++Package hyperref Warning: Option `pagebackref' has already been used,
++(hyperref)                setting the option has no effect on input line 366.
++
++) (/usr/share/texlive/texmf-dist/tex/latex/base/makeidx.sty)
++(/usr/share/texlive/texmf-dist/tex/latex/base/inputenc.sty
++(/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def
++(/usr/share/texlive/texmf-dist/tex/latex/base/t1enc.dfu)
++(/usr/share/texlive/texmf-dist/tex/latex/base/ot1enc.dfu)
++(/usr/share/texlive/texmf-dist/tex/latex/base/omsenc.dfu)
++(/usr/share/texlive/texmf-dist/tex/latex/base/ts1enc.dfu))
++(/usr/share/texlive/texmf-dist/tex/latex/base/latin1.def))
++Writing index file Rd2.idx
++(/tmp/RtmpdegcEq/Rd2pdf39604595c9da/Rd2.aux)
++(/usr/share/texlive/texmf-dist/tex/latex/base/ts1cmr.fd)
++(/usr/share/texlive/texmf-dist/tex/latex/psnfss/t1ptm.fd)
++(/usr/share/texlive/texmf-dist/tex/context/base/supp-pdf.mkii
++[Loading MPS to PDF converter (version 2006.09.02).]
++) (/usr/share/texlive/texmf-dist/tex/latex/hyperref/nameref.sty
++(/usr/share/texlive/texmf-dist/tex/generic/oberdiek/gettitlestring.sty))
++(/tmp/RtmpdegcEq/Rd2pdf39604595c9da/Rd2.out)
++(/tmp/RtmpdegcEq/Rd2pdf39604595c9da/Rd2.out)
++(/usr/share/texlive/texmf-dist/tex/latex/inconsolata/t1zi4.fd)
++(/usr/share/texlive/texmf-dist/tex/latex/psnfss/t1phv.fd)
++(/tmp/RtmpdegcEq/Rd2pdf39604595c9da/Rd2.toc)
++(/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def) [1{/usr/share/texlive/t
++exmf-dist/fonts/map/pdftex/updmap/pdftex.map}]
++Underfull \hbox (badness 10000) in paragraph at lines 65--66
++
++
++Underfull \hbox (badness 10000) in paragraph at lines 67--68
++
++
++Underfull \hbox (badness 10000) in paragraph at lines 69--70
++
++(/tmp/RtmpdegcEq/Rd2pdf39604595c9da/Rd2.ind [2] [3])
++(/tmp/RtmpdegcEq/Rd2pdf39604595c9da/Rd2.aux) )
++(see the transcript file for additional information){/usr/share/texlive/texmf-d
++ist/fonts/enc/dvips/base/8r.enc}{/usr/share/texlive/texmf-dist/fonts/enc/dvips/
++inconsolata/i4-t1-0.enc}</usr/share/texlive/texmf-dist/fonts/type1/public/incon
++solata/Inconsolata-zi4r.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/a
++msfonts/cm/cmmi10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfont
++s/cm/cmmi7.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cm
++r10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb>
++</usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/
++share/texlive/texmf-dist/fonts/type1/urw/helvetic/uhvr8a.pfb></usr/share/texliv
++e/texmf-dist/fonts/type1/urw/times/utmb8a.pfb></usr/share/texlive/texmf-dist/fo
++nts/type1/urw/times/utmr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/t
++imes/utmr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmri8a.pf
++b>
++Output written on Rd2.pdf (3 pages, 96156 bytes).
++Transcript written on Rd2.log.
++Saving output to 'pareto-manual.pdf' ...
++Done
++You may want to clean up by 'rm -rf /tmp/RtmpdegcEq/Rd2pdf39604595c9da'
+diff --git a/pareto.Rcheck/pareto-Ex.R b/pareto.Rcheck/pareto-Ex.R
+new file mode 100644
+index 0000000..eefa34a
+--- /dev/null
++++ b/pareto.Rcheck/pareto-Ex.R
+@@ -0,0 +1,36 @@
++pkgname <- "pareto"
++source(file.path(R.home("share"), "R", "examples-header.R"))
++options(warn = 1)
++library('pareto')
++
++base::assign(".oldSearch", base::search(), pos = 'CheckExEnv')
++cleanEx()
++nameEx("dpareto")
++### * dpareto
++
++flush(stderr()); flush(stdout())
++
++### Name: dpareto
++### Title: The Pareto Distribution
++### Aliases: dpareto
++### Keywords: distribution
++
++### ** Examples
++
++dpareto(4, 2, 1)
++dpareto(1:5, 2, 1)
++dpareto(1:5, 2, 1, log = TRUE)
++
++
++
++### * <FOOTER>
++###
++options(digits = 7L)
++base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
++grDevices::dev.off()
++###
++### Local variables: ***
++### mode: outline-minor ***
++### outline-regexp: "\\(> \\)?### [*]+" ***
++### End: ***
++quit('no')
+diff --git a/pareto.Rcheck/pareto-Ex.Rout b/pareto.Rcheck/pareto-Ex.Rout
+new file mode 100644
+index 0000000..dd6c1b8
+--- /dev/null
++++ b/pareto.Rcheck/pareto-Ex.Rout
+@@ -0,0 +1,61 @@
++
++R version 3.3.1 (2016-06-21) -- "Bug in Your Hair"
++Copyright (C) 2016 The R Foundation for Statistical Computing
++Platform: x86_64-redhat-linux-gnu (64-bit)
++
++R is free software and comes with ABSOLUTELY NO WARRANTY.
++You are welcome to redistribute it under certain conditions.
++Type 'license()' or 'licence()' for distribution details.
++
++  Natural language support but running in an English locale
++
++R is a collaborative project with many contributors.
++Type 'contributors()' for more information and
++'citation()' on how to cite R or R packages in publications.
++
++Type 'demo()' for some demos, 'help()' for on-line help, or
++'help.start()' for an HTML browser interface to help.
++Type 'q()' to quit R.
++
++> pkgname <- "pareto"
++> source(file.path(R.home("share"), "R", "examples-header.R"))
++> options(warn = 1)
++> library('pareto')
++> 
++> base::assign(".oldSearch", base::search(), pos = 'CheckExEnv')
++> cleanEx()
++> nameEx("dpareto")
++> ### * dpareto
++> 
++> flush(stderr()); flush(stdout())
++> 
++> ### Name: dpareto
++> ### Title: The Pareto Distribution
++> ### Aliases: dpareto
++> ### Keywords: distribution
++> 
++> ### ** Examples
++> 
++> dpareto(4, 2, 1)
++[1] 0.125
++> dpareto(1:5, 2, 1)
++[1] 0.0000000 0.0000000 0.2222222 0.1250000 0.0800000
++> dpareto(1:5, 2, 1, log = TRUE)
++[1]      -Inf      -Inf -1.504077 -2.079442 -2.525729
++> 
++> 
++> 
++> ### * <FOOTER>
++> ###
++> options(digits = 7L)
++> base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
++Time elapsed:  0.058 0.002 0.071 0 0 
++> grDevices::dev.off()
++null device 
++          1 
++> ###
++> ### Local variables: ***
++> ### mode: outline-minor ***
++> ### outline-regexp: "\\(> \\)?### [*]+" ***
++> ### End: ***
++> quit('no')
+diff --git a/pareto.Rcheck/pareto-Ex.pdf b/pareto.Rcheck/pareto-Ex.pdf
+new file mode 100644
+index 0000000..ae378cb
+Binary files /dev/null and b/pareto.Rcheck/pareto-Ex.pdf differ
+diff --git a/pareto.Rcheck/pareto-manual.log b/pareto.Rcheck/pareto-manual.log
+new file mode 100644
+index 0000000..01b1cfb
+--- /dev/null
++++ b/pareto.Rcheck/pareto-manual.log
+@@ -0,0 +1,772 @@
++This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2016/dev) (preloaded format=pdflatex 2017.1.6)  6 FEB 2017 14:46
++entering extended mode
++ restricted \write18 enabled.
++ %&-line parsing enabled.
++**\input ./Rd2.tex
++(./Rd2.tex
++(/usr/share/texlive/texmf-dist/tex/latex/base/book.cls
++Document Class: book 2014/09/29 v1.4h Standard LaTeX document class
++(/usr/share/texlive/texmf-dist/tex/latex/base/bk10.clo
++File: bk10.clo 2014/09/29 v1.4h Standard LaTeX file (size option)
++)
++\c@part=\count79
++\c@chapter=\count80
++\c@section=\count81
++\c@subsection=\count82
++\c@subsubsection=\count83
++\c@paragraph=\count84
++\c@subparagraph=\count85
++\c@figure=\count86
++\c@table=\count87
++\abovecaptionskip=\skip41
++\belowcaptionskip=\skip42
++\bibindent=\dimen102
++)
++(/usr/share/R/texmf/tex/latex/Rd.sty
++Package: Rd 
++
++(/usr/share/texlive/texmf-dist/tex/latex/base/ifthen.sty
++Package: ifthen 2014/09/29 v1.1c Standard LaTeX ifthen package (DPC)
++)
++(/usr/share/texlive/texmf-dist/tex/latex/tools/longtable.sty
++Package: longtable 2014/10/28 v4.11 Multi-page Table package (DPC)
++\LTleft=\skip43
++\LTright=\skip44
++\LTpre=\skip45
++\LTpost=\skip46
++\LTchunksize=\count88
++\LTcapwidth=\dimen103
++\LT@head=\box26
++\LT@firsthead=\box27
++\LT@foot=\box28
++\LT@lastfoot=\box29
++\LT@cols=\count89
++\LT@rows=\count90
++\c@LT@tables=\count91
++\c@LT@chunks=\count92
++\LT@p@ftn=\toks14
++)
++(/usr/share/texlive/texmf-dist/tex/latex/tools/bm.sty
++Package: bm 2014/10/28 v1.1c Bold Symbol Support (DPC/FMi)
++\symboldoperators=\mathgroup4
++\symboldletters=\mathgroup5
++\symboldsymbols=\mathgroup6
++LaTeX Font Info:    Redeclaring math alphabet \mathbf on input line 141.
++LaTeX Info: Redefining \bm on input line 207.
++)
++(/usr/share/texlive/texmf-dist/tex/latex/base/alltt.sty
++Package: alltt 1997/06/16 v2.0g defines alltt environment
++)
++(/usr/share/texlive/texmf-dist/tex/latex/tools/verbatim.sty
++Package: verbatim 2014/10/28 v1.5q LaTeX2e package for verbatim enhancements
++\every@verbatim=\toks15
++\verbatim@line=\toks16
++\verbatim@in@stream=\read1
++)
++(/usr/share/texlive/texmf-dist/tex/latex/url/url.sty
++\Urlmuskip=\muskip10
++Package: url 2013/09/16  ver 3.4  Verb mode for urls, etc.
++)
++(/usr/share/texlive/texmf-dist/tex/latex/base/textcomp.sty
++Package: textcomp 2005/09/27 v1.99g Standard LaTeX package
++Package textcomp Info: Sub-encoding information:
++(textcomp)               5 = only ISO-Adobe without \textcurrency
++(textcomp)               4 = 5 + \texteuro
++(textcomp)               3 = 4 + \textohm
++(textcomp)               2 = 3 + \textestimated + \textcurrency
++(textcomp)               1 = TS1 - \textcircled - \t
++(textcomp)               0 = TS1 (full)
++(textcomp)             Font families with sub-encoding setting implement
++(textcomp)             only a restricted character set as indicated.
++(textcomp)             Family '?' is the default used for unknown fonts.
++(textcomp)             See the documentation for details.
++Package textcomp Info: Setting ? sub-encoding to TS1/1 on input line 79.
++
++(/usr/share/texlive/texmf-dist/tex/latex/base/ts1enc.def
++File: ts1enc.def 2001/06/05 v3.0e (jk/car/fm) Standard LaTeX file
++)
++LaTeX Info: Redefining \oldstylenums on input line 334.
++Package textcomp Info: Setting cmr sub-encoding to TS1/0 on input line 349.
++Package textcomp Info: Setting cmss sub-encoding to TS1/0 on input line 350.
++Package textcomp Info: Setting cmtt sub-encoding to TS1/0 on input line 351.
++Package textcomp Info: Setting cmvtt sub-encoding to TS1/0 on input line 352.
++Package textcomp Info: Setting cmbr sub-encoding to TS1/0 on input line 353.
++Package textcomp Info: Setting cmtl sub-encoding to TS1/0 on input line 354.
++Package textcomp Info: Setting ccr sub-encoding to TS1/0 on input line 355.
++Package textcomp Info: Setting ptm sub-encoding to TS1/4 on input line 356.
++Package textcomp Info: Setting pcr sub-encoding to TS1/4 on input line 357.
++Package textcomp Info: Setting phv sub-encoding to TS1/4 on input line 358.
++Package textcomp Info: Setting ppl sub-encoding to TS1/3 on input line 359.
++Package textcomp Info: Setting pag sub-encoding to TS1/4 on input line 360.
++Package textcomp Info: Setting pbk sub-encoding to TS1/4 on input line 361.
++Package textcomp Info: Setting pnc sub-encoding to TS1/4 on input line 362.
++Package textcomp Info: Setting pzc sub-encoding to TS1/4 on input line 363.
++Package textcomp Info: Setting bch sub-encoding to TS1/4 on input line 364.
++Package textcomp Info: Setting put sub-encoding to TS1/5 on input line 365.
++Package textcomp Info: Setting uag sub-encoding to TS1/5 on input line 366.
++Package textcomp Info: Setting ugq sub-encoding to TS1/5 on input line 367.
++Package textcomp Info: Setting ul8 sub-encoding to TS1/4 on input line 368.
++Package textcomp Info: Setting ul9 sub-encoding to TS1/4 on input line 369.
++Package textcomp Info: Setting augie sub-encoding to TS1/5 on input line 370.
++Package textcomp Info: Setting dayrom sub-encoding to TS1/3 on input line 371.
++Package textcomp Info: Setting dayroms sub-encoding to TS1/3 on input line 372.
++
++Package textcomp Info: Setting pxr sub-encoding to TS1/0 on input line 373.
++Package textcomp Info: Setting pxss sub-encoding to TS1/0 on input line 374.
++Package textcomp Info: Setting pxtt sub-encoding to TS1/0 on input line 375.
++Package textcomp Info: Setting txr sub-encoding to TS1/0 on input line 376.
++Package textcomp Info: Setting txss sub-encoding to TS1/0 on input line 377.
++Package textcomp Info: Setting txtt sub-encoding to TS1/0 on input line 378.
++Package textcomp Info: Setting lmr sub-encoding to TS1/0 on input line 379.
++Package textcomp Info: Setting lmdh sub-encoding to TS1/0 on input line 380.
++Package textcomp Info: Setting lmss sub-encoding to TS1/0 on input line 381.
++Package textcomp Info: Setting lmssq sub-encoding to TS1/0 on input line 382.
++Package textcomp Info: Setting lmvtt sub-encoding to TS1/0 on input line 383.
++Package textcomp Info: Setting lmtt sub-encoding to TS1/0 on input line 384.
++Package textcomp Info: Setting qhv sub-encoding to TS1/0 on input line 385.
++Package textcomp Info: Setting qag sub-encoding to TS1/0 on input line 386.
++Package textcomp Info: Setting qbk sub-encoding to TS1/0 on input line 387.
++Package textcomp Info: Setting qcr sub-encoding to TS1/0 on input line 388.
++Package textcomp Info: Setting qcs sub-encoding to TS1/0 on input line 389.
++Package textcomp Info: Setting qpl sub-encoding to TS1/0 on input line 390.
++Package textcomp Info: Setting qtm sub-encoding to TS1/0 on input line 391.
++Package textcomp Info: Setting qzc sub-encoding to TS1/0 on input line 392.
++Package textcomp Info: Setting qhvc sub-encoding to TS1/0 on input line 393.
++Package textcomp Info: Setting futs sub-encoding to TS1/4 on input line 394.
++Package textcomp Info: Setting futx sub-encoding to TS1/4 on input line 395.
++Package textcomp Info: Setting futj sub-encoding to TS1/4 on input line 396.
++Package textcomp Info: Setting hlh sub-encoding to TS1/3 on input line 397.
++Package textcomp Info: Setting hls sub-encoding to TS1/3 on input line 398.
++Package textcomp Info: Setting hlst sub-encoding to TS1/3 on input line 399.
++Package textcomp Info: Setting hlct sub-encoding to TS1/5 on input line 400.
++Package textcomp Info: Setting hlx sub-encoding to TS1/5 on input line 401.
++Package textcomp Info: Setting hlce sub-encoding to TS1/5 on input line 402.
++Package textcomp Info: Setting hlcn sub-encoding to TS1/5 on input line 403.
++Package textcomp Info: Setting hlcw sub-encoding to TS1/5 on input line 404.
++Package textcomp Info: Setting hlcf sub-encoding to TS1/5 on input line 405.
++Package textcomp Info: Setting pplx sub-encoding to TS1/3 on input line 406.
++Package textcomp Info: Setting pplj sub-encoding to TS1/3 on input line 407.
++Package textcomp Info: Setting ptmx sub-encoding to TS1/4 on input line 408.
++Package textcomp Info: Setting ptmj sub-encoding to TS1/4 on input line 409.
++)
++\ldescriptionwidth=\skip47
++
++(/usr/share/texlive/texmf-dist/tex/latex/base/fontenc.sty
++Package: fontenc 2005/09/27 v1.99g Standard LaTeX package
++
++(/usr/share/texlive/texmf-dist/tex/latex/base/t1enc.def
++File: t1enc.def 2005/09/27 v1.99g Standard LaTeX file
++LaTeX Font Info:    Redeclaring font encoding T1 on input line 48.
++))
++(/usr/share/texlive/texmf-dist/tex/latex/psnfss/times.sty
++Package: times 2005/04/12 PSNFSS-v9.2a (SPQR) 
++)
++(/usr/share/texlive/texmf-dist/tex/latex/inconsolata/zi4.sty
++Package: zi4 2014/06/22 v1.05
++
++`inconsolata-zi4' v1.05, 2014/06/22 Text macros for Inconsolata (msharpe)
++(/usr/share/texlive/texmf-dist/tex/latex/graphics/keyval.sty
++Package: keyval 2014/10/28 v1.15 key=value parser (DPC)
++\KV@toks@=\toks17
++)
++\zifour@ocount=\count93
++)
++(/usr/share/texlive/texmf-dist/tex/latex/graphics/color.sty
++Package: color 2014/10/28 v1.1a Standard LaTeX Color (DPC)
++
++(/usr/share/texlive/texmf-dist/tex/latex/latexconfig/color.cfg
++File: color.cfg 2007/01/18 v1.5 color configuration of teTeX/TeXLive
++)
++Package color Info: Driver file: pdftex.def on input line 142.
++
++(/usr/share/texlive/texmf-dist/tex/latex/pdftex-def/pdftex.def
++File: pdftex.def 2011/05/27 v0.06d Graphics/color for pdfTeX
++
++(/usr/share/texlive/texmf-dist/tex/generic/oberdiek/infwarerr.sty
++Package: infwarerr 2010/04/08 v1.3 Providing info/warning/error messages (HO)
++)
++(/usr/share/texlive/texmf-dist/tex/generic/oberdiek/ltxcmds.sty
++Package: ltxcmds 2011/11/09 v1.22 LaTeX kernel commands for general use (HO)
++)
++\Gread@gobject=\count94
++))
++(/usr/share/texlive/texmf-dist/tex/latex/hyperref/hyperref.sty
++Package: hyperref 2012/11/06 v6.83m Hypertext links for LaTeX
++
++(/usr/share/texlive/texmf-dist/tex/generic/oberdiek/hobsub-hyperref.sty
++Package: hobsub-hyperref 2012/05/28 v1.13 Bundle oberdiek, subset hyperref (HO)
++
++
++(/usr/share/texlive/texmf-dist/tex/generic/oberdiek/hobsub-generic.sty
++Package: hobsub-generic 2012/05/28 v1.13 Bundle oberdiek, subset generic (HO)
++Package: hobsub 2012/05/28 v1.13 Construct package bundles (HO)
++Package hobsub Info: Skipping package `infwarerr' (already loaded).
++Package hobsub Info: Skipping package `ltxcmds' (already loaded).
++Package: ifluatex 2010/03/01 v1.3 Provides the ifluatex switch (HO)
++Package ifluatex Info: LuaTeX not detected.
++Package: ifvtex 2010/03/01 v1.5 Detect VTeX and its facilities (HO)
++Package ifvtex Info: VTeX not detected.
++Package: intcalc 2007/09/27 v1.1 Expandable calculations with integers (HO)
++Package: ifpdf 2011/01/30 v2.3 Provides the ifpdf switch (HO)
++Package ifpdf Info: pdfTeX in PDF mode is detected.
++Package: etexcmds 2011/02/16 v1.5 Avoid name clashes with e-TeX commands (HO)
++Package etexcmds Info: Could not find \expanded.
++(etexcmds)             That can mean that you are not using pdfTeX 1.50 or
++(etexcmds)             that some package has redefined \expanded.
++(etexcmds)             In the latter case, load this package earlier.
++Package: kvsetkeys 2012/04/25 v1.16 Key value parser (HO)
++Package: kvdefinekeys 2011/04/07 v1.3 Define keys (HO)
++Package: pdftexcmds 2011/11/29 v0.20 Utility functions of pdfTeX for LuaTeX (HO
++)
++Package pdftexcmds Info: LuaTeX not detected.
++Package pdftexcmds Info: \pdf@primitive is available.
++Package pdftexcmds Info: \pdf@ifprimitive is available.
++Package pdftexcmds Info: \pdfdraftmode found.
++Package: pdfescape 2011/11/25 v1.13 Implements pdfTeX's escape features (HO)
++Package: bigintcalc 2012/04/08 v1.3 Expandable calculations on big integers (HO
++)
++Package: bitset 2011/01/30 v1.1 Handle bit-vector datatype (HO)
++Package: uniquecounter 2011/01/30 v1.2 Provide unlimited unique counter (HO)
++)
++Package hobsub Info: Skipping package `hobsub' (already loaded).
++Package: letltxmacro 2010/09/02 v1.4 Let assignment for LaTeX macros (HO)
++Package: hopatch 2012/05/28 v1.2 Wrapper for package hooks (HO)
++Package: xcolor-patch 2011/01/30 xcolor patch
++Package: atveryend 2011/06/30 v1.8 Hooks at the very end of document (HO)
++Package atveryend Info: \enddocument detected (standard20110627).
++Package: atbegshi 2011/10/05 v1.16 At begin shipout hook (HO)
++Package: refcount 2011/10/16 v3.4 Data extraction from label references (HO)
++Package: hycolor 2011/01/30 v1.7 Color options for hyperref/bookmark (HO)
++)
++(/usr/share/texlive/texmf-dist/tex/generic/ifxetex/ifxetex.sty
++Package: ifxetex 2010/09/12 v0.6 Provides ifxetex conditional
++)
++(/usr/share/texlive/texmf-dist/tex/latex/oberdiek/auxhook.sty
++Package: auxhook 2011/03/04 v1.3 Hooks for auxiliary files (HO)
++)
++(/usr/share/texlive/texmf-dist/tex/latex/oberdiek/kvoptions.sty
++Package: kvoptions 2011/06/30 v3.11 Key value format for package options (HO)
++)
++\@linkdim=\dimen104
++\Hy@linkcounter=\count95
++\Hy@pagecounter=\count96
++
++(/usr/share/texlive/texmf-dist/tex/latex/hyperref/pd1enc.def
++File: pd1enc.def 2012/11/06 v6.83m Hyperref: PDFDocEncoding definition (HO)
++)
++\Hy@SavedSpaceFactor=\count97
++
++(/usr/share/texlive/texmf-dist/tex/latex/latexconfig/hyperref.cfg
++File: hyperref.cfg 2002/06/06 v1.2 hyperref configuration of TeXLive
++)
++Package hyperref Info: Hyper figures OFF on input line 4443.
++Package hyperref Info: Link nesting OFF on input line 4448.
++Package hyperref Info: Hyper index ON on input line 4451.
++Package hyperref Info: Plain pages OFF on input line 4458.
++Package hyperref Info: Backreferencing OFF on input line 4463.
++Package hyperref Info: Implicit mode ON; LaTeX internals redefined.
++Package hyperref Info: Bookmarks ON on input line 4688.
++\c@Hy@tempcnt=\count98
++LaTeX Info: Redefining \url on input line 5041.
++\XeTeXLinkMargin=\dimen105
++\Fld@menulength=\count99
++\Field@Width=\dimen106
++\Fld@charsize=\dimen107
++Package hyperref Info: Hyper figures OFF on input line 6295.
++Package hyperref Info: Link nesting OFF on input line 6300.
++Package hyperref Info: Hyper index ON on input line 6303.
++Package hyperref Info: backreferencing OFF on input line 6310.
++Package hyperref Info: Link coloring OFF on input line 6315.
++Package hyperref Info: Link coloring with OCG OFF on input line 6320.
++Package hyperref Info: PDF/A mode OFF on input line 6325.
++LaTeX Info: Redefining \ref on input line 6365.
++LaTeX Info: Redefining \pageref on input line 6369.
++\Hy@abspage=\count100
++\c@Item=\count101
++\c@Hfootnote=\count102
++)
++
++Package hyperref Message: Driver (autodetected): hpdftex.
++
++(/usr/share/texlive/texmf-dist/tex/latex/hyperref/hpdftex.def
++File: hpdftex.def 2012/11/06 v6.83m Hyperref driver for pdfTeX
++\Fld@listcount=\count103
++\c@bookmark@seq@number=\count104
++
++(/usr/share/texlive/texmf-dist/tex/latex/oberdiek/rerunfilecheck.sty
++Package: rerunfilecheck 2011/04/15 v1.7 Rerun checks for auxiliary files (HO)
++Package uniquecounter Info: New unique counter `rerunfilecheck' on input line 2
++82.
++)
++\Hy@SectionHShift=\skip48
++)
++
++Package hyperref Warning: Option `hyperindex' has already been used,
++(hyperref)                setting the option has no effect on input line 366.
++
++Package hyperref Info: Option `colorlinks' set `true' on input line 366.
++
++Package hyperref Warning: Option `pagebackref' has already been used,
++(hyperref)                setting the option has no effect on input line 366.
++
++Package hyperref Info: Option `linktocpage' set `true' on input line 366.
++Package hyperref Info: Option `plainpages' set `false' on input line 366.
++) (/usr/share/texlive/texmf-dist/tex/latex/base/makeidx.sty
++Package: makeidx 2014/09/29 v1.0m Standard LaTeX package
++)
++(/usr/share/texlive/texmf-dist/tex/latex/base/inputenc.sty
++Package: inputenc 2015/03/17 v1.2c Input encoding file
++\inpenc@prehook=\toks18
++\inpenc@posthook=\toks19
++
++(/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def
++File: utf8.def 2015/06/27 v1.1n UTF-8 support for inputenc
++Now handling font encoding OML ...
++... no UTF-8 mapping file for font encoding OML
++Now handling font encoding T1 ...
++... processing UTF-8 mapping file for font encoding T1
++
++(/usr/share/texlive/texmf-dist/tex/latex/base/t1enc.dfu
++File: t1enc.dfu 2015/06/27 v1.1n UTF-8 support for inputenc
++   defining Unicode char U+00A1 (decimal 161)
++   defining Unicode char U+00A3 (decimal 163)
++   defining Unicode char U+00AB (decimal 171)
++   defining Unicode char U+00BB (decimal 187)
++   defining Unicode char U+00BF (decimal 191)
++   defining Unicode char U+00C0 (decimal 192)
++   defining Unicode char U+00C1 (decimal 193)
++   defining Unicode char U+00C2 (decimal 194)
++   defining Unicode char U+00C3 (decimal 195)
++   defining Unicode char U+00C4 (decimal 196)
++   defining Unicode char U+00C5 (decimal 197)
++   defining Unicode char U+00C6 (decimal 198)
++   defining Unicode char U+00C7 (decimal 199)
++   defining Unicode char U+00C8 (decimal 200)
++   defining Unicode char U+00C9 (decimal 201)
++   defining Unicode char U+00CA (decimal 202)
++   defining Unicode char U+00CB (decimal 203)
++   defining Unicode char U+00CC (decimal 204)
++   defining Unicode char U+00CD (decimal 205)
++   defining Unicode char U+00CE (decimal 206)
++   defining Unicode char U+00CF (decimal 207)
++   defining Unicode char U+00D0 (decimal 208)
++   defining Unicode char U+00D1 (decimal 209)
++   defining Unicode char U+00D2 (decimal 210)
++   defining Unicode char U+00D3 (decimal 211)
++   defining Unicode char U+00D4 (decimal 212)
++   defining Unicode char U+00D5 (decimal 213)
++   defining Unicode char U+00D6 (decimal 214)
++   defining Unicode char U+00D8 (decimal 216)
++   defining Unicode char U+00D9 (decimal 217)
++   defining Unicode char U+00DA (decimal 218)
++   defining Unicode char U+00DB (decimal 219)
++   defining Unicode char U+00DC (decimal 220)
++   defining Unicode char U+00DD (decimal 221)
++   defining Unicode char U+00DE (decimal 222)
++   defining Unicode char U+00DF (decimal 223)
++   defining Unicode char U+00E0 (decimal 224)
++   defining Unicode char U+00E1 (decimal 225)
++   defining Unicode char U+00E2 (decimal 226)
++   defining Unicode char U+00E3 (decimal 227)
++   defining Unicode char U+00E4 (decimal 228)
++   defining Unicode char U+00E5 (decimal 229)
++   defining Unicode char U+00E6 (decimal 230)
++   defining Unicode char U+00E7 (decimal 231)
++   defining Unicode char U+00E8 (decimal 232)
++   defining Unicode char U+00E9 (decimal 233)
++   defining Unicode char U+00EA (decimal 234)
++   defining Unicode char U+00EB (decimal 235)
++   defining Unicode char U+00EC (decimal 236)
++   defining Unicode char U+00ED (decimal 237)
++   defining Unicode char U+00EE (decimal 238)
++   defining Unicode char U+00EF (decimal 239)
++   defining Unicode char U+00F0 (decimal 240)
++   defining Unicode char U+00F1 (decimal 241)
++   defining Unicode char U+00F2 (decimal 242)
++   defining Unicode char U+00F3 (decimal 243)
++   defining Unicode char U+00F4 (decimal 244)
++   defining Unicode char U+00F5 (decimal 245)
++   defining Unicode char U+00F6 (decimal 246)
++   defining Unicode char U+00F8 (decimal 248)
++   defining Unicode char U+00F9 (decimal 249)
++   defining Unicode char U+00FA (decimal 250)
++   defining Unicode char U+00FB (decimal 251)
++   defining Unicode char U+00FC (decimal 252)
++   defining Unicode char U+00FD (decimal 253)
++   defining Unicode char U+00FE (decimal 254)
++   defining Unicode char U+00FF (decimal 255)
++   defining Unicode char U+0102 (decimal 258)
++   defining Unicode char U+0103 (decimal 259)
++   defining Unicode char U+0104 (decimal 260)
++   defining Unicode char U+0105 (decimal 261)
++   defining Unicode char U+0106 (decimal 262)
++   defining Unicode char U+0107 (decimal 263)
++   defining Unicode char U+010C (decimal 268)
++   defining Unicode char U+010D (decimal 269)
++   defining Unicode char U+010E (decimal 270)
++   defining Unicode char U+010F (decimal 271)
++   defining Unicode char U+0110 (decimal 272)
++   defining Unicode char U+0111 (decimal 273)
++   defining Unicode char U+0118 (decimal 280)
++   defining Unicode char U+0119 (decimal 281)
++   defining Unicode char U+011A (decimal 282)
++   defining Unicode char U+011B (decimal 283)
++   defining Unicode char U+011E (decimal 286)
++   defining Unicode char U+011F (decimal 287)
++   defining Unicode char U+0130 (decimal 304)
++   defining Unicode char U+0131 (decimal 305)
++   defining Unicode char U+0132 (decimal 306)
++   defining Unicode char U+0133 (decimal 307)
++   defining Unicode char U+0139 (decimal 313)
++   defining Unicode char U+013A (decimal 314)
++   defining Unicode char U+013D (decimal 317)
++   defining Unicode char U+013E (decimal 318)
++   defining Unicode char U+0141 (decimal 321)
++   defining Unicode char U+0142 (decimal 322)
++   defining Unicode char U+0143 (decimal 323)
++   defining Unicode char U+0144 (decimal 324)
++   defining Unicode char U+0147 (decimal 327)
++   defining Unicode char U+0148 (decimal 328)
++   defining Unicode char U+014A (decimal 330)
++   defining Unicode char U+014B (decimal 331)
++   defining Unicode char U+0150 (decimal 336)
++   defining Unicode char U+0151 (decimal 337)
++   defining Unicode char U+0152 (decimal 338)
++   defining Unicode char U+0153 (decimal 339)
++   defining Unicode char U+0154 (decimal 340)
++   defining Unicode char U+0155 (decimal 341)
++   defining Unicode char U+0158 (decimal 344)
++   defining Unicode char U+0159 (decimal 345)
++   defining Unicode char U+015A (decimal 346)
++   defining Unicode char U+015B (decimal 347)
++   defining Unicode char U+015E (decimal 350)
++   defining Unicode char U+015F (decimal 351)
++   defining Unicode char U+0160 (decimal 352)
++   defining Unicode char U+0161 (decimal 353)
++   defining Unicode char U+0162 (decimal 354)
++   defining Unicode char U+0163 (decimal 355)
++   defining Unicode char U+0164 (decimal 356)
++   defining Unicode char U+0165 (decimal 357)
++   defining Unicode char U+016E (decimal 366)
++   defining Unicode char U+016F (decimal 367)
++   defining Unicode char U+0170 (decimal 368)
++   defining Unicode char U+0171 (decimal 369)
++   defining Unicode char U+0178 (decimal 376)
++   defining Unicode char U+0179 (decimal 377)
++   defining Unicode char U+017A (decimal 378)
++   defining Unicode char U+017B (decimal 379)
++   defining Unicode char U+017C (decimal 380)
++   defining Unicode char U+017D (decimal 381)
++   defining Unicode char U+017E (decimal 382)
++   defining Unicode char U+200C (decimal 8204)
++   defining Unicode char U+2013 (decimal 8211)
++   defining Unicode char U+2014 (decimal 8212)
++   defining Unicode char U+2018 (decimal 8216)
++   defining Unicode char U+2019 (decimal 8217)
++   defining Unicode char U+201A (decimal 8218)
++   defining Unicode char U+201C (decimal 8220)
++   defining Unicode char U+201D (decimal 8221)
++   defining Unicode char U+201E (decimal 8222)
++   defining Unicode char U+2030 (decimal 8240)
++   defining Unicode char U+2031 (decimal 8241)
++   defining Unicode char U+2039 (decimal 8249)
++   defining Unicode char U+203A (decimal 8250)
++   defining Unicode char U+2423 (decimal 9251)
++)
++Now handling font encoding OT1 ...
++... processing UTF-8 mapping file for font encoding OT1
++
++(/usr/share/texlive/texmf-dist/tex/latex/base/ot1enc.dfu
++File: ot1enc.dfu 2015/06/27 v1.1n UTF-8 support for inputenc
++   defining Unicode char U+00A1 (decimal 161)
++   defining Unicode char U+00A3 (decimal 163)
++   defining Unicode char U+00B8 (decimal 184)
++   defining Unicode char U+00BF (decimal 191)
++   defining Unicode char U+00C5 (decimal 197)
++   defining Unicode char U+00C6 (decimal 198)
++   defining Unicode char U+00D8 (decimal 216)
++   defining Unicode char U+00DF (decimal 223)
++   defining Unicode char U+00E6 (decimal 230)
++   defining Unicode char U+00EC (decimal 236)
++   defining Unicode char U+00ED (decimal 237)
++   defining Unicode char U+00EE (decimal 238)
++   defining Unicode char U+00EF (decimal 239)
++   defining Unicode char U+00F8 (decimal 248)
++   defining Unicode char U+0131 (decimal 305)
++   defining Unicode char U+0141 (decimal 321)
++   defining Unicode char U+0142 (decimal 322)
++   defining Unicode char U+0152 (decimal 338)
++   defining Unicode char U+0153 (decimal 339)
++   defining Unicode char U+2013 (decimal 8211)
++   defining Unicode char U+2014 (decimal 8212)
++   defining Unicode char U+2018 (decimal 8216)
++   defining Unicode char U+2019 (decimal 8217)
++   defining Unicode char U+201C (decimal 8220)
++   defining Unicode char U+201D (decimal 8221)
++)
++Now handling font encoding OMS ...
++... processing UTF-8 mapping file for font encoding OMS
++
++(/usr/share/texlive/texmf-dist/tex/latex/base/omsenc.dfu
++File: omsenc.dfu 2015/06/27 v1.1n UTF-8 support for inputenc
++   defining Unicode char U+00A7 (decimal 167)
++   defining Unicode char U+00B6 (decimal 182)
++   defining Unicode char U+00B7 (decimal 183)
++   defining Unicode char U+2020 (decimal 8224)
++   defining Unicode char U+2021 (decimal 8225)
++   defining Unicode char U+2022 (decimal 8226)
++)
++Now handling font encoding OMX ...
++... no UTF-8 mapping file for font encoding OMX
++Now handling font encoding U ...
++... no UTF-8 mapping file for font encoding U
++Now handling font encoding TS1 ...
++... processing UTF-8 mapping file for font encoding TS1
++
++(/usr/share/texlive/texmf-dist/tex/latex/base/ts1enc.dfu
++File: ts1enc.dfu 2015/06/27 v1.1n UTF-8 support for inputenc
++   defining Unicode char U+00A2 (decimal 162)
++   defining Unicode char U+00A3 (decimal 163)
++   defining Unicode char U+00A4 (decimal 164)
++   defining Unicode char U+00A5 (decimal 165)
++   defining Unicode char U+00A6 (decimal 166)
++   defining Unicode char U+00A7 (decimal 167)
++   defining Unicode char U+00A8 (decimal 168)
++   defining Unicode char U+00A9 (decimal 169)
++   defining Unicode char U+00AA (decimal 170)
++   defining Unicode char U+00AC (decimal 172)
++   defining Unicode char U+00AE (decimal 174)
++   defining Unicode char U+00AF (decimal 175)
++   defining Unicode char U+00B0 (decimal 176)
++   defining Unicode char U+00B1 (decimal 177)
++   defining Unicode char U+00B2 (decimal 178)
++   defining Unicode char U+00B3 (decimal 179)
++   defining Unicode char U+00B4 (decimal 180)
++   defining Unicode char U+00B5 (decimal 181)
++   defining Unicode char U+00B6 (decimal 182)
++   defining Unicode char U+00B7 (decimal 183)
++   defining Unicode char U+00B9 (decimal 185)
++   defining Unicode char U+00BA (decimal 186)
++   defining Unicode char U+00BC (decimal 188)
++   defining Unicode char U+00BD (decimal 189)
++   defining Unicode char U+00BE (decimal 190)
++   defining Unicode char U+00D7 (decimal 215)
++   defining Unicode char U+00F7 (decimal 247)
++   defining Unicode char U+0192 (decimal 402)
++   defining Unicode char U+02C7 (decimal 711)
++   defining Unicode char U+02D8 (decimal 728)
++   defining Unicode char U+02DD (decimal 733)
++   defining Unicode char U+0E3F (decimal 3647)
++   defining Unicode char U+2016 (decimal 8214)
++   defining Unicode char U+2020 (decimal 8224)
++   defining Unicode char U+2021 (decimal 8225)
++   defining Unicode char U+2022 (decimal 8226)
++   defining Unicode char U+2030 (decimal 8240)
++   defining Unicode char U+2031 (decimal 8241)
++   defining Unicode char U+203B (decimal 8251)
++   defining Unicode char U+203D (decimal 8253)
++   defining Unicode char U+2044 (decimal 8260)
++   defining Unicode char U+204E (decimal 8270)
++   defining Unicode char U+2052 (decimal 8274)
++   defining Unicode char U+20A1 (decimal 8353)
++   defining Unicode char U+20A4 (decimal 8356)
++   defining Unicode char U+20A6 (decimal 8358)
++   defining Unicode char U+20A9 (decimal 8361)
++   defining Unicode char U+20AB (decimal 8363)
++   defining Unicode char U+20AC (decimal 8364)
++   defining Unicode char U+20B1 (decimal 8369)
++   defining Unicode char U+2103 (decimal 8451)
++   defining Unicode char U+2116 (decimal 8470)
++   defining Unicode char U+2117 (decimal 8471)
++   defining Unicode char U+211E (decimal 8478)
++   defining Unicode char U+2120 (decimal 8480)
++   defining Unicode char U+2122 (decimal 8482)
++   defining Unicode char U+2126 (decimal 8486)
++   defining Unicode char U+2127 (decimal 8487)
++   defining Unicode char U+212E (decimal 8494)
++   defining Unicode char U+2190 (decimal 8592)
++   defining Unicode char U+2191 (decimal 8593)
++   defining Unicode char U+2192 (decimal 8594)
++   defining Unicode char U+2193 (decimal 8595)
++   defining Unicode char U+2329 (decimal 9001)
++   defining Unicode char U+232A (decimal 9002)
++   defining Unicode char U+2422 (decimal 9250)
++   defining Unicode char U+25E6 (decimal 9702)
++   defining Unicode char U+25EF (decimal 9711)
++   defining Unicode char U+266A (decimal 9834)
++)
++Now handling font encoding PD1 ...
++... no UTF-8 mapping file for font encoding PD1
++   defining Unicode char U+00A9 (decimal 169)
++   defining Unicode char U+00AA (decimal 170)
++   defining Unicode char U+00AE (decimal 174)
++   defining Unicode char U+00BA (decimal 186)
++   defining Unicode char U+02C6 (decimal 710)
++   defining Unicode char U+02DC (decimal 732)
++   defining Unicode char U+200C (decimal 8204)
++   defining Unicode char U+2026 (decimal 8230)
++   defining Unicode char U+2122 (decimal 8482)
++   defining Unicode char U+2423 (decimal 9251)
++)
++(/usr/share/texlive/texmf-dist/tex/latex/base/latin1.def
++File: latin1.def 2015/03/17 v1.2c Input encoding file
++))
++\@indexfile=\write3
++\openout3 = `Rd2.idx'.
++
++
++Writing index file Rd2.idx
++(/tmp/RtmpdegcEq/Rd2pdf39604595c9da/Rd2.aux)
++\openout1 = `Rd2.aux'.
++
++LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 8.
++LaTeX Font Info:    ... okay on input line 8.
++LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 8.
++LaTeX Font Info:    ... okay on input line 8.
++LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 8.
++LaTeX Font Info:    ... okay on input line 8.
++LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 8.
++LaTeX Font Info:    ... okay on input line 8.
++LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 8.
++LaTeX Font Info:    ... okay on input line 8.
++LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 8.
++LaTeX Font Info:    ... okay on input line 8.
++LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 8.
++LaTeX Font Info:    Try loading font information for TS1+cmr on input line 8.
++
++(/usr/share/texlive/texmf-dist/tex/latex/base/ts1cmr.fd
++File: ts1cmr.fd 2014/09/29 v2.5h Standard LaTeX font definitions
++)
++LaTeX Font Info:    ... okay on input line 8.
++LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 8.
++LaTeX Font Info:    ... okay on input line 8.
++LaTeX Font Info:    Try loading font information for T1+ptm on input line 8.
++
++(/usr/share/texlive/texmf-dist/tex/latex/psnfss/t1ptm.fd
++File: t1ptm.fd 2001/06/04 font definitions for T1/ptm.
++)
++(/usr/share/texlive/texmf-dist/tex/context/base/supp-pdf.mkii
++[Loading MPS to PDF converter (version 2006.09.02).]
++\scratchcounter=\count105
++\scratchdimen=\dimen108
++\scratchbox=\box30
++\nofMPsegments=\count106
++\nofMParguments=\count107
++\everyMPshowfont=\toks20
++\MPscratchCnt=\count108
++\MPscratchDim=\dimen109
++\MPnumerator=\count109
++\makeMPintoPDFobject=\count110
++\everyMPtoPDFconversion=\toks21
++)
++\AtBeginShipoutBox=\box31
++Package hyperref Info: Link coloring ON on input line 8.
++ (/usr/share/texlive/texmf-dist/tex/latex/hyperref/nameref.sty
++Package: nameref 2012/10/27 v2.43 Cross-referencing by name of section
++
++(/usr/share/texlive/texmf-dist/tex/generic/oberdiek/gettitlestring.sty
++Package: gettitlestring 2010/12/03 v1.4 Cleanup title references (HO)
++)
++\c@section@level=\count111
++)
++LaTeX Info: Redefining \ref on input line 8.
++LaTeX Info: Redefining \pageref on input line 8.
++LaTeX Info: Redefining \nameref on input line 8.
++
++(/tmp/RtmpdegcEq/Rd2pdf39604595c9da/Rd2.out)
++(/tmp/RtmpdegcEq/Rd2pdf39604595c9da/Rd2.out)
++\@outlinefile=\write4
++\openout4 = `Rd2.out'.
++
++LaTeX Font Info:    Font shape `T1/ptm/bx/n' in size <24.88> not available
++(Font)              Font shape `T1/ptm/b/n' tried instead on input line 9.
++LaTeX Font Info:    Font shape `T1/ptm/bx/n' in size <10> not available
++(Font)              Font shape `T1/ptm/b/n' tried instead on input line 11.
++LaTeX Font Info:    Font shape `T1/ptm/bx/n' in size <20.74> not available
++(Font)              Font shape `T1/ptm/b/n' tried instead on input line 11.
++LaTeX Font Info:    Try loading font information for T1+zi4 on input line 21.
++
++(/usr/share/texlive/texmf-dist/tex/latex/inconsolata/t1zi4.fd
++File: t1zi4.fd 2014/06/22 T1/zi4 (Inconsolata)
++)
++LaTeX Font Info:    Font shape `T1/ptm/bx/n' in size <14.4> not available
++(Font)              Font shape `T1/ptm/b/n' tried instead on input line 26.
++LaTeX Font Info:    Try loading font information for T1+phv on input line 26.
++
++(/usr/share/texlive/texmf-dist/tex/latex/psnfss/t1phv.fd
++File: t1phv.fd 2001/06/04 scalable font definitions for T1/phv.
++)
++(/tmp/RtmpdegcEq/Rd2pdf39604595c9da/Rd2.toc
++LaTeX Font Info:    External font `cmex10' loaded for size
++(Font)              <7> on input line 1.
++LaTeX Font Info:    External font `cmex10' loaded for size
++(Font)              <5> on input line 1.
++)
++\tf@toc=\write5
++\openout5 = `Rd2.toc'.
++
++
++(/usr/share/texlive/texmf-dist/tex/latex/base/utf8.def
++File: utf8.def 2015/06/27 v1.1n UTF-8 support for inputenc
++) [1
++
++
++{/usr/share/texlive/texmf-dist/fonts/map/pdftex/updmap/pdftex.map}]
++Underfull \hbox (badness 10000) in paragraph at lines 65--66
++
++ []
++
++
++Underfull \hbox (badness 10000) in paragraph at lines 67--68
++
++ []
++
++
++Underfull \hbox (badness 10000) in paragraph at lines 69--70
++
++ []
++
++(/tmp/RtmpdegcEq/Rd2pdf39604595c9da/Rd2.ind [2]
++LaTeX Font Info:    Font shape `T1/ptm/bx/n' in size <12> not available
++(Font)              Font shape `T1/ptm/b/n' tried instead on input line 3.
++ [3
++
++
++])
++Package atveryend Info: Empty hook `BeforeClearDocument' on input line 86.
++Package atveryend Info: Empty hook `AfterLastShipout' on input line 86.
++
++(/tmp/RtmpdegcEq/Rd2pdf39604595c9da/Rd2.aux)
++Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 86.
++Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 86.
++Package rerunfilecheck Info: File `Rd2.out' has not changed.
++(rerunfilecheck)             Checksum: C143BFDA90446F7495151F6880910DD1;84.
++Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 86.
++ ) 
++Here is how much of TeX's memory you used:
++ 6318 strings out of 493096
++ 90117 string characters out of 6137362
++ 170063 words of memory out of 5000000
++ 9695 multiletter control sequences out of 15000+600000
++ 40674 words of font info for 49 fonts, out of 8000000 for 9000
++ 1137 hyphenation exceptions out of 8191
++ 38i,6n,27p,227b,429s stack positions out of 5000i,500n,10000p,200000b,80000s
++{/usr/share/texlive/texmf-dist/fonts/enc/dvips/base/8r.enc}{/usr/share/texliv
++e/texmf-dist/fonts/enc/dvips/inconsolata/i4-t1-0.enc}</usr/share/texlive/texmf-
++dist/fonts/type1/public/inconsolata/Inconsolata-zi4r.pfb></usr/share/texlive/te
++xmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/share/texlive/texmf-di
++st/fonts/type1/public/amsfonts/cm/cmmi7.pfb></usr/share/texlive/texmf-dist/font
++s/type1/public/amsfonts/cm/cmr10.pfb></usr/share/texlive/texmf-dist/fonts/type1
++/public/amsfonts/cm/cmr7.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/
++amsfonts/cm/cmsy10.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/helvetic/
++uhvr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmb8a.pfb></us
++r/share/texlive/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/share/texlive
++/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/share/texlive/texmf-dist/fon
++ts/type1/urw/times/utmri8a.pfb>
++Output written on Rd2.pdf (3 pages, 96156 bytes).
++PDF statistics:
++ 93 PDF objects out of 1000 (max. 8388607)
++ 76 compressed objects within 1 object stream
++ 16 named destinations out of 1000 (max. 500000)
++ 17 words of extra memory for PDF output out of 10000 (max. 10000000)
++
+diff --git a/pareto.Rcheck/pareto-manual.pdf b/pareto.Rcheck/pareto-manual.pdf
+new file mode 100644
+index 0000000..7970544
+Binary files /dev/null and b/pareto.Rcheck/pareto-manual.pdf differ
+diff --git a/pareto.Rcheck/pareto/DESCRIPTION b/pareto.Rcheck/pareto/DESCRIPTION
+new file mode 100644
+index 0000000..8b59c8f
+--- /dev/null
++++ b/pareto.Rcheck/pareto/DESCRIPTION
+@@ -0,0 +1,12 @@
++Package: pareto
++Type: Package
++Title: Density Function for Pareto Distribution
++Version: 1.0-1
++Date: 2017-02-04
++Author: Yiheng Liu
++Maintainer: Yiheng Liu <yiheng-liu@uiowa.edu>
++Description: Density function for the pareto distribution with scale equal to alpha and shape equal to beta.
++License: GPL (>=2)
++NeedsCompilation: no
++Packaged: 2017-02-06 20:46:20 UTC; yliu255
++Built: R 3.3.1; ; 2017-02-06 20:46:27 UTC; unix
+diff --git a/pareto.Rcheck/pareto/INDEX b/pareto.Rcheck/pareto/INDEX
+new file mode 100644
+index 0000000..234ff9f
+--- /dev/null
++++ b/pareto.Rcheck/pareto/INDEX
+@@ -0,0 +1 @@
++dpareto                 The Pareto Distribution
+diff --git a/pareto.Rcheck/pareto/Meta/Rd.rds b/pareto.Rcheck/pareto/Meta/Rd.rds
+new file mode 100644
+index 0000000..bf2c244
+Binary files /dev/null and b/pareto.Rcheck/pareto/Meta/Rd.rds differ
+diff --git a/pareto.Rcheck/pareto/Meta/hsearch.rds b/pareto.Rcheck/pareto/Meta/hsearch.rds
+new file mode 100644
+index 0000000..9edbaeb
+Binary files /dev/null and b/pareto.Rcheck/pareto/Meta/hsearch.rds differ
+diff --git a/pareto.Rcheck/pareto/Meta/links.rds b/pareto.Rcheck/pareto/Meta/links.rds
+new file mode 100644
+index 0000000..69596af
+Binary files /dev/null and b/pareto.Rcheck/pareto/Meta/links.rds differ
+diff --git a/pareto.Rcheck/pareto/Meta/nsInfo.rds b/pareto.Rcheck/pareto/Meta/nsInfo.rds
+new file mode 100644
+index 0000000..1300ecc
+Binary files /dev/null and b/pareto.Rcheck/pareto/Meta/nsInfo.rds differ
+diff --git a/pareto.Rcheck/pareto/Meta/package.rds b/pareto.Rcheck/pareto/Meta/package.rds
+new file mode 100644
+index 0000000..0277e60
+Binary files /dev/null and b/pareto.Rcheck/pareto/Meta/package.rds differ
+diff --git a/pareto.Rcheck/pareto/NAMESPACE b/pareto.Rcheck/pareto/NAMESPACE
+new file mode 100644
+index 0000000..5aec65d
+--- /dev/null
++++ b/pareto.Rcheck/pareto/NAMESPACE
+@@ -0,0 +1 @@
++export(dpareto)
+diff --git a/pareto.Rcheck/pareto/R/pareto b/pareto.Rcheck/pareto/R/pareto
+new file mode 100644
+index 0000000..3b65e3c
+--- /dev/null
++++ b/pareto.Rcheck/pareto/R/pareto
+@@ -0,0 +1,27 @@
++#  File share/R/nspackloader.R
++#  Part of the R package, http://www.R-project.org
++#
++#  Copyright (C) 1995-2012 The R Core Team
++#
++#  This program is free software; you can redistribute it and/or modify
++#  it under the terms of the GNU General Public License as published by
++#  the Free Software Foundation; either version 2 of the License, or
++#  (at your option) any later version.
++#
++#  This program is distributed in the hope that it will be useful,
++#  but WITHOUT ANY WARRANTY; without even the implied warranty of
++#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++#  GNU General Public License for more details.
++#
++#  A copy of the GNU General Public License is available at
++#  http://www.r-project.org/Licenses/
++
++local({
++    info <- loadingNamespaceInfo()
++    pkg <- info$pkgname
++    ns <- .getNamespace(as.name(pkg))
++    if (is.null(ns))
++        stop("cannot find namespace environment for ", pkg, domain = NA);
++    dbbase <- file.path(info$libname, pkg, "R", pkg)
++    lazyLoad(dbbase, ns, filter = function(n) n != ".__NAMESPACE__.")
++})
+diff --git a/pareto.Rcheck/pareto/R/pareto.rdb b/pareto.Rcheck/pareto/R/pareto.rdb
+new file mode 100644
+index 0000000..bc5fc66
+Binary files /dev/null and b/pareto.Rcheck/pareto/R/pareto.rdb differ
+diff --git a/pareto.Rcheck/pareto/R/pareto.rdx b/pareto.Rcheck/pareto/R/pareto.rdx
+new file mode 100644
+index 0000000..f272b69
+Binary files /dev/null and b/pareto.Rcheck/pareto/R/pareto.rdx differ
+diff --git a/pareto.Rcheck/pareto/help/AnIndex b/pareto.Rcheck/pareto/help/AnIndex
+new file mode 100644
+index 0000000..514744d
+--- /dev/null
++++ b/pareto.Rcheck/pareto/help/AnIndex
+@@ -0,0 +1 @@
++dpareto	dpareto
+diff --git a/pareto.Rcheck/pareto/help/aliases.rds b/pareto.Rcheck/pareto/help/aliases.rds
+new file mode 100644
+index 0000000..f2bb26e
+Binary files /dev/null and b/pareto.Rcheck/pareto/help/aliases.rds differ
+diff --git a/pareto.Rcheck/pareto/help/pareto.rdb b/pareto.Rcheck/pareto/help/pareto.rdb
+new file mode 100644
+index 0000000..fe72340
+Binary files /dev/null and b/pareto.Rcheck/pareto/help/pareto.rdb differ
+diff --git a/pareto.Rcheck/pareto/help/pareto.rdx b/pareto.Rcheck/pareto/help/pareto.rdx
+new file mode 100644
+index 0000000..fc1c827
+Binary files /dev/null and b/pareto.Rcheck/pareto/help/pareto.rdx differ
+diff --git a/pareto.Rcheck/pareto/help/paths.rds b/pareto.Rcheck/pareto/help/paths.rds
+new file mode 100644
+index 0000000..3316144
+Binary files /dev/null and b/pareto.Rcheck/pareto/help/paths.rds differ
+diff --git a/pareto.Rcheck/pareto/html/00Index.html b/pareto.Rcheck/pareto/html/00Index.html
+new file mode 100644
+index 0000000..46f27e1
+--- /dev/null
++++ b/pareto.Rcheck/pareto/html/00Index.html
+@@ -0,0 +1,26 @@
++<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
++<html xmlns="http://www.w3.org/1999/xhtml">
++<head><title>R: Density Function for Pareto Distribution</title>
++<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
++<link rel="stylesheet" type="text/css" href="R.css" />
++</head><body>
++<h1> Density Function for Pareto Distribution
++<img class="toplogo" src="../../../doc/html/Rlogo.svg" alt="[R logo]" />
++</h1>
++<hr/>
++<div style="text-align: center;">
++<a href="../../../doc/html/packages.html"><img class="arrow" src="../../../doc/html/left.jpg" alt="[Up]" /></a>
++<a href="../../../doc/html/index.html"><img class="arrow" src="../../../doc/html/up.jpg" alt="[Top]" /></a>
++</div><h2>Documentation for package &lsquo;pareto&rsquo; version 1.0-1</h2>
++
++<ul><li><a href="../DESCRIPTION">DESCRIPTION file</a>.</li>
++</ul>
++
++<h2>Help Pages</h2>
++
++
++<table width="100%">
++<tr><td style="width: 25%;"><a href="dpareto.html">dpareto</a></td>
++<td>The Pareto Distribution</td></tr>
++</table>
++</body></html>
+diff --git a/pareto.Rcheck/pareto/html/R.css b/pareto.Rcheck/pareto/html/R.css
+new file mode 100644
+index 0000000..f10f5ea
+--- /dev/null
++++ b/pareto.Rcheck/pareto/html/R.css
+@@ -0,0 +1,97 @@
++body {
++    background: white;
++    color: black;
++}
++
++a:link {
++    background: white;
++    color: blue;
++}
++
++a:visited {
++    background: white;
++    color: rgb(50%, 0%, 50%);
++}
++
++h1 {
++    background: white;
++    color: rgb(55%, 55%, 55%);
++    font-family: monospace;
++    font-size: x-large;
++    text-align: center;
++}
++
++h2 {
++    background: white;
++    color: rgb(40%, 40%, 40%);
++    font-family: monospace;
++    font-size: large;
++    text-align: center;
++}
++
++h3 {
++    background: white;
++    color: rgb(40%, 40%, 40%);
++    font-family: monospace;
++    font-size: large;
++}
++
++h4 {
++    background: white;
++    color: rgb(40%, 40%, 40%);
++    font-family: monospace;
++    font-style: italic;
++    font-size: large;
++}
++
++h5 {
++    background: white;
++    color: rgb(40%, 40%, 40%);
++    font-family: monospace;
++}
++
++h6 {
++    background: white;
++    color: rgb(40%, 40%, 40%);
++    font-family: monospace;
++    font-style: italic;
++}
++		
++img.toplogo {
++    width: 4em;
++    vertical-align: middle;
++}
++
++img.arrow {
++    width: 30px;
++    height: 30px;
++    border: 0;
++}
++
++span.acronym {
++    font-size: small;
++}
++
++span.env {
++    font-family: monospace;
++}
++
++span.file {
++    font-family: monospace;
++}
++
++span.option{
++    font-family: monospace;
++}
++
++span.pkg {
++    font-weight: bold;
++}
++
++span.samp{
++    font-family: monospace;
++}
++
++div.vignettes a:hover {
++    background: rgb(85%, 85%, 85%);
++}
+diff --git a/pareto.Rcheck/tests/startup.Rs b/pareto.Rcheck/tests/startup.Rs
+new file mode 100644
+index 0000000..8ad6d25
+--- /dev/null
++++ b/pareto.Rcheck/tests/startup.Rs
+@@ -0,0 +1,4 @@
++## A custom startup file for tests
++## Run as if a system Rprofile, so no packages, no assignments
++options(useFancyQuotes = FALSE)
++
+diff --git a/pareto.Rcheck/tests/tests.R b/pareto.Rcheck/tests/tests.R
+new file mode 100644
+index 0000000..049ceb2
+--- /dev/null
++++ b/pareto.Rcheck/tests/tests.R
+@@ -0,0 +1,11 @@
++library(pareto)
++stopifnot(all.equal(dpareto(3, -2, 1), NaN))
++stopifnot(all.equal(dpareto(3, 2, -1), NaN))
++stopifnot(all.equal(dpareto(3, 2, 1), 0.2222222222))
++stopifnot(all.equal(dpareto(1, 2, 3), 0))
++stopifnot(all.equal(dpareto(3:5, 2, 1), c(0.2222222222, 0.125, 0.08)))
++stopifnot(all.equal(dpareto(1:5, 2, 1), c(0, 0, 0.2222222222, 0.125, 0.08)))
++stopifnot(all.equal(dpareto(6, 2:4, 1), c(0.05555555556, 0.08333333333, 0.11111111111)))
++stopifnot(all.equal(log(dpareto(1:5, 2, 1)), dpareto(1:5, 2, 1, log = TRUE)))
++stopifnot(all.equal(dpareto(1:6, 1:2, 1), c(0, 0, 0.11111111111, 0.125, 0.04, 0.05555555556)))
++stopifnot(all.equal(dpareto(1, 2, 1:2), c(0, 0)))
+\ No newline at end of file
+diff --git a/pareto.Rcheck/tests/tests.Rout b/pareto.Rcheck/tests/tests.Rout
+new file mode 100644
+index 0000000..099a6fe
+--- /dev/null
++++ b/pareto.Rcheck/tests/tests.Rout
+@@ -0,0 +1,36 @@
++
++R version 3.3.1 (2016-06-21) -- "Bug in Your Hair"
++Copyright (C) 2016 The R Foundation for Statistical Computing
++Platform: x86_64-redhat-linux-gnu (64-bit)
++
++R is free software and comes with ABSOLUTELY NO WARRANTY.
++You are welcome to redistribute it under certain conditions.
++Type 'license()' or 'licence()' for distribution details.
++
++R is a collaborative project with many contributors.
++Type 'contributors()' for more information and
++'citation()' on how to cite R or R packages in publications.
++
++Type 'demo()' for some demos, 'help()' for on-line help, or
++'help.start()' for an HTML browser interface to help.
++Type 'q()' to quit R.
++
++> library(pareto)
++> stopifnot(all.equal(dpareto(3, -2, 1), NaN))
++Warning message:
++In dpareto(3, -2, 1) : NaNs produced
++> stopifnot(all.equal(dpareto(3, 2, -1), NaN))
++Warning message:
++In dpareto(3, 2, -1) : NaNs produced
++> stopifnot(all.equal(dpareto(3, 2, 1), 0.2222222222))
++> stopifnot(all.equal(dpareto(1, 2, 3), 0))
++> stopifnot(all.equal(dpareto(3:5, 2, 1), c(0.2222222222, 0.125, 0.08)))
++> stopifnot(all.equal(dpareto(1:5, 2, 1), c(0, 0, 0.2222222222, 0.125, 0.08)))
++> stopifnot(all.equal(dpareto(6, 2:4, 1), c(0.05555555556, 0.08333333333, 0.11111111111)))
++> stopifnot(all.equal(log(dpareto(1:5, 2, 1)), dpareto(1:5, 2, 1, log = TRUE)))
++> stopifnot(all.equal(dpareto(1:6, 1:2, 1), c(0, 0, 0.11111111111, 0.125, 0.04, 0.05555555556)))
++> stopifnot(all.equal(dpareto(1, 2, 1:2), c(0, 0)))
++> 
++> proc.time()
++   user  system elapsed 
++  0.129   0.021   0.154 
+diff --git a/pareto_1.0-1.tar.gz b/pareto_1.0-1.tar.gz
+new file mode 100644
+index 0000000..c499444
+Binary files /dev/null and b/pareto_1.0-1.tar.gz differ
+
+commit 3790affc8ff50bbea11ad9509625620eb128136a
+Author: Yiheng Liu <yiheng-liu@uiowa.edu>
+Date:   Mon Feb 6 14:25:57 2017 -0600
+
+    Add dir pareto and HW3
+
+diff --git a/HW3/.~lock.HW3.docx# b/HW3/.~lock.HW3.docx#
+new file mode 100644
+index 0000000..5eb5a63
+--- /dev/null
++++ b/HW3/.~lock.HW3.docx#
+@@ -0,0 +1 @@
++,yliu255,r-lnx401.stat.uiowa.edu,06.02.2017 13:33,file:///mnt/nfs/netapp2/grad/yliu255/.config/libreoffice/4;
+\ No newline at end of file
+diff --git a/HW3/HW3.docx b/HW3/HW3.docx
+new file mode 100644
+index 0000000..0e3b3c0
+Binary files /dev/null and b/HW3/HW3.docx differ
+diff --git a/HW3/approximation.R b/HW3/approximation.R
+new file mode 100644
+index 0000000..8b18d05
+--- /dev/null
++++ b/HW3/approximation.R
+@@ -0,0 +1,69 @@
++h <- 2^seq(-1,-64,-1)
++
++#1)f_1(x) = sin(x) at x = 1 (cos(x))
++f1 <- matrix(NA,length(h),3)
++x <- 1
++f1.true <- cos(x)
++#1.1) forward
++f1[,1] <- (sin(x+h)-sin(x))/h 
++#1.2) central
++f1[,2] <- (sin(x+h)-sin(x-h))/(2*h) 
++#1.3) complex
++f1[,3] <- Im(sin(complex(real = x, imaginary = h)))/h
++#plot
++matplot(-log2(h),f1-f1.true,type="l", ylab="error", main="f(x) = sin(x) at x = 1")
++legend("bottomleft",legend=c("forward","central","complex"),lty=c(1,2,3),col=c("black","red","green"))
++
++
++
++#2)f_2(x) = 10000sin(x) at x = 1 (10000cos(x))
++f2 <- matrix(NA,length(h),3)
++x <- 1
++f2.true <- 10000*cos(x)
++#2.1) forward
++f2[,1] <- 10000*(sin(x+h)-sin(x))/h 
++#2.2) central
++f2[,2] <- 10000*(sin(x+h)-sin(x-h))/(2*h) 
++#2.3) complex
++f2[,3] <- Im(10000*sin(complex(real = x, imaginary = h)))/h
++#plot
++matplot(-log2(h),f2-f2.true,type="l", ylab="error", main="f(x) = 10000sin(x) at x = 1")
++legend("bottomleft",legend=c("forward","central","complex"),lty=c(1,2,3),col=c("black","red","green"))
++
++
++
++#3)f_3(x) = tan(x) at x = 1.59 (1/cos(x)^2)
++f3 <- matrix(NA,length(h),3)
++x <- 1.59
++f3.true <- 1/cos(x)^2
++#3.1) forward
++f3[,1] <- (tan(x+h)-tan(x))/h 
++#3.2) central
++f3[,2] <- (tan(x+h)-tan(x-h))/(2*h) 
++#3.3) complex
++f3[,3] <- Im(tan(complex(real = x, imaginary = h)))/h
++#plot
++matplot(-log2(h),f3-f3.true,type="l", ylab="error", main="f(x) = tan(x) at x = 1.59")
++legend("topright",legend=c("forward","central","complex"),lty=c(1,2,3),col=c("black","red","green"))
++
++
++
++
++
++
++#4)f_4(x) = phi(x) at x = 0.5 (-x*phi(x))
++f4 <- matrix(NA,length(h),3)
++x <- 0.5
++f4.true <- -x*dnorm(x)
++#4.1) forward
++f4[,1] <- (dnorm(x+h)-dnorm(x))/h 
++#4.2) central
++f4[,2] <- (dnorm(x+h)-dnorm(x-h))/(2*h)
++#4.3) complex
++f4[,3] <- Im(1/sqrt(2*pi)*exp(-0.5*complex(real = x, imaginary = h)^2))/h
++matplot(-log2(h),f4-f4.true,type="l", ylab="error", main="f(x) = phi(x) at x = 0.5")
++legend("bottomlef",legend=c("forward","central","complex"),lty=c(1,2,3),col=c("black","red","green"))
++
++
++
++
+diff --git a/HW3/f1.png b/HW3/f1.png
+new file mode 100644
+index 0000000..9df7985
+Binary files /dev/null and b/HW3/f1.png differ
+diff --git a/HW3/f2.png b/HW3/f2.png
+new file mode 100644
+index 0000000..ea892cb
+Binary files /dev/null and b/HW3/f2.png differ
+diff --git a/HW3/f3.png b/HW3/f3.png
+new file mode 100644
+index 0000000..74ea3c3
+Binary files /dev/null and b/HW3/f3.png differ
+diff --git a/HW3/f4.png b/HW3/f4.png
+new file mode 100644
+index 0000000..847b5f0
+Binary files /dev/null and b/HW3/f4.png differ
+diff --git a/pareto/DESCRIPTION b/pareto/DESCRIPTION
+new file mode 100644
+index 0000000..3f843f8
+--- /dev/null
++++ b/pareto/DESCRIPTION
+@@ -0,0 +1,10 @@
++Package: pareto
++Type: Package
++Title: Density Function for Pareto Distribution
++Version: 1.0-1
++Date: 2017-02-04
++Author: Yiheng Liu
++Maintainer: Yiheng Liu <yiheng-liu@uiowa.edu>
++Description: Density function for the pareto distribution with scale equal to alpha and shape equal to beta.
++License: GPL (>=2)
++
+diff --git a/pareto/NAMESPACE b/pareto/NAMESPACE
+new file mode 100644
+index 0000000..5aec65d
+--- /dev/null
++++ b/pareto/NAMESPACE
+@@ -0,0 +1 @@
++export(dpareto)
+diff --git a/pareto/R/dpareto.R b/pareto/R/dpareto.R
+new file mode 100644
+index 0000000..e601dd3
+--- /dev/null
++++ b/pareto/R/dpareto.R
+@@ -0,0 +1,22 @@
++dpareto <- function(x, alpha, beta, log = FALSE) {
++    
++    # Calculate the maximum length of inputs
++    L <- max(length(x), length(alpha), length(beta))
++    
++    # Align all the inputs
++    x <- rep(x, length.out = L)
++    alpha <- rep(alpha, length.out = L)
++    beta <- rep(beta, length.out = L)
++    
++    logdens <- ifelse(alpha <= 0 | beta <= 0,
++                      NaN,
++                      ifelse(x <= alpha,
++                             log(0),
++                             log(beta) + beta * log(alpha) - (beta + 1) * log(x)))
++    
++    # Check whether NaNs exist
++    if (sum(is.nan(logdens))) 
++        warning("NaNs produced")
++    
++    if (log) logdens else exp(logdens)
++}
+\ No newline at end of file
+diff --git a/pareto/README b/pareto/README
+new file mode 100644
+index 0000000..8033359
+--- /dev/null
++++ b/pareto/README
+@@ -0,0 +1 @@
++This is a simple package with a function to calcualte the density of pareto distribtuion.
+diff --git a/pareto/man/.Rhistory b/pareto/man/.Rhistory
+new file mode 100644
+index 0000000..9d16615
+--- /dev/null
++++ b/pareto/man/.Rhistory
+@@ -0,0 +1,459 @@
++x1 <- seq(0,1,0.01)
++x2 <- seq(1.01,10,0.01)
++y1 <- dpareto(x1,1,1)
++y2 <- dpareto(x2,1,1)
++plot(x1,y1,xlim=range(c(x1,x2)),ylim=range(c(y1,y2)),type="l")
++lines(x2,y2)
++dpareto <- function(x, alpha, beta, log = FALSE) {
++# Calculate the maximum length of inputs
++L <- max(length(x), length(alpha), length(beta))
++# Align all the inputs
++x <- rep(x, length.out = L)
++alpha <- rep(alpha, length.out = L)
++beta <- rep(beta, length.out = L)
++logdens <- ifelse(alpha <= 0 | beta <= 0,
++NaN,
++ifelse(x <= alpha,
++log(0),
++log(beta) + beta * log(alpha) - (beta + 1) * log(x)))
++# Check whether NaNs exist
++if (sum(is.nan(logdens)))
++warning("NaNs produced")
++if (log) logdens else exp(logdens)
++}
++x1 <- seq(0,1,0.01)
++x2 <- seq(1.01,10,0.01)
++y1 <- dpareto(x1,1,1)
++y2 <- dpareto(x2,1,1)
++plot(x1,y1,xlim=range(c(x1,x2)),ylim=range(c(y1,y2)),type="l")
++lines(x2,y2)
++? plot
++x1 <- seq(0,1,0.01)
++x2 <- seq(1.01,10,0.01)
++y1 <- dpareto(x1,1,1)
++y2 <- dpareto(x2,1,1)
++x3 <- seq(0,2,0.01)
++x4 <- seq(2.01,10,0.01)
++y3 <- dpareto(x3,2,3)
++y4 <- dpareto(x4,2,3)
++plot(x1,y1,xlim=range(c(x1,x2,x3,x4)),ylim=range(c(y1,y2,y3,y4)),type="l",col="red",xlab="x",ylab="density")
++lines(x2,y2,col="red")
++lines(x3,y3,col="blue")
++lines(x4,y4,col="blue")
++? plot
++? lines
++x1 <- seq(0,1,0.01)
++x2 <- seq(1.01,10,0.01)
++y1 <- dpareto(x1,1,1)
++y2 <- dpareto(x2,1,1)
++x3 <- seq(0,2,0.01)
++x4 <- seq(2.01,10,0.01)
++y3 <- dpareto(x3,2,3)
++y4 <- dpareto(x4,2,3)
++plot(x1,y1,xlim=range(c(x1,x2,x3,x4)),ylim=range(c(y1,y2,y3,y4)),type="l",col="red",xlab="x",ylab="density")
++lines(x2,y2,col="red")
++lines(x3,y3,col="blue",lty=2)
++lines(x4,y4,col="blue",lty=2)
++x1 <- seq(0,1,0.01)
++x2 <- seq(1.01,10,0.01)
++y1 <- dpareto(x1,1,1)
++y2 <- dpareto(x2,1,1)
++x3 <- seq(0,2,0.01)
++x4 <- seq(2.01,10,0.01)
++y3 <- dpareto(x3,2,3)
++y4 <- dpareto(x4,2,3)
++plot(x1,y1,xlim=range(c(x1,x2,x3,x4)),ylim=range(c(y1,y2,y3,y4)),type="l",col="red",xlab="x",ylab="density")
++lines(x2,y2,col="red")
++lines(x3,y3,col="blue",lty=3)
++lines(x4,y4,col="blue",lty=3)
++x1 <- seq(0,1,0.01)
++x2 <- seq(1.01,10,0.01)
++y1 <- dpareto(x1,1,1)
++y2 <- dpareto(x2,1,1)
++x3 <- seq(0,2,0.01)
++x4 <- seq(2.01,10,0.01)
++y3 <- dpareto(x3,2,3)
++y4 <- dpareto(x4,2,3)
++plot(x1,y1,xlim=range(c(x1,x2,x3,x4)),ylim=range(c(y1,y2,y3,y4)),type="l",col="red",xlab="x",ylab="density")
++lines(x2,y2,col="red")
++lines(x3,y3,col="blue",lty=2)
++lines(x4,y4,col="blue",lty=2)
++? legend
++plot(x1,y1,xlim=range(c(x1,x2,x3,x4)),ylim=range(c(y1,y2,y3,y4)),type="l",col="red",xlab="x",ylab="density")
++lines(x2,y2,col="red")
++lines(x3,y3,col="blue",lty=2)
++lines(x4,y4,col="blue",lty=2)
++legend("topright",c(1,2),lty=c(1,3),col=c("red","blue"))
++plot(x1,y1,xlim=range(c(x1,x2,x3,x4)),ylim=range(c(y1,y2,y3,y4)),type="l",col="red",xlab="x",ylab="density")
++lines(x2,y2,col="red")
++lines(x3,y3,col="blue",lty=2)
++lines(x4,y4,col="blue",lty=2)
++legend("topright",legend=c(1,2),lty=c(1,3),col=c("red","blue"))
++plot(x1,y1,xlim=range(c(x1,x2,x3,x4)),ylim=range(c(y1,y2,y3,y4)),type="l",col="red",xlab="x",ylab="density")
++lines(x2,y2,col="red")
++lines(x3,y3,col="blue",lty=2)
++lines(x4,y4,col="blue",lty=2)
++legend("topright",legend=c(expression(alpha=1),expression(alpha=2)),lty=c(1,2),col=c("red","blue"))
++espression(alpha)
++? expression
++plot(x1,y1,xlim=range(c(x1,x2,x3,x4)),ylim=range(c(y1,y2,y3,y4)),type="l",col="red",xlab="x",ylab="density")
++lines(x2,y2,col="red")
++lines(x3,y3,col="blue",lty=2)
++lines(x4,y4,col="blue",lty=2)
++legend("topright",legend=c(expression(alpha),expression(alpha)),lty=c(1,2),col=c("red","blue"))
++plot(x1,y1,xlim=range(c(x1,x2,x3,x4)),ylim=range(c(y1,y2,y3,y4)),type="l",col="red",xlab="x",ylab="density")
++lines(x2,y2,col="red")
++lines(x3,y3,col="blue",lty=2)
++lines(x4,y4,col="blue",lty=2)
++legend("topright",legend=c(expression(alpha)=1,expression(alpha)),lty=c(1,2),col=c("red","blue"))
++plot(x1,y1,xlim=range(c(x1,x2,x3,x4)),ylim=range(c(y1,y2,y3,y4)),type="l",col="red",xlab="x",ylab="density")
++lines(x2,y2,col="red")
++lines(x3,y3,col="blue",lty=2)
++lines(x4,y4,col="blue",lty=2)
++legend("topright",legend=c("expression(alpha)=1",expression(alpha)),lty=c(1,2),col=c("red","blue"))
++plot(x1,y1,xlim=range(c(x1,x2,x3,x4)),ylim=range(c(y1,y2,y3,y4)),type="l",col="red",xlab="x",ylab="density")
++lines(x2,y2,col="red")
++lines(x3,y3,col="blue",lty=2)
++lines(x4,y4,col="blue",lty=2)
++legend("topright",legend=c("scale=1,shape=1","scale=2,shape=3"),lty=c(1,2),col=c("red","blue"))
++x1 <- seq(0,1,0.01)
++x2 <- seq(1.01,10,0.01)
++y1 <- dpareto(x1,1,1)
++y2 <- dpareto(x2,1,1)
++x3 <- seq(0,2,0.01)
++x4 <- seq(2.01,10,0.01)
++y3 <- dpareto(x3,2,3)
++y4 <- dpareto(x4,2,3)
++plot(x1,y1,xlim=range(c(x1,x2,x3,x4)),ylim=range(c(y1,y2,y3,y4)),type="l",col="red",xlab="x",ylab="density",main="Pareto Distribution")
++lines(x2,y2,col="red")
++lines(x3,y3,col="blue",lty=2)
++lines(x4,y4,col="blue",lty=2)
++legend("topright",legend=c("scale=1,shape=1","scale=2,shape=3"),lty=c(1,2),col=c("red","blue"))
++a <- FALSE
++typeof(a)
++as.integer(a)
++as.integer(TRUE)
++? double
++double(3)
++double(3)
++double(56)
++paretodens(1,1,1)
++paretodens <- function(x, alpha, beta, log = FALSE) {
++nx <- length(x)
++nalpha <- length(alpha)
++nbeta <- length(beta)
++n <- max(nx, nalpha, nbeta)
++result <- .C("paretodens",
++as.double(x), as.integer(nx),
++as.double(alpha), as.integer(nalpha),
++as.double(beta), as.integer(nbeta),
++dens = double(n), as.integer(log))
++result$dens
++}
++paretodens(1,1,1)
++paretodens(1,1,1)
++dyn.load("paretodens.so")
++? dyn.load
++dyn.load(paretodens)
++dyn.load("paretodens.so")
++setwd("/mnt/nfs/netapp2/grad/yliu255/s7400/STAT7400/HW2")
++dyn.load("paretodens.so")
++paretodens(1,1,1)
++as.integer(0)
++dyn.load("paretodens.so")
++paretodens <- function(x, alpha, beta, log = FALSE) {
++nx <- length(x)
++nalpha <- length(alpha)
++nbeta <- length(beta)
++n <- max(nx, nalpha, nbeta)
++result <- .C("paretodens",
++as.double(x), as.integer(nx),
++as.double(alpha), as.integer(nalpha),
++as.double(beta), as.integer(nbeta),
++dens = double(n), as.integer(log))
++result$dens
++}
++paretodens(1,1,1)
++paretodens(3,-2,1)
++paretodens(3,2,-1)
++paretodens(3,2,1)
++paretodens(1,2,3)
++paretodens(3:5,2,1)
++paretodens(1:5,2,1)
++paretodens(6,2:4,1)
++paretodens(1:5,2,1)
++paretodens(1:5,2,1,TRUE)
++log(paretodens(1:5,2,1))
++paretodens(1:6,1:2,1)
++paretodens(1,2,1:2)
++paretodens(1,-1:2,1:2)
++dyn.load("paretodens.so")
++paretodens(1,-1:2,1:2)
++paretodens(1,-1,1:2)
++paretodens(5,c(-1,2,3),1:2)
++paretodens(1,-1:2,1:2)
++paretodens(1,-1:2,1:2)
++paretodens(1,-1:2,1:2)
++paretodens(1,-1:2,1:2)
++paretodens(1,-1:2,1:2)
++paretodens(1,-1:2,1:2)
++paretodens(1,-1:2,1:2)
++paretodens(1,-1:2,1:2)
++paretodens(1,-1:2,1:2)
++paretodens(1,-1:2,1:2)
++dyn.load("paretodens.so")
++paretodens(1,-1:2,1:2)
++? warning
++? warnings
++dyn.load("paretodens.so")
++paretodens(1,-1:2,1:2)
++dgamma
++? dgamma
++dgamma(1,-1,0)
++dgamma(1,-1,1)
++dgamma(1,c(-1,2),1)
++dyn.load("paretodensDotC.so")
++paretodensDotC(1,-1:2,1:2)
++paretodensDotC <- function(x, alpha, beta, log = FALSE) {
++nx <- length(x)
++nalpha <- length(alpha)
++nbeta <- length(beta)
++n <- max(nx, nalpha, nbeta)
++result <- .C("paretodensDotC",
++as.double(x), as.integer(nx),
++as.double(alpha), as.integer(nalpha),
++as.double(beta), as.integer(nbeta),
++dens = double(n), as.integer(log))
++result$dens
++}
++paretodensDotC(1,-1:2,1:2)
++paretodensDotC(1,-1,2)
++paretodensDotC(1:5,2,1)
++paretodensDotC(1:5,-1,1)
++paretodensDotC(1:5,-1:2,1)
++dyn.load("paretodensDotC.so")
++paretodensDotC(3,2,1,TRUE)
++all.equal(log(paretodensDotC(1:5,2, 1)), paretodens](1:5,2, 1, log = TRUE))
++all.equal(log(paretodensDotC(1:5,2, 1)), paretodensDotC(1:5,2, 1, log = TRUE))
++all.equal(log(paretodensDotC(1:5,-1:2, 1)), paretodensDotC(1:5,-1:2, 1, log = TRUE))
++paretodensDotC(3,2)
++tidy_source()
++library(formatR)
++tidy_source("paretodensDotC.R")
++paretodensDotC(3, 2, 1)
++paretodensDotC(1, 2, 3)
++paretodensDotC(3, -2, 1)
++paretodensDotC(3, 2, -1)
++paretodensDotC(3 : 5, 2, 1)
++paretodensDotC(1 : 5, 2, 1)
++paretodensDotC(6, 2 : 4, 1)
++paretodensDotC(3, 2, 1, log = TRUE)
++? library
++? INSTALL
++install.packages("readxl")
++setwd("~/Downloads")
++library(readxl)
++? read_excel
++read_excel("Final Data Sheet for SPSS updated.xlsx")
++data <- read_excel("Final Data Sheet for SPSS updated.xlsx")
++data$GENDER
++data <- read.csv("Final Data Sheet for SPSS updated.csv")
++data
++? fisher.test
++attach(data)
++View(data)
++fisher.test(HPV,STAGE)
++fisher.test(HPV,STAGE..l.lV.)
++fisher.test(HPV,STAGE..l.lV.)
++fisher.test(HPV,GRADE..l.lll.)
++fisher.test(HPV,LYMPH.NODE..yes.no.)
++fisher.test(HPV,METASTASIS..yes.no.)
++fisher.test(HPV,TYPE.OF.Disease..DCIS..IDC.MC.PC.)
++fisher.test(EBV,STAGE..l.lV.)
++fisher.test(EBV,GRADE..l.lll.)
++fisher.test(EBV,LYMPH.NODE..yes.no.)
++fisher.test(EBV,METASTASIS..yes.no.)
++fisher.test(EBV,TYPE.OF.Disease..DCIS..IDC.MC.PC.)
++fisher.test(HPV,STAGE..l.lV.)
++fisher.test(HPV,GRADE..l.lll.)
++fisher.test(HPV,LYMPH.NODE..yes.no.)
++fisher.test(HPV,METASTASIS..yes.no.)
++fisher.test(HPV,TYPE.OF.Disease..DCIS..IDC.MC.PC.)
++fisher.test(EBV,STAGE..l.lV.)
++fisher.test(EBV,GRADE..l.lll.)
++fisher.test(EBV,LYMPH.NODE..yes.no.)
++fisher.test(EBV,METASTASIS..yes.no.)
++fisher.test(EBV,TYPE.OF.Disease..DCIS..IDC.MC.PC.)
++fisher.test(MMTV,STAGE..l.lV.)
++fisher.test(MMTV,GRADE..l.lll.)
++fisher.test(MMTV,LYMPH.NODE..yes.no.)
++fisher.test(MMTV,METASTASIS..yes.no.)
++fisher.test(MMTV,TYPE.OF.Disease..DCIS..IDC.MC.PC.)
++fisher.test(Co.existence,STAGE..l.lV.)
++fisher.test(Co.existence,GRADE..l.lll.)
++fisher.test(Co.existence,LYMPH.NODE..yes.no.)
++fisher.test(Co.existence,METASTASIS..yes.no.)
++fisher.test(Co.existence,TYPE.OF.Disease..DCIS..IDC.MC.PC.)
++fisher.test(as.factor(Co.existence),STAGE..l.lV.)
++a[1] < -fisher.test(HPV,STAGE..l.lV.)
++a[2] <- fisher.test(HPV,GRADE..l.lll.)
++a[3] <- fisher.test(HPV,LYMPH.NODE..yes.no.)
++a[4] <- fisher.test(HPV,METASTASIS..yes.no.)
++a[5] <- fisher.test(HPV,TYPE.OF.Disease..DCIS..IDC.MC.PC.)
++a <- rep(0,5)
++a[1] < -fisher.test(HPV,STAGE..l.lV.)
++a[2] <- fisher.test(HPV,GRADE..l.lll.)
++a[3] <- fisher.test(HPV,LYMPH.NODE..yes.no.)
++a[4] <- fisher.test(HPV,METASTASIS..yes.no.)
++a[5] <- fisher.test(HPV,TYPE.OF.Disease..DCIS..IDC.MC.PC.)
++fisher.test(HPV,STAGE..l.lV.)
++fisher.test(HPV,GRADE..l.lll.)
++fisher.test(HPV,LYMPH.NODE..yes.no.)
++fisher.test(HPV,METASTASIS..yes.no.)
++fisher.test(HPV,TYPE.OF.Disease..DCIS..IDC.MC.PC.)
++fisher.test(EBV,STAGE..l.lV.)
++fisher.test(EBV,GRADE..l.lll.)
++fisher.test(EBV,LYMPH.NODE..yes.no.)
++fisher.test(EBV,METASTASIS..yes.no.)
++fisher.test(EBV,TYPE.OF.Disease..DCIS..IDC.MC.PC.)
++fisher.test(MMTV,STAGE..l.lV.)
++fisher.test(MMTV,GRADE..l.lll.)
++fisher.test(MMTV,LYMPH.NODE..yes.no.)
++fisher.test(MMTV,METASTASIS..yes.no.)
++fisher.test(MMTV,TYPE.OF.Disease..DCIS..IDC.MC.PC.)
++fisher.test(Co.existence,GRADE..l.lll.)
++package.skeleton()
++? package.skeleton
++getwd()
++log(5)
++log(1)
++? heasure
++library(hmeasure)
++? ifelse
++? max
++? log
++? rep
++? package.skeleton
++? rnorm
++getwd()
++? require
++f <- function(x, y) x+y
++g <- function(x, y) x-y
++d <- data.frame(a = 1, b = 2)
++e <- rnorm(1000)
++package.skeleton(list = c("f","g","d","e"), name = "mypkg")
++dpareto <- function(x, alpha, beta, log = FALSE) {
++# Calculate the maximum length of inputs
++L <- max(length(x), length(alpha), length(beta))
++# Align all the inputs
++x <- rep(x, length.out = L)
++alpha <- rep(alpha, length.out = L)
++beta <- rep(beta, length.out = L)
++logdens <- ifelse(alpha <= 0 | beta <= 0,
++NaN,
++ifelse(x <= alpha,
++log(0),
++log(beta) + beta * log(alpha) - (beta + 1) * log(x)))
++# Check whether NaNs exist
++if (sum(is.nan(logdens)))
++warning("NaNs produced")
++if (log) logdens else exp(logdens)
++}
++package.skeleton(list="dpareto", name="pareto")
++install.packages("manipulate")
++hmeasure()
++hmeasure
++install.packages("~/Downloads/AddOne_1.0-1.tar.gz", repos = NULL, type = "source")
++library(AddOne)
++AddOner
++AddOne
++? AddOne
++dpareto <- function(x, alpha, beta, log = FALSE) {
++# Calculate the maximum length of inputs
++L <- max(length(x), length(alpha), length(beta))
++# Align all the inputs
++x <- rep(x, length.out = L)
++alpha <- rep(alpha, length.out = L)
++beta <- rep(beta, length.out = L)
++logdens <- ifelse(alpha <= 0 | beta <= 0,
++NaN,
++ifelse(x <= alpha,
++log(0),
++log(beta) + beta * log(alpha) - (beta + 1) * log(x)))
++# Check whether NaNs exist
++if (sum(is.nan(logdens)))
++warning("NaNs produced")
++if (log) logdens else exp(logdens)
++}
++dpareto
++? package.skeleton
++package.skeleton(names="pareto",code_files = "dpareto.R")
++package.skeleton(name="pareto",code_files = "dpareto.R")
++? bass
++? base
++? dnorm
++? dnorm
++? tidy_source
++? dnorm
++? dgamma
++? dgamma
++dpareto(1,2,4)
++dpareto(3,2,4)
++dpareto(3,2,4,log=TRUE)
++dpareto(3,2,4,log=C(TRUE,FALSE))
++dpareto(3,2,4,log=c(TRUE,FALSE))
++library(fromatR)
++library(fORmatR)
++library(formatR)
++? tidy_source
++tidy_source(".\pareto\man\dpareto.Rd")
++tidy_source("\pareto\man\dpareto.Rd")
++tidy_source("pareto\man\dpareto.Rd")
++getwd()
++tidy_source("/pareto/man/dpareto.Rd")
++tidy_source("/pareto/R/dpareto.R")
++tidy_source(source="/pareto/R/dpareto.R")
++getwd()
++setwd("/mnt/nfs/netapp2/grad/yliu255/Downloads/pareto/R")
++tidy_source(dpareto.R)
++tidy_source("dpareto.R")
++setwd("/mnt/nfs/netapp2/grad/yliu255/Downloads/pareto/man")
++tidy_source("dpareto.Rd")
++? dgamma
++? dnorm
++? dgamma
++? dnorm
++? dgamma
++RShowDoc("KEYWORDS")
++install.packages("~/Downloads/pareto_1.0-1.tar.gz", repos = NULL, type = "source")
++library(pareto)
++? pareto
++? dgamma
++? dnorm
++remove.package(pareto)
++remove.package
++remove.packags(pareto)
++remove.packages(pareto)
++? remove.packages
++. libpaths
++.libpaths
++.libpaths()
++.libPaths()
++remove.packages(pareto)
++remove.packages("pareto")
++install.packages("~/Downloads/pareto_1.0-1.tar.gz", repos = NULL, type = "source")
++library(pareto)
++? dpareto
++? dpareto
++? dgamma
++? dpareto
++dpareto
++dpareto(3,2,1)
++dpareto(3,1,1)
++? dnorm
++? dpareto
++remove.packages("pareto")
++install.packages("~/Downloads/pareto_1.0-1.tar.gz", repos = NULL, type = "source")
++library(pareto)
++? dpareto
++? dgamma
+diff --git a/pareto/man/dpareto.Rd b/pareto/man/dpareto.Rd
+new file mode 100644
+index 0000000..be4016a
+--- /dev/null
++++ b/pareto/man/dpareto.Rd
+@@ -0,0 +1,51 @@
++\name{dpareto}
++\alias{dpareto}
++%- Also NEED an '\alias' for EACH other topic documented here.
++\title{The Pareto Distribution}
++\description{
++  Density function for the pareto distribution with scale equal to \code{alpha} and shape equal to \code{beta}.
++}
++\usage{
++dpareto(x, alpha, beta, log = FALSE)
++}
++%- maybe also 'usage' for other objects documented here.
++\arguments{
++  \item{x}{
++  vector of quantiles.
++}
++  \item{alpha}{
++  scale parameters. Must be positive.
++}
++  \item{beta}{
++  shape parameters. Must be positive.
++}
++  \item{log}{
++  logical; if TRUE, probabilities \code{p} are given as \code{log(p)}.
++}
++}
++\details{
++  The pareto distribution has density
++    \deqn{f(x) = \frac{\beta \alpha^{\beta}}{x^{\beta+1}}}{%
++    f(x) = \beta \alpha^\beta/x^(\beta+1)}
++  where \eqn{0 < \alpha < x} and \eqn{\beta > 0}.
++}
++\value{
++  \code{dpareto} gives the density.\cr
++
++  Invalid arguments will result in return value NaN, with a warning.\cr
++
++  The length of the result is the maximum of the lengths of the numerical arguments.\cr
++
++  The numerical arguments are recycled to the length of the result. Only the first element of the logical argument is used.
++}
++
++\author{Yiheng Liu}
++
++\examples{
++dpareto(4, 2, 1)
++dpareto(1:5, 2, 1)
++dpareto(1:5, 2, 1, log = TRUE)
++}
++% Add one or more standard keywords, see file 'KEYWORDS' in the
++% R documentation directory.
++\keyword{distribution}
+diff --git a/pareto/tests/.Rhistory b/pareto/tests/.Rhistory
+new file mode 100644
+index 0000000..49f294b
+--- /dev/null
++++ b/pareto/tests/.Rhistory
+@@ -0,0 +1,29 @@
++library(dpareto)
++library(pareto)
++? dpareto
++? dgamma
++? dnorm
++dpareto(4,2,1)
++dpareto(3,-2, 1) # bad parameter
++dpareto(3,2, -1) # bar parameter
++stopifnot(all.equal(dpareto(3,2,1), 0.2222222222))
++stopifnot(all.equal(dpareto(1,2,3), 0.0))
++stopifnot(all.equal(dpareto(3:5,2, 1), c(0.2222222222, 0.1250000, 0.0800000)))
++stopifnot(all.equal(dpareto(1:5,2, 1), c(0.0, 0.0, 0.2222222222, 0.1250000, 0.0800000)))
++stopifnot(all.equal(dpareto(6,2:4, 1), c(0.05555555556, 0.08333333333, 0.11111111111)))
++stopifnot(all.equal(log(dpareto(1:5,2, 1)), dpareto(1:5,2, 1, log = TRUE)))
++stopifnot(all.equal(dpareto(1:6,1:2, 1),
++c(0.0, 0.0, 0.11111111111, 0.125, 0.04, 0.05555555556)))
++stopifnot(all.equal(dpareto(1, 2, 1:2), c(0, 0)))
++remove.packages("pareto")
++dpareto(6,2,1)
++library(formatR)
++library(formatR)
++tidy_source()
++getwd()
++tidy_source("/pareto/tests/tests.R")
++setwd("/mnt/nfs/netapp2/grad/yliu255/Downloads/pareto/tests")
++getwd()
++tidy_source("tests.R")
++install.packages("~/Downloads/pareto_1.0-1.tar.gz", repos = NULL, type = "source")
++? dpareto
+diff --git a/pareto/tests/tests.R b/pareto/tests/tests.R
+new file mode 100644
+index 0000000..049ceb2
+--- /dev/null
++++ b/pareto/tests/tests.R
+@@ -0,0 +1,11 @@
++library(pareto)
++stopifnot(all.equal(dpareto(3, -2, 1), NaN))
++stopifnot(all.equal(dpareto(3, 2, -1), NaN))
++stopifnot(all.equal(dpareto(3, 2, 1), 0.2222222222))
++stopifnot(all.equal(dpareto(1, 2, 3), 0))
++stopifnot(all.equal(dpareto(3:5, 2, 1), c(0.2222222222, 0.125, 0.08)))
++stopifnot(all.equal(dpareto(1:5, 2, 1), c(0, 0, 0.2222222222, 0.125, 0.08)))
++stopifnot(all.equal(dpareto(6, 2:4, 1), c(0.05555555556, 0.08333333333, 0.11111111111)))
++stopifnot(all.equal(log(dpareto(1:5, 2, 1)), dpareto(1:5, 2, 1, log = TRUE)))
++stopifnot(all.equal(dpareto(1:6, 1:2, 1), c(0, 0, 0.11111111111, 0.125, 0.04, 0.05555555556)))
++stopifnot(all.equal(dpareto(1, 2, 1:2), c(0, 0)))
+\ No newline at end of file
+
+commit 6f4ded62dc8edebac538ffd51f1dab501d95e3bb
+Author: Yiheng Liu <yiheng-liu@uiowa.edu>
+Date:   Sat Feb 4 15:53:19 2017 -0600
+
+    MOdified HW2.docx
+
+diff --git a/HW2/HW2.docx b/HW2/HW2.docx
+index e910bb4..4630101 100644
+Binary files a/HW2/HW2.docx and b/HW2/HW2.docx differ
+
+commit 9e9c73a0ed6317beca0252ac30fda04a5629242b
+Author: Yiheng Liu <yiheng-liu@uiowa.edu>
+Date:   Thu Feb 2 22:37:37 2017 -0600
+
+    Remove R history files
+
+diff --git a/HW2/.Rhistory b/HW2/.Rhistory
+deleted file mode 100644
+index f67e848..0000000
+--- a/HW2/.Rhistory
++++ /dev/null
+@@ -1,401 +0,0 @@
+-? dgamma
+-? dpareto
+-log(0)
+-exp(log(0))
+-? ifelse
+-a <- c(1:5)
+-a
+-b <- c(3,3,3,3,3)
+-b
+-ifelse(a>b,TRUE,FALSE)
+-library(formatR)
+-? tidy_source
+-tidy_source
+-tidy_source()
+-tidy_source()
+-tidy_source("dpareto.r")
+-tidy_source("dpareto.R")
+-tidy_source("dpareto.R")
+-tidy_source("dpareto.R")
+-tidy_source("dpareto.r")
+-setwd("/mnt/nfs/netapp2/grad/yliu255/s7400/STAT7400/HW2")
+-tidy_source("dpareto.R")
+-log(0)
+-exp(log(0))
+-exp(-Inf)
+-? ifelse
+-c(0,1,2,3,NaN)
+-a <- c(0,1,2,3,NaN)
+-a
+-exp(a)
+-dpareto <- function(x, a, b, log = FALSE) {
+-nx <- length(x)
+-na <- length(a)
+-nb <- length(b)
+-n <- max(nx, na, nb)
+-if (nx < n) x <- rep(x, length.out = n)
+-if (na < n) a <- rep(a, length.out = n)
+-if (nb < n) b <- rep(b, length.out = n)
+-ld <- ifelse(a > 0 & b > 0,
+-ifelse(x > a,
+-log(b) + b * log(a) - (b + 1) * log(x),
+-log(0)),
+-NaN)
+-if (log) ld
+-else exp(ld)
+-}
+-dpareto(2,-1,3)
+-? dgamma
+-dgamma(1,-2)
+-dpareto <- function(x, alpha, beta, log = FALSE) {
+-# Calculate the maximum length of inputs
+-L <- max(length(x), length(alpha), length(beta))
+-# Align all the inputs
+-x <- rep(x, length.out = L)
+-alpha <- rep(alpha, length.out = L)
+-beta <- rep(beta, length.out = L)
+-# Initialize the log densities with NaN
+-logdens <- rep(NaN, length.out = L)
+-for (i in 1:L) {
+-if (alpha[i] <= 0 || beta[i] <= 0) {
+-warning("NaNs produced")
+-next
+-} else if (x[i] < alpha[i]) {
+-logdens[i] <- log(0)
+-} else {
+-logdens[i] <- log(beta[i]) + beta[i]*log(alpha[i])-(beta[i]+1)*log(alpha[i])
+-}
+-}
+-if (log) logdens else exp(logdens)
+-}
+-dpaerto(1:3,2,4)
+-dpareto(1:3,2,4)
+-dpareto(1:3,2,4,TRUE)
+-stopifnot(all.equal(dpareto(3,2,1), 0.2222222222))
+-dpareto(3,-2,1)
+-dpareto(3,-2,1,TRUE)
+-dpareto(3,2,-1,TRUE)
+-dpareto(3,2,-1)
+-dpareto(1,2,3)
+-dpareto(3,2,1)
+-dpareto(3,2,1)
+-dpareto <- function(x, alpha, beta, log = FALSE) {
+-# Calculate the maximum length of inputs
+-L <- max(length(x), length(alpha), length(beta))
+-# Align all the inputs
+-x <- rep(x, length.out = L)
+-alpha <- rep(alpha, length.out = L)
+-beta <- rep(beta, length.out = L)
+-# Initialize the log densities with NaN
+-logdens <- rep(NaN, length.out = L)
+-for (i in 1:L) {
+-if (alpha[i] <= 0 || beta[i] <= 0) {
+-warning("NaNs produced")
+-next
+-} else if (x[i] < alpha[i]) {
+-logdens[i] <- log(0)
+-} else {
+-logdens[i] <- log(beta[i]) + beta[i]*log(alpha[i])-(beta[i]+1)*log(x[i])
+-}
+-}
+-if (log) logdens else exp(logdens)
+-}
+-dpareto(3,2,1)
+-dpareto(3:5,2,1)
+-dpareto(1:5,2,1)
+-dpareto(6,2:4,1)
+-log(dpareto(1:5,2,1))-dpareto(1:5,2,1,TRUE)
+-all.equal
+-all.equal(log(dpareto(1:5,2,1)),dpareto(1:5,2,1,TRUE))
+-dpareto(1:6,1:2,1)
+-dpareto(1,1,1)
+-dpareto(1,1,1)
+-dpareto <- function(x, alpha, beta, log = FALSE) {
+-# Calculate the maximum length of inputs
+-L <- max(length(x), length(alpha), length(beta))
+-# Align all the inputs
+-x <- rep(x, length.out = L)
+-alpha <- rep(alpha, length.out = L)
+-beta <- rep(beta, length.out = L)
+-# Initialize the log densities with NaN
+-logdens <- rep(NaN, length.out = L)
+-for (i in 1:L) {
+-if (alpha[i] <= 0 || beta[i] <= 0) {
+-warning("NaNs produced")
+-next
+-} else if (x[i] <= alpha[i]) {
+-logdens[i] <- log(0)
+-} else {
+-logdens[i] <- log(beta[i]) + beta[i]*log(alpha[i])-(beta[i]+1)*log(x[i])
+-}
+-}
+-if (log) logdens else exp(logdens)
+-}
+-dpareto(3,-2, 1) # bad parameter
+-dpareto(3,2, -1) # bar parameter
+-stopifnot(all.equal(dpareto(3,2,1), 0.2222222222))
+-stopifnot(all.equal(dpareto(1,2,3), 0.0))
+-stopifnot(all.equal(dpareto(3:5,2, 1), c(0.2222222222, 0.1250000, 0.0800000)))
+-stopifnot(all.equal(dpareto(1:5,2, 1), c(0.0, 0.0, 0.2222222222, 0.1250000, 0.0800000)))
+-stopifnot(all.equal(dpareto(6,2:4, 1), c(0.05555555556, 0.08333333333, 0.11111111111)))
+-stopifnot(all.equal(log(dpareto(1:5,2, 1)), dpareto(1:5,2, 1, log = TRUE)))
+-stopifnot(all.equal(dpareto(1:6,1:2, 1),
+-c(0.0, 0.0, 0.11111111111, 0.125, 0.04, 0.05555555556)))
+-stopifnot(all.equal(dpareto(1, 2, 1:2), c(0, 0)))
+-dpareto(3,-2, 1) # bad parameter
+-dpareto(3,2, -1) # bar parameter
+-stopifnot(all.equal(dpareto(3,2,1), 0.2222222222))
+-stopifnot(all.equal(dpareto(1,2,3), 0.0))
+-stopifnot(all.equal(dpareto(3:5,2, 1), c(0.2222222222, 0.1250000, 0.0800000)))
+-stopifnot(all.equal(dpareto(1:5,2, 1), c(0.0, 0.0, 0.2222222222, 0.1250000, 0.0800000)))
+-stopifnot(all.equal(dpareto(6,2:4, 1), c(0.05555555556, 0.08333333333, 0.11111111111)))
+-stopifnot(all.equal(log(dpareto(1:5,2, 1)), dpareto(1:5,2, 1, log = TRUE)))
+-stopifnot(all.equal(dpareto(1:6,1:2, 1),
+-c(0.0, 0.0, 0.11111111111, 0.125, 0.04, 0.05555555556)))
+-stopifnot(all.equal(dpareto(1, 2, 1:2), c(0, 1)))
+-dpareto(3,-2, 1) # bad parameter
+-dpareto(3,2, -1) # bar parameter
+-stopifnot(all.equal(dpareto(3,2,1), 0.2222222222))
+-stopifnot(all.equal(dpareto(1,2,3), 0.0))
+-stopifnot(all.equal(dpareto(3:5,2, 1), c(0.2222222222, 0.1250000, 0.0800000)))
+-stopifnot(all.equal(dpareto(1:5,2, 1), c(0.0, 0.0, 0.2222222222, 0.1250000, 0.0800000)))
+-stopifnot(all.equal(dpareto(6,2:4, 1), c(0.05555555556, 0.08333333333, 0.11111111111)))
+-stopifnot(all.equal(log(dpareto(1:5,2, 1)), dpareto(1:5,2, 1, log = TRUE)))
+-stopifnot(all.equal(dpareto(1:6,1:2, 1),
+-c(0.0, 0.0, 0.11111111111, 0.115, 0.04, 0.05555555556)))
+-stopifnot(all.equal(dpareto(1, 2, 1:2), c(0, 0)))
+-x <- 0
+-x <- ifelse(TRUE,warning("test",99))
+-x
+-ifelse(TRUE,warning("test",99))
+-ifelse(TRUE,warning("test"),99)
+-ifelse(TRUE,warning("test"),99)
+-? ifelse
+-? dgamma
+-dgamma
+-dpareto(,3,3)
+-dpareto(,-3,3)
+-dpareto(1,-3,3)
+-dpareto(1:1000,3,3)
+-dpareto(1:1000,c(-1,1),3)
+-dgamma(1:1000,c(-1,1),3)
+-? all.equal
+-all.equal(1,1)
+-all.equal(1,2)
+-is.nan(1)
+-is.nan(c(1,2))
+-is.nan(c(1,NaN))
+-? is.na.numeric_version
+-Inf
+-Inf
+--Inf
+-Inf-Inf
+--Inf-Inf
+-is.nan(NaN)
+-is.nan(Inf)
+-dpareto <- function(x, alpha, beta, log = FALSE) {
+-# Calculate the maximum length of inputs
+-L <- max(length(x), length(alpha), length(beta))
+-# Align all the inputs
+-x <- rep(x, length.out = L)
+-alpha <- rep(alpha, length.out = L)
+-beta <- rep(beta, length.out = L)
+-logdens <- ifelse(alpha<=0 || beta<=0,
+-NaN,
+-ifelse(x<=alpha,
+-log(0),
+-log(beta) + beta*log(alpha)-(beta+1)*log(x))
+-)
+-#Check whether NaN exists
+-if (sum(is.nan(logdens))) warning("NaNs produced")
+-if (log) logdens else exp(logdens)
+-}
+-dpareto(3,-2, 1) # bad parameter
+-dpareto(3,2, -1) # bar parameter
+-stopifnot(all.equal(dpareto(3,2,1), 0.2222222222))
+-stopifnot(all.equal(dpareto(1,2,3), 0.0))
+-stopifnot(all.equal(dpareto(3:5,2, 1), c(0.2222222222, 0.1250000, 0.0800000)))
+-stopifnot(all.equal(dpareto(1:5,2, 1), c(0.0, 0.0, 0.2222222222, 0.1250000, 0.0800000)))
+-stopifnot(all.equal(dpareto(6,2:4, 1), c(0.05555555556, 0.08333333333, 0.11111111111)))
+-stopifnot(all.equal(log(dpareto(1:5,2, 1)), dpareto(1:5,2, 1, log = TRUE)))
+-stopifnot(all.equal(dpareto(1:6,1:2, 1),
+-c(0.0, 0.0, 0.11111111111, 0.125, 0.04, 0.05555555556)))
+-stopifnot(all.equal(dpareto(1, 2, 1:2), c(0, 0)))
+-dpareto(3:5,2,1)
+-dpareto <- function(x, a, b, log = FALSE) {
+-nx <- length(x)
+-na <- length(a)
+-nb <- length(b)
+-n <- max(nx, na, nb)
+-if (nx < n) x <- rep(x, length.out = n)
+-if (na < n) a <- rep(a, length.out = n)
+-if (nb < n) b <- rep(b, length.out = n)
+-ld <- ifelse(a > 0 & b > 0,
+-ifelse(x > a,
+-log(b) + b * log(a) - (b + 1) * log(x),
+-log(0)),
+-NaN)
+-if (log) ld
+-else exp(ld)
+-}
+-dpareto(3,-2, 1) # bad parameter
+-dpareto(3,2, -1) # bar parameter
+-stopifnot(all.equal(dpareto(3,2,1), 0.2222222222))
+-stopifnot(all.equal(dpareto(1,2,3), 0.0))
+-stopifnot(all.equal(dpareto(3:5,2, 1), c(0.2222222222, 0.1250000, 0.0800000)))
+-stopifnot(all.equal(dpareto(1:5,2, 1), c(0.0, 0.0, 0.2222222222, 0.1250000, 0.0800000)))
+-stopifnot(all.equal(dpareto(6,2:4, 1), c(0.05555555556, 0.08333333333, 0.11111111111)))
+-stopifnot(all.equal(log(dpareto(1:5,2, 1)), dpareto(1:5,2, 1, log = TRUE)))
+-stopifnot(all.equal(dpareto(1:6,1:2, 1),
+-c(0.0, 0.0, 0.11111111111, 0.125, 0.04, 0.05555555556)))
+-stopifnot(all.equal(dpareto(1, 2, 1:2), c(0, 0)))
+-dpareto <- function(x, alpha, beta, log = FALSE) {
+-# Calculate the maximum length of inputs
+-L <- max(length(x), length(alpha), length(beta))
+-# Align all the inputs
+-x <- rep(x, length.out = L)
+-alpha <- rep(alpha, length.out = L)
+-beta <- rep(beta, length.out = L)
+-logdens <- ifelse(alpha<=0 || beta<=0,
+-NaN,
+-ifelse(x<=alpha,
+-log(0),
+-log(beta) + beta*log(alpha)-(beta+1)*log(x))
+-)
+-#Check whether NaN exists
+-if (sum(is.nan(logdens))) warning("NaNs produced")
+-if (log) logdens else exp(logdens)
+-}
+-dpareto(2,-1,2)
+-dpareto(2,1:2,2)
+-dpareto(2,1,2)
+-a <- 1:5
+-a
+-b <- c(3,3,3,3,3)
+-ifelse(a<b,TRUE.FALSE)
+-ifelse(a<b,TRUE,FALSE)
+-dpareto(3,2,1)
+-dpareto(4,2,1)
+-dpareto(5,2,1)
+-dpareto(3:5,2,1)
+-dpareto(3:5,2,1.TRUE)
+-dpareto(3:5,2,1,TRUE)
+-? ifelse
+-dpareto <- function(x, alpha, beta, log = FALSE) {
+-# Calculate the maximum length of inputs
+-L <- max(length(x), length(alpha), length(beta))
+-# Align all the inputs
+-x <- rep(x, length.out = L)
+-alpha <- rep(alpha, length.out = L)
+-beta <- rep(beta, length.out = L)
+-logdens <- ifelse(alpha<=0 | beta<=0,
+-NaN,
+-ifelse(x<=alpha,
+-log(0),
+-log(beta) + beta*log(alpha)-(beta+1)*log(x))
+-)
+-#Check whether NaN exists
+-if (sum(is.nan(logdens))) warning("NaNs produced")
+-if (log) logdens else exp(logdens)
+-}
+-dpareto(3,-2, 1) # bad parameter
+-dpareto(3,2, -1) # bar parameter
+-stopifnot(all.equal(dpareto(3,2,1), 0.2222222222))
+-stopifnot(all.equal(dpareto(1,2,3), 0.0))
+-stopifnot(all.equal(dpareto(3:5,2, 1), c(0.2222222222, 0.1250000, 0.0800000)))
+-stopifnot(all.equal(dpareto(1:5,2, 1), c(0.0, 0.0, 0.2222222222, 0.1250000, 0.0800000)))
+-stopifnot(all.equal(dpareto(6,2:4, 1), c(0.05555555556, 0.08333333333, 0.11111111111)))
+-stopifnot(all.equal(log(dpareto(1:5,2, 1)), dpareto(1:5,2, 1, log = TRUE)))
+-stopifnot(all.equal(dpareto(1:6,1:2, 1),
+-c(0.0, 0.0, 0.11111111111, 0.125, 0.04, 0.05555555556)))
+-stopifnot(all.equal(dpareto(1, 2, 1:2), c(0, 0)))
+-dpareto(3:5,2,1)
+-tidy_source()
+-tidy_source()
+-tidy_source("dpareto.R")
+-dpareto <- function(x, alpha, beta, log = FALSE) {
+-# Calculate the maximum length of inputs
+-L <- max(length(x), length(alpha), length(beta))
+-# Align all the inputs
+-x <- rep(x, length.out = L)
+-alpha <- rep(alpha, length.out = L)
+-beta <- rep(beta, length.out = L)
+-logdens <- ifelse(alpha <= 0 | beta <= 0,
+-NaN,
+-ifelse(x <= alpha,
+-log(0),
+-log(beta) + beta * log(alpha) - (beta + 1) * log(x)))
+-# Check whether NaN exists
+-if (sum(is.nan(logdens)))
+-warning("NaNs produced")
+-if (log) logdens else exp(logdens)
+-}
+-dpareto(3,-2, 1) # bad parameter
+-dpareto(3,2, -1) # bar parameter
+-stopifnot(all.equal(dpareto(3,2,1), 0.2222222222))
+-stopifnot(all.equal(dpareto(1,2,3), 0.0))
+-stopifnot(all.equal(dpareto(3:5,2, 1), c(0.2222222222, 0.1250000, 0.0800000)))
+-stopifnot(all.equal(dpareto(1:5,2, 1), c(0.0, 0.0, 0.2222222222, 0.1250000, 0.0800000)))
+-stopifnot(all.equal(dpareto(6,2:4, 1), c(0.05555555556, 0.08333333333, 0.11111111111)))
+-stopifnot(all.equal(log(dpareto(1:5,2, 1)), dpareto(1:5,2, 1, log = TRUE)))
+-stopifnot(all.equal(dpareto(1:6,1:2, 1),
+-c(0.0, 0.0, 0.11111111111, 0.125, 0.04, 0.05555555556)))
+-stopifnot(all.equal(dpareto(1, 2, 1:2), c(0, 0)))
+-dpareto(3, 2, 1)
+-dpareto(1, 2, 3)
+-dpareto(3, -2, 1)
+-dpareto(3, 2, -1)
+-dpareto(3 : 5, 2, 1)
+-dpareto(1 : 5, 2, 1)
+-dpareto(6, 2 : 4, 1)
+-dpareto(3, 2, 1, log = TRUE)
+-? plot.stepfun
+-example(plot.stepfun)
+-x <- seq(-5,5,length=1001)
+-y = 1/x
+-lines(x,y)
+-plot.new()
+-plot.window(xlim=c(-4, 4), ylim=c(-4, 4))
+-lines(x, y)
+-plot(x,y)
+-plot(x,y,type="l")
+-x <- seq(0,10,length=100)
+-x <- seq(0,10,length=1000)
+-x <- seq(0,10,length=1001)
+-y <- dpareto(x,1,1)
+-plot(x,y)
+-plot(x,y,type="l")
+-? seq
+-x1 <- seq(0,1,0.01)
+-x2 <- seq(1.01,10,0.01)
+-y1 <- dpareto(x1,1,1)
+-y2 <- dpareto(x2,1,1)
+-plot(x1,y1,tyoe="l")
+-x1 <- seq(0,1,0.01)
+-x2 <- seq(1.01,10,0.01)
+-y1 <- dpareto(x1,1,1)
+-y2 <- dpareto(x2,1,1)
+-plot(x1,y1,type="l")
+-x1 <- seq(0,1,0.01)
+-x2 <- seq(1.01,10,0.01)
+-y1 <- dpareto(x1,1,1)
+-y2 <- dpareto(x2,1,1)
+-plot(x1,y1,type="l")
+-x1 <- seq(0,1,0.01)
+-x2 <- seq(1.01,10,0.01)
+-y1 <- dpareto(x1,1,1)
+-y2 <- dpareto(x2,1,1)
+-plot(x1,y1,type="l")
+-range(x1)
+-x1 <- seq(0,1,0.01)
+-x2 <- seq(1.01,10,0.01)
+-y1 <- dpareto(x1,1,1)
+-y2 <- dpareto(x2,1,1)
+-plot(x1,y1,xlim=range(c(x1,x2)),ylim=range(c(y1,y2)),type="l")
+-lines(x2,y2)
+-x1 <- seq(0,1,0.01)
+-x2 <- seq(1.01,10,0.01)
+-y1 <- dpareto(x1,1,1)
+-y2 <- dpareto(x2,1,1)
+-plot(x1,y1,xlim=range(c(x1,x2)),ylim=range(c(y1,y2)),type="l")
+-lines(x2,y2)
+
+commit a8fec0f374dff650ababa5fee8f99a5ed9e88c70
+Author: Yiheng Liu <yiheng-liu@uiowa.edu>
+Date:   Mon Jan 30 14:06:34 2017 -0600
+
+    Add hw2 git log file
+
+diff --git a/HW2/hw2-gitlog.txt b/HW2/hw2-gitlog.txt
+new file mode 100644
+index 0000000..fbb27f1
+--- /dev/null
++++ b/HW2/hw2-gitlog.txt
+@@ -0,0 +1,981 @@
++commit 4c74e4e7117ce994d6160c7ee2f4df4ba363e908
++Author: Yiheng Liu <yiheng-liu@uiowa.edu>
++Date:   Mon Jan 30 14:01:39 2017 -0600
++
++    Delete HW1.tar.gz
++
++diff --git a/HW1.tar.gz b/HW1.tar.gz
++deleted file mode 100644
++index f7664e6..0000000
++Binary files a/HW1.tar.gz and /dev/null differ
++
++commit 609d75cb162242c04dd9252e203a1e9f40e36ce5
++Author: Yiheng Liu <yiheng-liu@uiowa.edu>
++Date:   Mon Jan 30 13:54:31 2017 -0600
++
++    Add Problem 2 Files
++
++diff --git a/HW2/.Rhistory b/HW2/.Rhistory
++new file mode 100644
++index 0000000..f67e848
++--- /dev/null
+++++ b/HW2/.Rhistory
++@@ -0,0 +1,401 @@
+++? dgamma
+++? dpareto
+++log(0)
+++exp(log(0))
+++? ifelse
+++a <- c(1:5)
+++a
+++b <- c(3,3,3,3,3)
+++b
+++ifelse(a>b,TRUE,FALSE)
+++library(formatR)
+++? tidy_source
+++tidy_source
+++tidy_source()
+++tidy_source()
+++tidy_source("dpareto.r")
+++tidy_source("dpareto.R")
+++tidy_source("dpareto.R")
+++tidy_source("dpareto.R")
+++tidy_source("dpareto.r")
+++setwd("/mnt/nfs/netapp2/grad/yliu255/s7400/STAT7400/HW2")
+++tidy_source("dpareto.R")
+++log(0)
+++exp(log(0))
+++exp(-Inf)
+++? ifelse
+++c(0,1,2,3,NaN)
+++a <- c(0,1,2,3,NaN)
+++a
+++exp(a)
+++dpareto <- function(x, a, b, log = FALSE) {
+++nx <- length(x)
+++na <- length(a)
+++nb <- length(b)
+++n <- max(nx, na, nb)
+++if (nx < n) x <- rep(x, length.out = n)
+++if (na < n) a <- rep(a, length.out = n)
+++if (nb < n) b <- rep(b, length.out = n)
+++ld <- ifelse(a > 0 & b > 0,
+++ifelse(x > a,
+++log(b) + b * log(a) - (b + 1) * log(x),
+++log(0)),
+++NaN)
+++if (log) ld
+++else exp(ld)
+++}
+++dpareto(2,-1,3)
+++? dgamma
+++dgamma(1,-2)
+++dpareto <- function(x, alpha, beta, log = FALSE) {
+++# Calculate the maximum length of inputs
+++L <- max(length(x), length(alpha), length(beta))
+++# Align all the inputs
+++x <- rep(x, length.out = L)
+++alpha <- rep(alpha, length.out = L)
+++beta <- rep(beta, length.out = L)
+++# Initialize the log densities with NaN
+++logdens <- rep(NaN, length.out = L)
+++for (i in 1:L) {
+++if (alpha[i] <= 0 || beta[i] <= 0) {
+++warning("NaNs produced")
+++next
+++} else if (x[i] < alpha[i]) {
+++logdens[i] <- log(0)
+++} else {
+++logdens[i] <- log(beta[i]) + beta[i]*log(alpha[i])-(beta[i]+1)*log(alpha[i])
+++}
+++}
+++if (log) logdens else exp(logdens)
+++}
+++dpaerto(1:3,2,4)
+++dpareto(1:3,2,4)
+++dpareto(1:3,2,4,TRUE)
+++stopifnot(all.equal(dpareto(3,2,1), 0.2222222222))
+++dpareto(3,-2,1)
+++dpareto(3,-2,1,TRUE)
+++dpareto(3,2,-1,TRUE)
+++dpareto(3,2,-1)
+++dpareto(1,2,3)
+++dpareto(3,2,1)
+++dpareto(3,2,1)
+++dpareto <- function(x, alpha, beta, log = FALSE) {
+++# Calculate the maximum length of inputs
+++L <- max(length(x), length(alpha), length(beta))
+++# Align all the inputs
+++x <- rep(x, length.out = L)
+++alpha <- rep(alpha, length.out = L)
+++beta <- rep(beta, length.out = L)
+++# Initialize the log densities with NaN
+++logdens <- rep(NaN, length.out = L)
+++for (i in 1:L) {
+++if (alpha[i] <= 0 || beta[i] <= 0) {
+++warning("NaNs produced")
+++next
+++} else if (x[i] < alpha[i]) {
+++logdens[i] <- log(0)
+++} else {
+++logdens[i] <- log(beta[i]) + beta[i]*log(alpha[i])-(beta[i]+1)*log(x[i])
+++}
+++}
+++if (log) logdens else exp(logdens)
+++}
+++dpareto(3,2,1)
+++dpareto(3:5,2,1)
+++dpareto(1:5,2,1)
+++dpareto(6,2:4,1)
+++log(dpareto(1:5,2,1))-dpareto(1:5,2,1,TRUE)
+++all.equal
+++all.equal(log(dpareto(1:5,2,1)),dpareto(1:5,2,1,TRUE))
+++dpareto(1:6,1:2,1)
+++dpareto(1,1,1)
+++dpareto(1,1,1)
+++dpareto <- function(x, alpha, beta, log = FALSE) {
+++# Calculate the maximum length of inputs
+++L <- max(length(x), length(alpha), length(beta))
+++# Align all the inputs
+++x <- rep(x, length.out = L)
+++alpha <- rep(alpha, length.out = L)
+++beta <- rep(beta, length.out = L)
+++# Initialize the log densities with NaN
+++logdens <- rep(NaN, length.out = L)
+++for (i in 1:L) {
+++if (alpha[i] <= 0 || beta[i] <= 0) {
+++warning("NaNs produced")
+++next
+++} else if (x[i] <= alpha[i]) {
+++logdens[i] <- log(0)
+++} else {
+++logdens[i] <- log(beta[i]) + beta[i]*log(alpha[i])-(beta[i]+1)*log(x[i])
+++}
+++}
+++if (log) logdens else exp(logdens)
+++}
+++dpareto(3,-2, 1) # bad parameter
+++dpareto(3,2, -1) # bar parameter
+++stopifnot(all.equal(dpareto(3,2,1), 0.2222222222))
+++stopifnot(all.equal(dpareto(1,2,3), 0.0))
+++stopifnot(all.equal(dpareto(3:5,2, 1), c(0.2222222222, 0.1250000, 0.0800000)))
+++stopifnot(all.equal(dpareto(1:5,2, 1), c(0.0, 0.0, 0.2222222222, 0.1250000, 0.0800000)))
+++stopifnot(all.equal(dpareto(6,2:4, 1), c(0.05555555556, 0.08333333333, 0.11111111111)))
+++stopifnot(all.equal(log(dpareto(1:5,2, 1)), dpareto(1:5,2, 1, log = TRUE)))
+++stopifnot(all.equal(dpareto(1:6,1:2, 1),
+++c(0.0, 0.0, 0.11111111111, 0.125, 0.04, 0.05555555556)))
+++stopifnot(all.equal(dpareto(1, 2, 1:2), c(0, 0)))
+++dpareto(3,-2, 1) # bad parameter
+++dpareto(3,2, -1) # bar parameter
+++stopifnot(all.equal(dpareto(3,2,1), 0.2222222222))
+++stopifnot(all.equal(dpareto(1,2,3), 0.0))
+++stopifnot(all.equal(dpareto(3:5,2, 1), c(0.2222222222, 0.1250000, 0.0800000)))
+++stopifnot(all.equal(dpareto(1:5,2, 1), c(0.0, 0.0, 0.2222222222, 0.1250000, 0.0800000)))
+++stopifnot(all.equal(dpareto(6,2:4, 1), c(0.05555555556, 0.08333333333, 0.11111111111)))
+++stopifnot(all.equal(log(dpareto(1:5,2, 1)), dpareto(1:5,2, 1, log = TRUE)))
+++stopifnot(all.equal(dpareto(1:6,1:2, 1),
+++c(0.0, 0.0, 0.11111111111, 0.125, 0.04, 0.05555555556)))
+++stopifnot(all.equal(dpareto(1, 2, 1:2), c(0, 1)))
+++dpareto(3,-2, 1) # bad parameter
+++dpareto(3,2, -1) # bar parameter
+++stopifnot(all.equal(dpareto(3,2,1), 0.2222222222))
+++stopifnot(all.equal(dpareto(1,2,3), 0.0))
+++stopifnot(all.equal(dpareto(3:5,2, 1), c(0.2222222222, 0.1250000, 0.0800000)))
+++stopifnot(all.equal(dpareto(1:5,2, 1), c(0.0, 0.0, 0.2222222222, 0.1250000, 0.0800000)))
+++stopifnot(all.equal(dpareto(6,2:4, 1), c(0.05555555556, 0.08333333333, 0.11111111111)))
+++stopifnot(all.equal(log(dpareto(1:5,2, 1)), dpareto(1:5,2, 1, log = TRUE)))
+++stopifnot(all.equal(dpareto(1:6,1:2, 1),
+++c(0.0, 0.0, 0.11111111111, 0.115, 0.04, 0.05555555556)))
+++stopifnot(all.equal(dpareto(1, 2, 1:2), c(0, 0)))
+++x <- 0
+++x <- ifelse(TRUE,warning("test",99))
+++x
+++ifelse(TRUE,warning("test",99))
+++ifelse(TRUE,warning("test"),99)
+++ifelse(TRUE,warning("test"),99)
+++? ifelse
+++? dgamma
+++dgamma
+++dpareto(,3,3)
+++dpareto(,-3,3)
+++dpareto(1,-3,3)
+++dpareto(1:1000,3,3)
+++dpareto(1:1000,c(-1,1),3)
+++dgamma(1:1000,c(-1,1),3)
+++? all.equal
+++all.equal(1,1)
+++all.equal(1,2)
+++is.nan(1)
+++is.nan(c(1,2))
+++is.nan(c(1,NaN))
+++? is.na.numeric_version
+++Inf
+++Inf
+++-Inf
+++Inf-Inf
+++-Inf-Inf
+++is.nan(NaN)
+++is.nan(Inf)
+++dpareto <- function(x, alpha, beta, log = FALSE) {
+++# Calculate the maximum length of inputs
+++L <- max(length(x), length(alpha), length(beta))
+++# Align all the inputs
+++x <- rep(x, length.out = L)
+++alpha <- rep(alpha, length.out = L)
+++beta <- rep(beta, length.out = L)
+++logdens <- ifelse(alpha<=0 || beta<=0,
+++NaN,
+++ifelse(x<=alpha,
+++log(0),
+++log(beta) + beta*log(alpha)-(beta+1)*log(x))
+++)
+++#Check whether NaN exists
+++if (sum(is.nan(logdens))) warning("NaNs produced")
+++if (log) logdens else exp(logdens)
+++}
+++dpareto(3,-2, 1) # bad parameter
+++dpareto(3,2, -1) # bar parameter
+++stopifnot(all.equal(dpareto(3,2,1), 0.2222222222))
+++stopifnot(all.equal(dpareto(1,2,3), 0.0))
+++stopifnot(all.equal(dpareto(3:5,2, 1), c(0.2222222222, 0.1250000, 0.0800000)))
+++stopifnot(all.equal(dpareto(1:5,2, 1), c(0.0, 0.0, 0.2222222222, 0.1250000, 0.0800000)))
+++stopifnot(all.equal(dpareto(6,2:4, 1), c(0.05555555556, 0.08333333333, 0.11111111111)))
+++stopifnot(all.equal(log(dpareto(1:5,2, 1)), dpareto(1:5,2, 1, log = TRUE)))
+++stopifnot(all.equal(dpareto(1:6,1:2, 1),
+++c(0.0, 0.0, 0.11111111111, 0.125, 0.04, 0.05555555556)))
+++stopifnot(all.equal(dpareto(1, 2, 1:2), c(0, 0)))
+++dpareto(3:5,2,1)
+++dpareto <- function(x, a, b, log = FALSE) {
+++nx <- length(x)
+++na <- length(a)
+++nb <- length(b)
+++n <- max(nx, na, nb)
+++if (nx < n) x <- rep(x, length.out = n)
+++if (na < n) a <- rep(a, length.out = n)
+++if (nb < n) b <- rep(b, length.out = n)
+++ld <- ifelse(a > 0 & b > 0,
+++ifelse(x > a,
+++log(b) + b * log(a) - (b + 1) * log(x),
+++log(0)),
+++NaN)
+++if (log) ld
+++else exp(ld)
+++}
+++dpareto(3,-2, 1) # bad parameter
+++dpareto(3,2, -1) # bar parameter
+++stopifnot(all.equal(dpareto(3,2,1), 0.2222222222))
+++stopifnot(all.equal(dpareto(1,2,3), 0.0))
+++stopifnot(all.equal(dpareto(3:5,2, 1), c(0.2222222222, 0.1250000, 0.0800000)))
+++stopifnot(all.equal(dpareto(1:5,2, 1), c(0.0, 0.0, 0.2222222222, 0.1250000, 0.0800000)))
+++stopifnot(all.equal(dpareto(6,2:4, 1), c(0.05555555556, 0.08333333333, 0.11111111111)))
+++stopifnot(all.equal(log(dpareto(1:5,2, 1)), dpareto(1:5,2, 1, log = TRUE)))
+++stopifnot(all.equal(dpareto(1:6,1:2, 1),
+++c(0.0, 0.0, 0.11111111111, 0.125, 0.04, 0.05555555556)))
+++stopifnot(all.equal(dpareto(1, 2, 1:2), c(0, 0)))
+++dpareto <- function(x, alpha, beta, log = FALSE) {
+++# Calculate the maximum length of inputs
+++L <- max(length(x), length(alpha), length(beta))
+++# Align all the inputs
+++x <- rep(x, length.out = L)
+++alpha <- rep(alpha, length.out = L)
+++beta <- rep(beta, length.out = L)
+++logdens <- ifelse(alpha<=0 || beta<=0,
+++NaN,
+++ifelse(x<=alpha,
+++log(0),
+++log(beta) + beta*log(alpha)-(beta+1)*log(x))
+++)
+++#Check whether NaN exists
+++if (sum(is.nan(logdens))) warning("NaNs produced")
+++if (log) logdens else exp(logdens)
+++}
+++dpareto(2,-1,2)
+++dpareto(2,1:2,2)
+++dpareto(2,1,2)
+++a <- 1:5
+++a
+++b <- c(3,3,3,3,3)
+++ifelse(a<b,TRUE.FALSE)
+++ifelse(a<b,TRUE,FALSE)
+++dpareto(3,2,1)
+++dpareto(4,2,1)
+++dpareto(5,2,1)
+++dpareto(3:5,2,1)
+++dpareto(3:5,2,1.TRUE)
+++dpareto(3:5,2,1,TRUE)
+++? ifelse
+++dpareto <- function(x, alpha, beta, log = FALSE) {
+++# Calculate the maximum length of inputs
+++L <- max(length(x), length(alpha), length(beta))
+++# Align all the inputs
+++x <- rep(x, length.out = L)
+++alpha <- rep(alpha, length.out = L)
+++beta <- rep(beta, length.out = L)
+++logdens <- ifelse(alpha<=0 | beta<=0,
+++NaN,
+++ifelse(x<=alpha,
+++log(0),
+++log(beta) + beta*log(alpha)-(beta+1)*log(x))
+++)
+++#Check whether NaN exists
+++if (sum(is.nan(logdens))) warning("NaNs produced")
+++if (log) logdens else exp(logdens)
+++}
+++dpareto(3,-2, 1) # bad parameter
+++dpareto(3,2, -1) # bar parameter
+++stopifnot(all.equal(dpareto(3,2,1), 0.2222222222))
+++stopifnot(all.equal(dpareto(1,2,3), 0.0))
+++stopifnot(all.equal(dpareto(3:5,2, 1), c(0.2222222222, 0.1250000, 0.0800000)))
+++stopifnot(all.equal(dpareto(1:5,2, 1), c(0.0, 0.0, 0.2222222222, 0.1250000, 0.0800000)))
+++stopifnot(all.equal(dpareto(6,2:4, 1), c(0.05555555556, 0.08333333333, 0.11111111111)))
+++stopifnot(all.equal(log(dpareto(1:5,2, 1)), dpareto(1:5,2, 1, log = TRUE)))
+++stopifnot(all.equal(dpareto(1:6,1:2, 1),
+++c(0.0, 0.0, 0.11111111111, 0.125, 0.04, 0.05555555556)))
+++stopifnot(all.equal(dpareto(1, 2, 1:2), c(0, 0)))
+++dpareto(3:5,2,1)
+++tidy_source()
+++tidy_source()
+++tidy_source("dpareto.R")
+++dpareto <- function(x, alpha, beta, log = FALSE) {
+++# Calculate the maximum length of inputs
+++L <- max(length(x), length(alpha), length(beta))
+++# Align all the inputs
+++x <- rep(x, length.out = L)
+++alpha <- rep(alpha, length.out = L)
+++beta <- rep(beta, length.out = L)
+++logdens <- ifelse(alpha <= 0 | beta <= 0,
+++NaN,
+++ifelse(x <= alpha,
+++log(0),
+++log(beta) + beta * log(alpha) - (beta + 1) * log(x)))
+++# Check whether NaN exists
+++if (sum(is.nan(logdens)))
+++warning("NaNs produced")
+++if (log) logdens else exp(logdens)
+++}
+++dpareto(3,-2, 1) # bad parameter
+++dpareto(3,2, -1) # bar parameter
+++stopifnot(all.equal(dpareto(3,2,1), 0.2222222222))
+++stopifnot(all.equal(dpareto(1,2,3), 0.0))
+++stopifnot(all.equal(dpareto(3:5,2, 1), c(0.2222222222, 0.1250000, 0.0800000)))
+++stopifnot(all.equal(dpareto(1:5,2, 1), c(0.0, 0.0, 0.2222222222, 0.1250000, 0.0800000)))
+++stopifnot(all.equal(dpareto(6,2:4, 1), c(0.05555555556, 0.08333333333, 0.11111111111)))
+++stopifnot(all.equal(log(dpareto(1:5,2, 1)), dpareto(1:5,2, 1, log = TRUE)))
+++stopifnot(all.equal(dpareto(1:6,1:2, 1),
+++c(0.0, 0.0, 0.11111111111, 0.125, 0.04, 0.05555555556)))
+++stopifnot(all.equal(dpareto(1, 2, 1:2), c(0, 0)))
+++dpareto(3, 2, 1)
+++dpareto(1, 2, 3)
+++dpareto(3, -2, 1)
+++dpareto(3, 2, -1)
+++dpareto(3 : 5, 2, 1)
+++dpareto(1 : 5, 2, 1)
+++dpareto(6, 2 : 4, 1)
+++dpareto(3, 2, 1, log = TRUE)
+++? plot.stepfun
+++example(plot.stepfun)
+++x <- seq(-5,5,length=1001)
+++y = 1/x
+++lines(x,y)
+++plot.new()
+++plot.window(xlim=c(-4, 4), ylim=c(-4, 4))
+++lines(x, y)
+++plot(x,y)
+++plot(x,y,type="l")
+++x <- seq(0,10,length=100)
+++x <- seq(0,10,length=1000)
+++x <- seq(0,10,length=1001)
+++y <- dpareto(x,1,1)
+++plot(x,y)
+++plot(x,y,type="l")
+++? seq
+++x1 <- seq(0,1,0.01)
+++x2 <- seq(1.01,10,0.01)
+++y1 <- dpareto(x1,1,1)
+++y2 <- dpareto(x2,1,1)
+++plot(x1,y1,tyoe="l")
+++x1 <- seq(0,1,0.01)
+++x2 <- seq(1.01,10,0.01)
+++y1 <- dpareto(x1,1,1)
+++y2 <- dpareto(x2,1,1)
+++plot(x1,y1,type="l")
+++x1 <- seq(0,1,0.01)
+++x2 <- seq(1.01,10,0.01)
+++y1 <- dpareto(x1,1,1)
+++y2 <- dpareto(x2,1,1)
+++plot(x1,y1,type="l")
+++x1 <- seq(0,1,0.01)
+++x2 <- seq(1.01,10,0.01)
+++y1 <- dpareto(x1,1,1)
+++y2 <- dpareto(x2,1,1)
+++plot(x1,y1,type="l")
+++range(x1)
+++x1 <- seq(0,1,0.01)
+++x2 <- seq(1.01,10,0.01)
+++y1 <- dpareto(x1,1,1)
+++y2 <- dpareto(x2,1,1)
+++plot(x1,y1,xlim=range(c(x1,x2)),ylim=range(c(y1,y2)),type="l")
+++lines(x2,y2)
+++x1 <- seq(0,1,0.01)
+++x2 <- seq(1.01,10,0.01)
+++y1 <- dpareto(x1,1,1)
+++y2 <- dpareto(x2,1,1)
+++plot(x1,y1,xlim=range(c(x1,x2)),ylim=range(c(y1,y2)),type="l")
+++lines(x2,y2)
++diff --git a/HW2/HW2.docx b/HW2/HW2.docx
++new file mode 100644
++index 0000000..e910bb4
++Binary files /dev/null and b/HW2/HW2.docx differ
++diff --git a/HW2/HW2.pdf b/HW2/HW2.pdf
++new file mode 100644
++index 0000000..f38ffd3
++Binary files /dev/null and b/HW2/HW2.pdf differ
++diff --git a/HW2/HW2_plot.R b/HW2/HW2_plot.R
++new file mode 100644
++index 0000000..2eaf006
++--- /dev/null
+++++ b/HW2/HW2_plot.R
++@@ -0,0 +1,16 @@
+++x1 <- seq(0,1,0.01)
+++x2 <- seq(1.01,10,0.01)
+++y1 <- dpareto(x1,1,1)
+++y2 <- dpareto(x2,1,1)
+++
+++x3 <- seq(0,2,0.01)
+++x4 <- seq(2.01,10,0.01)
+++y3 <- dpareto(x3,2,3)
+++y4 <- dpareto(x4,2,3)
+++
+++
+++plot(x1,y1,xlim=range(c(x1,x2,x3,x4)),ylim=range(c(y1,y2,y3,y4)),type="l",col="red",xlab="x",ylab="density",main="Pareto Distribution")
+++lines(x2,y2,col="red")
+++lines(x3,y3,col="blue",lty=2)
+++lines(x4,y4,col="blue",lty=2)
+++legend("topright",legend=c("scale=1,shape=1","scale=2,shape=3"),lty=c(1,2),col=c("red","blue"))
++diff --git a/HW2/pareto.png b/HW2/pareto.png
++new file mode 100644
++index 0000000..81ac030
++Binary files /dev/null and b/HW2/pareto.png differ
++diff --git a/HW2/paretodensDotC.R b/HW2/paretodensDotC.R
++new file mode 100644
++index 0000000..2df9396
++--- /dev/null
+++++ b/HW2/paretodensDotC.R
++@@ -0,0 +1,13 @@
+++paretodensDotC <- function(x, alpha, beta, log = FALSE) {
+++    nx <- length(x)
+++    nalpha <- length(alpha)
+++    nbeta <- length(beta)
+++    n <- max(nx, nalpha, nbeta)
+++    
+++    result <- .C("paretodensDotC",
+++                 as.double(x), as.integer(nx),
+++                 as.double(alpha), as.integer(nalpha), 
+++                 as.double(beta), as.integer(nbeta),
+++                 dens = double(n), as.integer(log))
+++    result$dens
+++}
++\ No newline at end of file
++diff --git a/HW2/paretodensDotC.c b/HW2/paretodensDotC.c
++new file mode 100644
++index 0000000..895c044
++--- /dev/null
+++++ b/HW2/paretodensDotC.c
++@@ -0,0 +1,48 @@
+++#include <math.h>
+++#include <R.h>
+++#ifndef max
+++#define max( a, b ) ( ((a) > (b)) ? (a) : (b) )
+++#endif
+++
+++/*Define parto density function*/
+++void paretodensDotC(double *x, int *nx, double *alpha, int *nalpha,
+++                    double *beta, int *nbeta, double *dens, int *lg)
+++{
+++    /*Calculate the maximum input length */
+++    int i, n = max(max(nx[0], nalpha[0]), nbeta[0]), flag = 0, ind[3];
+++    double ldens[n];
+++
+++    for (i = 0; i < n; i++) {
+++        ind[0] = i % nx[0];
+++        ind[1] = i % nalpha[0];
+++        ind[2] = i % nbeta[0];
+++
+++        /*Calculate whether alpha and beta are meaningful */
+++        if (alpha[ind[1]] <= 0 || beta[ind[2]] <= 0) {
+++            ldens[i] = NAN;
+++            flag++;
+++        }
+++        /*Check whether x is greater than alpha */
+++        else if (x[ind[0]] <= alpha[ind[1]]) {
+++            ldens[i] = log(0);
+++        }
+++        else {
+++            ldens[i] =
+++                log(beta[ind[2]]) + beta[ind[2]] * log(alpha[ind[1]]) -
+++                (beta[ind[2]] + 1) * log(x[ind[0]]);
+++        }
+++
+++        if (lg[0] == 0) {
+++            dens[i] = exp(ldens[i]);
+++        }
+++        else {
+++            dens[i] = ldens[i];
+++        }
+++
+++    }
+++    /*Check whether NaNs exist */
+++    if (flag > 0) {
+++        warning("NaNs produced");
+++    }
+++
+++}
++diff --git a/HW2/paretodensDotC.o b/HW2/paretodensDotC.o
++new file mode 100644
++index 0000000..0b10e72
++Binary files /dev/null and b/HW2/paretodensDotC.o differ
++diff --git a/HW2/paretodensDotC.so b/HW2/paretodensDotC.so
++new file mode 100755
++index 0000000..cd3bea7
++Binary files /dev/null and b/HW2/paretodensDotC.so differ
++
++commit eb3a3b5dbdd8ff1dcc816dab90c8a406f28e365f
++Author: Yiheng Liu <yiheng-liu@uiowa.edu>
++Date:   Sun Jan 29 21:34:05 2017 -0600
++
++    Files deleted
++
++diff --git a/HW2/HW1.docx b/HW2/HW1.docx
++deleted file mode 100644
++index 9a20ea8..0000000
++Binary files a/HW2/HW1.docx and /dev/null differ
++
++commit d1916d561c23328c9804daf189927d3b4bb10392
++Author: Yiheng Liu <yiheng-liu@uiowa.edu>
++Date:   Sun Jan 29 21:31:13 2017 -0600
++
++    Add dpareto.R in HW2
++
++diff --git a/HW1.tar.gz b/HW1.tar.gz
++new file mode 100644
++index 0000000..f7664e6
++Binary files /dev/null and b/HW1.tar.gz differ
++diff --git a/HW2/HW1.docx b/HW2/HW1.docx
++new file mode 100644
++index 0000000..9a20ea8
++Binary files /dev/null and b/HW2/HW1.docx differ
++diff --git a/HW2/dpareto.R b/HW2/dpareto.R
++new file mode 100644
++index 0000000..e601dd3
++--- /dev/null
+++++ b/HW2/dpareto.R
++@@ -0,0 +1,22 @@
+++dpareto <- function(x, alpha, beta, log = FALSE) {
+++    
+++    # Calculate the maximum length of inputs
+++    L <- max(length(x), length(alpha), length(beta))
+++    
+++    # Align all the inputs
+++    x <- rep(x, length.out = L)
+++    alpha <- rep(alpha, length.out = L)
+++    beta <- rep(beta, length.out = L)
+++    
+++    logdens <- ifelse(alpha <= 0 | beta <= 0,
+++                      NaN,
+++                      ifelse(x <= alpha,
+++                             log(0),
+++                             log(beta) + beta * log(alpha) - (beta + 1) * log(x)))
+++    
+++    # Check whether NaNs exist
+++    if (sum(is.nan(logdens))) 
+++        warning("NaNs produced")
+++    
+++    if (log) logdens else exp(logdens)
+++}
++\ No newline at end of file
++
++commit bd7cf525dbc5f5fe76c4b945f393f69956870d76
++Author: Yiheng Liu <yiheng-liu@uiowa.edu>
++Date:   Mon Jan 23 15:16:07 2017 -0600
++
++    Add git log files
++
++diff --git a/HW1/hw1-gitlog.txt b/HW1/hw1-gitlog.txt
++new file mode 100644
++index 0000000..933527a
++--- /dev/null
+++++ b/HW1/hw1-gitlog.txt
++@@ -0,0 +1,186 @@
+++commit 0702cc2782a0134bf34e8982cea447fc3b478d8b
+++Author: Yiheng Liu <yiheng-liu@uiowa.edu>
+++Date:   Mon Jan 23 15:08:41 2017 -0600
+++
+++    Add HW1 writeup
+++
+++diff --git a/HW1/HW1.docx b/HW1/HW1.docx
+++new file mode 100644
+++index 0000000..9a20ea8
+++Binary files /dev/null and b/HW1/HW1.docx differ
+++diff --git a/HW1/HW1.pdf b/HW1/HW1.pdf
+++new file mode 100644
+++index 0000000..14c506a
+++Binary files /dev/null and b/HW1/HW1.pdf differ
+++
+++commit 03f5add2b9186e44dc5f8f821004600e632d0abf
+++Author: Yiheng Liu <yiheng-liu@uiowa.edu>
+++Date:   Mon Jan 23 14:58:37 2017 -0600
+++
+++    Add dpareto function
+++
+++diff --git a/HW1/dpareto.r b/HW1/dpareto.r
+++new file mode 100644
+++index 0000000..7dccd9e
+++--- /dev/null
++++++ b/HW1/dpareto.r
+++@@ -0,0 +1,27 @@
++++dpareto <- function(x,alpha,beta){
++++  
++++  #Calculate the maximum length of inputs
++++  L <- max(length(x), length(alpha), length(beta))
++++  
++++  #Align all the inputs
++++  x <- rep(x,length.out = L)
++++  alpha <- rep(alpha,length.out = L)
++++  beta <- rep(beta,length.out = L)
++++  
++++  #Initialize the densities with NaN
++++  dens <- rep(NaN, length.out = L)
++++
++++  for (i in 1:L){
++++    if (alpha[i] <= 0 || beta[i] <= 0){
++++      warning("NaNs produced")
++++      next
++++    } else if (x[i] < alpha[i]){
++++      dens[i] <- 0
++++    } else{
++++      dens[i] <- beta[i]*alpha[i]^beta[i]/x[i]^(beta[i]+1)
++++    }
++++  }
++++  return(dens)
++++}
++++
++++
+++
+++commit e11a24425f04f2a7df586c0640bd45e3ba555dbb
+++Author: Yiheng Liu <yiheng-liu@uiowa.edu>
+++Date:   Sun Jan 22 21:58:51 2017 -0600
+++
+++    Add pareto density function programmed by C
+++
+++diff --git a/HW1/paretodens b/HW1/paretodens
+++new file mode 100755
+++index 0000000..1f49c22
+++Binary files /dev/null and b/HW1/paretodens differ
+++diff --git a/HW1/paretodens.c b/HW1/paretodens.c
+++new file mode 100644
+++index 0000000..4d5713d
+++--- /dev/null
++++++ b/HW1/paretodens.c
+++@@ -0,0 +1,34 @@
++++#include <stdio.h>
++++#include <math.h>
++++
++++/*Define parto density function*/
++++double paretodens(double x, double alpha, double beta) {
++++    /*Check whether alpha and beta are positve*/
++++    if (alpha <=0 || beta <= 0){
++++        printf("Warning message: The parameters are not meaningful! NaN produced!\n");
++++        return NAN;
++++    }
++++    /*Check whether x is greater than alpha*/
++++    else if (x < alpha){
++++        return 0;
++++    }
++++    else {
++++        return beta*pow(alpha,beta)/pow(x,beta+1);
++++    }
++++}
++++
++++int main() {
++++    double x,alpha,beta;
++++
++++    printf("Input x:\n");
++++    scanf("%lf",&x);
++++
++++    printf("Input alpha:\n");
++++    scanf("%lf",&alpha);
++++
++++    printf("Input beta:\n");
++++    scanf("%lf",&beta);
++++
++++    printf("The density is %lf.\n", paretodens(x,alpha,beta));
++++    return 0;
++++}
+++diff --git a/HW1/paretodens.o b/HW1/paretodens.o
+++new file mode 100644
+++index 0000000..07ef60d
+++Binary files /dev/null and b/HW1/paretodens.o differ
+++
+++commit 5f64ebb53b7436bb773fc116688642a2bd92cca8
+++Author: Yiheng Liu <yiheng-liu@uiowa.edu>
+++Date:   Sun Jan 22 18:59:30 2017 -0600
+++
+++     Update
+++
+++diff --git a/code.r b/code.r
+++deleted file mode 100644
+++index 49ec3f8..0000000
+++--- a/code.r
++++++ /dev/null
+++@@ -1,2 +0,0 @@
+++-hello
+++-c world
+++\ No newline at end of file
+++diff --git a/doc.txt b/doc.txt
+++deleted file mode 100644
+++index 7f33c13..0000000
+++--- a/doc.txt
++++++ /dev/null
+++@@ -1 +0,0 @@
+++-This file documents the code for this project.
+++\ No newline at end of file
+++
+++commit 1c9eca2d8c5c766b08402d4ad6a06e63c4a77734
+++Merge: 8c388ae 388af1d
+++Author: Yiheng Liu <yiheng-liu@uiowa.edu>
+++Date:   Thu Jan 19 16:04:26 2017 -0600
+++
+++    Add documenttaion file
+++
+++commit 388af1d2bc5db748845edc1cf05b6b1d280ef088
+++Author: Yiheng Liu <yiheng-liu@uiowa.edu>
+++Date:   Thu Jan 19 15:53:59 2017 -0600
+++
+++    Add documentation file
+++
+++diff --git a/doc.txt b/doc.txt
+++new file mode 100644
+++index 0000000..7f33c13
+++--- /dev/null
++++++ b/doc.txt
+++@@ -0,0 +1 @@
++++This file documents the code for this project.
+++\ No newline at end of file
+++
+++commit 8c388ae15e8b8e97b2b933c10ad46d286925624d
+++Author: Yiheng Liu <yiheng-liu@uiowa.edu>
+++Date:   Thu Jan 19 15:42:15 2017 -0600
+++
+++    hello
+++
+++diff --git a/code.r b/code.r
+++new file mode 100644
+++index 0000000..49ec3f8
+++--- /dev/null
++++++ b/code.r
+++@@ -0,0 +1,2 @@
++++hello
++++c world
+++\ No newline at end of file
+++
+++commit 9fe14bce78f820ff396be39b549bc46903d44191
+++Author: Tierney, Luke <luke-tierney@uiowa.edu>
+++Date:   Thu Jan 19 10:54:54 2017 -0600
+++
+++    Initial commit
+++
+++diff --git a/README.md b/README.md
+++new file mode 100644
+++index 0000000..dab0a03
+++--- /dev/null
++++++ b/README.md
+++@@ -0,0 +1 @@
++++# yliu255
+++\ No newline at end of file
++
++commit 0702cc2782a0134bf34e8982cea447fc3b478d8b
++Author: Yiheng Liu <yiheng-liu@uiowa.edu>
++Date:   Mon Jan 23 15:08:41 2017 -0600
++
++    Add HW1 writeup
++
++diff --git a/HW1/HW1.docx b/HW1/HW1.docx
++new file mode 100644
++index 0000000..9a20ea8
++Binary files /dev/null and b/HW1/HW1.docx differ
++diff --git a/HW1/HW1.pdf b/HW1/HW1.pdf
++new file mode 100644
++index 0000000..14c506a
++Binary files /dev/null and b/HW1/HW1.pdf differ
++
++commit 03f5add2b9186e44dc5f8f821004600e632d0abf
++Author: Yiheng Liu <yiheng-liu@uiowa.edu>
++Date:   Mon Jan 23 14:58:37 2017 -0600
++
++    Add dpareto function
++
++diff --git a/HW1/dpareto.r b/HW1/dpareto.r
++new file mode 100644
++index 0000000..7dccd9e
++--- /dev/null
+++++ b/HW1/dpareto.r
++@@ -0,0 +1,27 @@
+++dpareto <- function(x,alpha,beta){
+++  
+++  #Calculate the maximum length of inputs
+++  L <- max(length(x), length(alpha), length(beta))
+++  
+++  #Align all the inputs
+++  x <- rep(x,length.out = L)
+++  alpha <- rep(alpha,length.out = L)
+++  beta <- rep(beta,length.out = L)
+++  
+++  #Initialize the densities with NaN
+++  dens <- rep(NaN, length.out = L)
+++
+++  for (i in 1:L){
+++    if (alpha[i] <= 0 || beta[i] <= 0){
+++      warning("NaNs produced")
+++      next
+++    } else if (x[i] < alpha[i]){
+++      dens[i] <- 0
+++    } else{
+++      dens[i] <- beta[i]*alpha[i]^beta[i]/x[i]^(beta[i]+1)
+++    }
+++  }
+++  return(dens)
+++}
+++
+++
++
++commit e11a24425f04f2a7df586c0640bd45e3ba555dbb
++Author: Yiheng Liu <yiheng-liu@uiowa.edu>
++Date:   Sun Jan 22 21:58:51 2017 -0600
++
++    Add pareto density function programmed by C
++
++diff --git a/HW1/paretodens b/HW1/paretodens
++new file mode 100755
++index 0000000..1f49c22
++Binary files /dev/null and b/HW1/paretodens differ
++diff --git a/HW1/paretodens.c b/HW1/paretodens.c
++new file mode 100644
++index 0000000..4d5713d
++--- /dev/null
+++++ b/HW1/paretodens.c
++@@ -0,0 +1,34 @@
+++#include <stdio.h>
+++#include <math.h>
+++
+++/*Define parto density function*/
+++double paretodens(double x, double alpha, double beta) {
+++    /*Check whether alpha and beta are positve*/
+++    if (alpha <=0 || beta <= 0){
+++        printf("Warning message: The parameters are not meaningful! NaN produced!\n");
+++        return NAN;
+++    }
+++    /*Check whether x is greater than alpha*/
+++    else if (x < alpha){
+++        return 0;
+++    }
+++    else {
+++        return beta*pow(alpha,beta)/pow(x,beta+1);
+++    }
+++}
+++
+++int main() {
+++    double x,alpha,beta;
+++
+++    printf("Input x:\n");
+++    scanf("%lf",&x);
+++
+++    printf("Input alpha:\n");
+++    scanf("%lf",&alpha);
+++
+++    printf("Input beta:\n");
+++    scanf("%lf",&beta);
+++
+++    printf("The density is %lf.\n", paretodens(x,alpha,beta));
+++    return 0;
+++}
++diff --git a/HW1/paretodens.o b/HW1/paretodens.o
++new file mode 100644
++index 0000000..07ef60d
++Binary files /dev/null and b/HW1/paretodens.o differ
++
++commit 5f64ebb53b7436bb773fc116688642a2bd92cca8
++Author: Yiheng Liu <yiheng-liu@uiowa.edu>
++Date:   Sun Jan 22 18:59:30 2017 -0600
++
++     Update
++
++diff --git a/code.r b/code.r
++deleted file mode 100644
++index 49ec3f8..0000000
++--- a/code.r
+++++ /dev/null
++@@ -1,2 +0,0 @@
++-hello
++-c world
++\ No newline at end of file
++diff --git a/doc.txt b/doc.txt
++deleted file mode 100644
++index 7f33c13..0000000
++--- a/doc.txt
+++++ /dev/null
++@@ -1 +0,0 @@
++-This file documents the code for this project.
++\ No newline at end of file
++
++commit 1c9eca2d8c5c766b08402d4ad6a06e63c4a77734
++Merge: 8c388ae 388af1d
++Author: Yiheng Liu <yiheng-liu@uiowa.edu>
++Date:   Thu Jan 19 16:04:26 2017 -0600
++
++    Add documenttaion file
++
++commit 388af1d2bc5db748845edc1cf05b6b1d280ef088
++Author: Yiheng Liu <yiheng-liu@uiowa.edu>
++Date:   Thu Jan 19 15:53:59 2017 -0600
++
++    Add documentation file
++
++diff --git a/doc.txt b/doc.txt
++new file mode 100644
++index 0000000..7f33c13
++--- /dev/null
+++++ b/doc.txt
++@@ -0,0 +1 @@
+++This file documents the code for this project.
++\ No newline at end of file
++
++commit 8c388ae15e8b8e97b2b933c10ad46d286925624d
++Author: Yiheng Liu <yiheng-liu@uiowa.edu>
++Date:   Thu Jan 19 15:42:15 2017 -0600
++
++    hello
++
++diff --git a/code.r b/code.r
++new file mode 100644
++index 0000000..49ec3f8
++--- /dev/null
+++++ b/code.r
++@@ -0,0 +1,2 @@
+++hello
+++c world
++\ No newline at end of file
++
++commit 9fe14bce78f820ff396be39b549bc46903d44191
++Author: Tierney, Luke <luke-tierney@uiowa.edu>
++Date:   Thu Jan 19 10:54:54 2017 -0600
++
++    Initial commit
++
++diff --git a/README.md b/README.md
++new file mode 100644
++index 0000000..dab0a03
++--- /dev/null
+++++ b/README.md
++@@ -0,0 +1 @@
+++# yliu255
++\ No newline at end of file
+
+commit 4c74e4e7117ce994d6160c7ee2f4df4ba363e908
+Author: Yiheng Liu <yiheng-liu@uiowa.edu>
+Date:   Mon Jan 30 14:01:39 2017 -0600
+
+    Delete HW1.tar.gz
+
+diff --git a/HW1.tar.gz b/HW1.tar.gz
+deleted file mode 100644
+index f7664e6..0000000
+Binary files a/HW1.tar.gz and /dev/null differ
+
+commit 609d75cb162242c04dd9252e203a1e9f40e36ce5
+Author: Yiheng Liu <yiheng-liu@uiowa.edu>
+Date:   Mon Jan 30 13:54:31 2017 -0600
+
+    Add Problem 2 Files
+
+diff --git a/HW2/.Rhistory b/HW2/.Rhistory
+new file mode 100644
+index 0000000..f67e848
+--- /dev/null
++++ b/HW2/.Rhistory
+@@ -0,0 +1,401 @@
++? dgamma
++? dpareto
++log(0)
++exp(log(0))
++? ifelse
++a <- c(1:5)
++a
++b <- c(3,3,3,3,3)
++b
++ifelse(a>b,TRUE,FALSE)
++library(formatR)
++? tidy_source
++tidy_source
++tidy_source()
++tidy_source()
++tidy_source("dpareto.r")
++tidy_source("dpareto.R")
++tidy_source("dpareto.R")
++tidy_source("dpareto.R")
++tidy_source("dpareto.r")
++setwd("/mnt/nfs/netapp2/grad/yliu255/s7400/STAT7400/HW2")
++tidy_source("dpareto.R")
++log(0)
++exp(log(0))
++exp(-Inf)
++? ifelse
++c(0,1,2,3,NaN)
++a <- c(0,1,2,3,NaN)
++a
++exp(a)
++dpareto <- function(x, a, b, log = FALSE) {
++nx <- length(x)
++na <- length(a)
++nb <- length(b)
++n <- max(nx, na, nb)
++if (nx < n) x <- rep(x, length.out = n)
++if (na < n) a <- rep(a, length.out = n)
++if (nb < n) b <- rep(b, length.out = n)
++ld <- ifelse(a > 0 & b > 0,
++ifelse(x > a,
++log(b) + b * log(a) - (b + 1) * log(x),
++log(0)),
++NaN)
++if (log) ld
++else exp(ld)
++}
++dpareto(2,-1,3)
++? dgamma
++dgamma(1,-2)
++dpareto <- function(x, alpha, beta, log = FALSE) {
++# Calculate the maximum length of inputs
++L <- max(length(x), length(alpha), length(beta))
++# Align all the inputs
++x <- rep(x, length.out = L)
++alpha <- rep(alpha, length.out = L)
++beta <- rep(beta, length.out = L)
++# Initialize the log densities with NaN
++logdens <- rep(NaN, length.out = L)
++for (i in 1:L) {
++if (alpha[i] <= 0 || beta[i] <= 0) {
++warning("NaNs produced")
++next
++} else if (x[i] < alpha[i]) {
++logdens[i] <- log(0)
++} else {
++logdens[i] <- log(beta[i]) + beta[i]*log(alpha[i])-(beta[i]+1)*log(alpha[i])
++}
++}
++if (log) logdens else exp(logdens)
++}
++dpaerto(1:3,2,4)
++dpareto(1:3,2,4)
++dpareto(1:3,2,4,TRUE)
++stopifnot(all.equal(dpareto(3,2,1), 0.2222222222))
++dpareto(3,-2,1)
++dpareto(3,-2,1,TRUE)
++dpareto(3,2,-1,TRUE)
++dpareto(3,2,-1)
++dpareto(1,2,3)
++dpareto(3,2,1)
++dpareto(3,2,1)
++dpareto <- function(x, alpha, beta, log = FALSE) {
++# Calculate the maximum length of inputs
++L <- max(length(x), length(alpha), length(beta))
++# Align all the inputs
++x <- rep(x, length.out = L)
++alpha <- rep(alpha, length.out = L)
++beta <- rep(beta, length.out = L)
++# Initialize the log densities with NaN
++logdens <- rep(NaN, length.out = L)
++for (i in 1:L) {
++if (alpha[i] <= 0 || beta[i] <= 0) {
++warning("NaNs produced")
++next
++} else if (x[i] < alpha[i]) {
++logdens[i] <- log(0)
++} else {
++logdens[i] <- log(beta[i]) + beta[i]*log(alpha[i])-(beta[i]+1)*log(x[i])
++}
++}
++if (log) logdens else exp(logdens)
++}
++dpareto(3,2,1)
++dpareto(3:5,2,1)
++dpareto(1:5,2,1)
++dpareto(6,2:4,1)
++log(dpareto(1:5,2,1))-dpareto(1:5,2,1,TRUE)
++all.equal
++all.equal(log(dpareto(1:5,2,1)),dpareto(1:5,2,1,TRUE))
++dpareto(1:6,1:2,1)
++dpareto(1,1,1)
++dpareto(1,1,1)
++dpareto <- function(x, alpha, beta, log = FALSE) {
++# Calculate the maximum length of inputs
++L <- max(length(x), length(alpha), length(beta))
++# Align all the inputs
++x <- rep(x, length.out = L)
++alpha <- rep(alpha, length.out = L)
++beta <- rep(beta, length.out = L)
++# Initialize the log densities with NaN
++logdens <- rep(NaN, length.out = L)
++for (i in 1:L) {
++if (alpha[i] <= 0 || beta[i] <= 0) {
++warning("NaNs produced")
++next
++} else if (x[i] <= alpha[i]) {
++logdens[i] <- log(0)
++} else {
++logdens[i] <- log(beta[i]) + beta[i]*log(alpha[i])-(beta[i]+1)*log(x[i])
++}
++}
++if (log) logdens else exp(logdens)
++}
++dpareto(3,-2, 1) # bad parameter
++dpareto(3,2, -1) # bar parameter
++stopifnot(all.equal(dpareto(3,2,1), 0.2222222222))
++stopifnot(all.equal(dpareto(1,2,3), 0.0))
++stopifnot(all.equal(dpareto(3:5,2, 1), c(0.2222222222, 0.1250000, 0.0800000)))
++stopifnot(all.equal(dpareto(1:5,2, 1), c(0.0, 0.0, 0.2222222222, 0.1250000, 0.0800000)))
++stopifnot(all.equal(dpareto(6,2:4, 1), c(0.05555555556, 0.08333333333, 0.11111111111)))
++stopifnot(all.equal(log(dpareto(1:5,2, 1)), dpareto(1:5,2, 1, log = TRUE)))
++stopifnot(all.equal(dpareto(1:6,1:2, 1),
++c(0.0, 0.0, 0.11111111111, 0.125, 0.04, 0.05555555556)))
++stopifnot(all.equal(dpareto(1, 2, 1:2), c(0, 0)))
++dpareto(3,-2, 1) # bad parameter
++dpareto(3,2, -1) # bar parameter
++stopifnot(all.equal(dpareto(3,2,1), 0.2222222222))
++stopifnot(all.equal(dpareto(1,2,3), 0.0))
++stopifnot(all.equal(dpareto(3:5,2, 1), c(0.2222222222, 0.1250000, 0.0800000)))
++stopifnot(all.equal(dpareto(1:5,2, 1), c(0.0, 0.0, 0.2222222222, 0.1250000, 0.0800000)))
++stopifnot(all.equal(dpareto(6,2:4, 1), c(0.05555555556, 0.08333333333, 0.11111111111)))
++stopifnot(all.equal(log(dpareto(1:5,2, 1)), dpareto(1:5,2, 1, log = TRUE)))
++stopifnot(all.equal(dpareto(1:6,1:2, 1),
++c(0.0, 0.0, 0.11111111111, 0.125, 0.04, 0.05555555556)))
++stopifnot(all.equal(dpareto(1, 2, 1:2), c(0, 1)))
++dpareto(3,-2, 1) # bad parameter
++dpareto(3,2, -1) # bar parameter
++stopifnot(all.equal(dpareto(3,2,1), 0.2222222222))
++stopifnot(all.equal(dpareto(1,2,3), 0.0))
++stopifnot(all.equal(dpareto(3:5,2, 1), c(0.2222222222, 0.1250000, 0.0800000)))
++stopifnot(all.equal(dpareto(1:5,2, 1), c(0.0, 0.0, 0.2222222222, 0.1250000, 0.0800000)))
++stopifnot(all.equal(dpareto(6,2:4, 1), c(0.05555555556, 0.08333333333, 0.11111111111)))
++stopifnot(all.equal(log(dpareto(1:5,2, 1)), dpareto(1:5,2, 1, log = TRUE)))
++stopifnot(all.equal(dpareto(1:6,1:2, 1),
++c(0.0, 0.0, 0.11111111111, 0.115, 0.04, 0.05555555556)))
++stopifnot(all.equal(dpareto(1, 2, 1:2), c(0, 0)))
++x <- 0
++x <- ifelse(TRUE,warning("test",99))
++x
++ifelse(TRUE,warning("test",99))
++ifelse(TRUE,warning("test"),99)
++ifelse(TRUE,warning("test"),99)
++? ifelse
++? dgamma
++dgamma
++dpareto(,3,3)
++dpareto(,-3,3)
++dpareto(1,-3,3)
++dpareto(1:1000,3,3)
++dpareto(1:1000,c(-1,1),3)
++dgamma(1:1000,c(-1,1),3)
++? all.equal
++all.equal(1,1)
++all.equal(1,2)
++is.nan(1)
++is.nan(c(1,2))
++is.nan(c(1,NaN))
++? is.na.numeric_version
++Inf
++Inf
++-Inf
++Inf-Inf
++-Inf-Inf
++is.nan(NaN)
++is.nan(Inf)
++dpareto <- function(x, alpha, beta, log = FALSE) {
++# Calculate the maximum length of inputs
++L <- max(length(x), length(alpha), length(beta))
++# Align all the inputs
++x <- rep(x, length.out = L)
++alpha <- rep(alpha, length.out = L)
++beta <- rep(beta, length.out = L)
++logdens <- ifelse(alpha<=0 || beta<=0,
++NaN,
++ifelse(x<=alpha,
++log(0),
++log(beta) + beta*log(alpha)-(beta+1)*log(x))
++)
++#Check whether NaN exists
++if (sum(is.nan(logdens))) warning("NaNs produced")
++if (log) logdens else exp(logdens)
++}
++dpareto(3,-2, 1) # bad parameter
++dpareto(3,2, -1) # bar parameter
++stopifnot(all.equal(dpareto(3,2,1), 0.2222222222))
++stopifnot(all.equal(dpareto(1,2,3), 0.0))
++stopifnot(all.equal(dpareto(3:5,2, 1), c(0.2222222222, 0.1250000, 0.0800000)))
++stopifnot(all.equal(dpareto(1:5,2, 1), c(0.0, 0.0, 0.2222222222, 0.1250000, 0.0800000)))
++stopifnot(all.equal(dpareto(6,2:4, 1), c(0.05555555556, 0.08333333333, 0.11111111111)))
++stopifnot(all.equal(log(dpareto(1:5,2, 1)), dpareto(1:5,2, 1, log = TRUE)))
++stopifnot(all.equal(dpareto(1:6,1:2, 1),
++c(0.0, 0.0, 0.11111111111, 0.125, 0.04, 0.05555555556)))
++stopifnot(all.equal(dpareto(1, 2, 1:2), c(0, 0)))
++dpareto(3:5,2,1)
++dpareto <- function(x, a, b, log = FALSE) {
++nx <- length(x)
++na <- length(a)
++nb <- length(b)
++n <- max(nx, na, nb)
++if (nx < n) x <- rep(x, length.out = n)
++if (na < n) a <- rep(a, length.out = n)
++if (nb < n) b <- rep(b, length.out = n)
++ld <- ifelse(a > 0 & b > 0,
++ifelse(x > a,
++log(b) + b * log(a) - (b + 1) * log(x),
++log(0)),
++NaN)
++if (log) ld
++else exp(ld)
++}
++dpareto(3,-2, 1) # bad parameter
++dpareto(3,2, -1) # bar parameter
++stopifnot(all.equal(dpareto(3,2,1), 0.2222222222))
++stopifnot(all.equal(dpareto(1,2,3), 0.0))
++stopifnot(all.equal(dpareto(3:5,2, 1), c(0.2222222222, 0.1250000, 0.0800000)))
++stopifnot(all.equal(dpareto(1:5,2, 1), c(0.0, 0.0, 0.2222222222, 0.1250000, 0.0800000)))
++stopifnot(all.equal(dpareto(6,2:4, 1), c(0.05555555556, 0.08333333333, 0.11111111111)))
++stopifnot(all.equal(log(dpareto(1:5,2, 1)), dpareto(1:5,2, 1, log = TRUE)))
++stopifnot(all.equal(dpareto(1:6,1:2, 1),
++c(0.0, 0.0, 0.11111111111, 0.125, 0.04, 0.05555555556)))
++stopifnot(all.equal(dpareto(1, 2, 1:2), c(0, 0)))
++dpareto <- function(x, alpha, beta, log = FALSE) {
++# Calculate the maximum length of inputs
++L <- max(length(x), length(alpha), length(beta))
++# Align all the inputs
++x <- rep(x, length.out = L)
++alpha <- rep(alpha, length.out = L)
++beta <- rep(beta, length.out = L)
++logdens <- ifelse(alpha<=0 || beta<=0,
++NaN,
++ifelse(x<=alpha,
++log(0),
++log(beta) + beta*log(alpha)-(beta+1)*log(x))
++)
++#Check whether NaN exists
++if (sum(is.nan(logdens))) warning("NaNs produced")
++if (log) logdens else exp(logdens)
++}
++dpareto(2,-1,2)
++dpareto(2,1:2,2)
++dpareto(2,1,2)
++a <- 1:5
++a
++b <- c(3,3,3,3,3)
++ifelse(a<b,TRUE.FALSE)
++ifelse(a<b,TRUE,FALSE)
++dpareto(3,2,1)
++dpareto(4,2,1)
++dpareto(5,2,1)
++dpareto(3:5,2,1)
++dpareto(3:5,2,1.TRUE)
++dpareto(3:5,2,1,TRUE)
++? ifelse
++dpareto <- function(x, alpha, beta, log = FALSE) {
++# Calculate the maximum length of inputs
++L <- max(length(x), length(alpha), length(beta))
++# Align all the inputs
++x <- rep(x, length.out = L)
++alpha <- rep(alpha, length.out = L)
++beta <- rep(beta, length.out = L)
++logdens <- ifelse(alpha<=0 | beta<=0,
++NaN,
++ifelse(x<=alpha,
++log(0),
++log(beta) + beta*log(alpha)-(beta+1)*log(x))
++)
++#Check whether NaN exists
++if (sum(is.nan(logdens))) warning("NaNs produced")
++if (log) logdens else exp(logdens)
++}
++dpareto(3,-2, 1) # bad parameter
++dpareto(3,2, -1) # bar parameter
++stopifnot(all.equal(dpareto(3,2,1), 0.2222222222))
++stopifnot(all.equal(dpareto(1,2,3), 0.0))
++stopifnot(all.equal(dpareto(3:5,2, 1), c(0.2222222222, 0.1250000, 0.0800000)))
++stopifnot(all.equal(dpareto(1:5,2, 1), c(0.0, 0.0, 0.2222222222, 0.1250000, 0.0800000)))
++stopifnot(all.equal(dpareto(6,2:4, 1), c(0.05555555556, 0.08333333333, 0.11111111111)))
++stopifnot(all.equal(log(dpareto(1:5,2, 1)), dpareto(1:5,2, 1, log = TRUE)))
++stopifnot(all.equal(dpareto(1:6,1:2, 1),
++c(0.0, 0.0, 0.11111111111, 0.125, 0.04, 0.05555555556)))
++stopifnot(all.equal(dpareto(1, 2, 1:2), c(0, 0)))
++dpareto(3:5,2,1)
++tidy_source()
++tidy_source()
++tidy_source("dpareto.R")
++dpareto <- function(x, alpha, beta, log = FALSE) {
++# Calculate the maximum length of inputs
++L <- max(length(x), length(alpha), length(beta))
++# Align all the inputs
++x <- rep(x, length.out = L)
++alpha <- rep(alpha, length.out = L)
++beta <- rep(beta, length.out = L)
++logdens <- ifelse(alpha <= 0 | beta <= 0,
++NaN,
++ifelse(x <= alpha,
++log(0),
++log(beta) + beta * log(alpha) - (beta + 1) * log(x)))
++# Check whether NaN exists
++if (sum(is.nan(logdens)))
++warning("NaNs produced")
++if (log) logdens else exp(logdens)
++}
++dpareto(3,-2, 1) # bad parameter
++dpareto(3,2, -1) # bar parameter
++stopifnot(all.equal(dpareto(3,2,1), 0.2222222222))
++stopifnot(all.equal(dpareto(1,2,3), 0.0))
++stopifnot(all.equal(dpareto(3:5,2, 1), c(0.2222222222, 0.1250000, 0.0800000)))
++stopifnot(all.equal(dpareto(1:5,2, 1), c(0.0, 0.0, 0.2222222222, 0.1250000, 0.0800000)))
++stopifnot(all.equal(dpareto(6,2:4, 1), c(0.05555555556, 0.08333333333, 0.11111111111)))
++stopifnot(all.equal(log(dpareto(1:5,2, 1)), dpareto(1:5,2, 1, log = TRUE)))
++stopifnot(all.equal(dpareto(1:6,1:2, 1),
++c(0.0, 0.0, 0.11111111111, 0.125, 0.04, 0.05555555556)))
++stopifnot(all.equal(dpareto(1, 2, 1:2), c(0, 0)))
++dpareto(3, 2, 1)
++dpareto(1, 2, 3)
++dpareto(3, -2, 1)
++dpareto(3, 2, -1)
++dpareto(3 : 5, 2, 1)
++dpareto(1 : 5, 2, 1)
++dpareto(6, 2 : 4, 1)
++dpareto(3, 2, 1, log = TRUE)
++? plot.stepfun
++example(plot.stepfun)
++x <- seq(-5,5,length=1001)
++y = 1/x
++lines(x,y)
++plot.new()
++plot.window(xlim=c(-4, 4), ylim=c(-4, 4))
++lines(x, y)
++plot(x,y)
++plot(x,y,type="l")
++x <- seq(0,10,length=100)
++x <- seq(0,10,length=1000)
++x <- seq(0,10,length=1001)
++y <- dpareto(x,1,1)
++plot(x,y)
++plot(x,y,type="l")
++? seq
++x1 <- seq(0,1,0.01)
++x2 <- seq(1.01,10,0.01)
++y1 <- dpareto(x1,1,1)
++y2 <- dpareto(x2,1,1)
++plot(x1,y1,tyoe="l")
++x1 <- seq(0,1,0.01)
++x2 <- seq(1.01,10,0.01)
++y1 <- dpareto(x1,1,1)
++y2 <- dpareto(x2,1,1)
++plot(x1,y1,type="l")
++x1 <- seq(0,1,0.01)
++x2 <- seq(1.01,10,0.01)
++y1 <- dpareto(x1,1,1)
++y2 <- dpareto(x2,1,1)
++plot(x1,y1,type="l")
++x1 <- seq(0,1,0.01)
++x2 <- seq(1.01,10,0.01)
++y1 <- dpareto(x1,1,1)
++y2 <- dpareto(x2,1,1)
++plot(x1,y1,type="l")
++range(x1)
++x1 <- seq(0,1,0.01)
++x2 <- seq(1.01,10,0.01)
++y1 <- dpareto(x1,1,1)
++y2 <- dpareto(x2,1,1)
++plot(x1,y1,xlim=range(c(x1,x2)),ylim=range(c(y1,y2)),type="l")
++lines(x2,y2)
++x1 <- seq(0,1,0.01)
++x2 <- seq(1.01,10,0.01)
++y1 <- dpareto(x1,1,1)
++y2 <- dpareto(x2,1,1)
++plot(x1,y1,xlim=range(c(x1,x2)),ylim=range(c(y1,y2)),type="l")
++lines(x2,y2)
+diff --git a/HW2/HW2.docx b/HW2/HW2.docx
+new file mode 100644
+index 0000000..e910bb4
+Binary files /dev/null and b/HW2/HW2.docx differ
+diff --git a/HW2/HW2.pdf b/HW2/HW2.pdf
+new file mode 100644
+index 0000000..f38ffd3
+Binary files /dev/null and b/HW2/HW2.pdf differ
+diff --git a/HW2/HW2_plot.R b/HW2/HW2_plot.R
+new file mode 100644
+index 0000000..2eaf006
+--- /dev/null
++++ b/HW2/HW2_plot.R
+@@ -0,0 +1,16 @@
++x1 <- seq(0,1,0.01)
++x2 <- seq(1.01,10,0.01)
++y1 <- dpareto(x1,1,1)
++y2 <- dpareto(x2,1,1)
++
++x3 <- seq(0,2,0.01)
++x4 <- seq(2.01,10,0.01)
++y3 <- dpareto(x3,2,3)
++y4 <- dpareto(x4,2,3)
++
++
++plot(x1,y1,xlim=range(c(x1,x2,x3,x4)),ylim=range(c(y1,y2,y3,y4)),type="l",col="red",xlab="x",ylab="density",main="Pareto Distribution")
++lines(x2,y2,col="red")
++lines(x3,y3,col="blue",lty=2)
++lines(x4,y4,col="blue",lty=2)
++legend("topright",legend=c("scale=1,shape=1","scale=2,shape=3"),lty=c(1,2),col=c("red","blue"))
+diff --git a/HW2/pareto.png b/HW2/pareto.png
+new file mode 100644
+index 0000000..81ac030
+Binary files /dev/null and b/HW2/pareto.png differ
+diff --git a/HW2/paretodensDotC.R b/HW2/paretodensDotC.R
+new file mode 100644
+index 0000000..2df9396
+--- /dev/null
++++ b/HW2/paretodensDotC.R
+@@ -0,0 +1,13 @@
++paretodensDotC <- function(x, alpha, beta, log = FALSE) {
++    nx <- length(x)
++    nalpha <- length(alpha)
++    nbeta <- length(beta)
++    n <- max(nx, nalpha, nbeta)
++    
++    result <- .C("paretodensDotC",
++                 as.double(x), as.integer(nx),
++                 as.double(alpha), as.integer(nalpha), 
++                 as.double(beta), as.integer(nbeta),
++                 dens = double(n), as.integer(log))
++    result$dens
++}
+\ No newline at end of file
+diff --git a/HW2/paretodensDotC.c b/HW2/paretodensDotC.c
+new file mode 100644
+index 0000000..895c044
+--- /dev/null
++++ b/HW2/paretodensDotC.c
+@@ -0,0 +1,48 @@
++#include <math.h>
++#include <R.h>
++#ifndef max
++#define max( a, b ) ( ((a) > (b)) ? (a) : (b) )
++#endif
++
++/*Define parto density function*/
++void paretodensDotC(double *x, int *nx, double *alpha, int *nalpha,
++                    double *beta, int *nbeta, double *dens, int *lg)
++{
++    /*Calculate the maximum input length */
++    int i, n = max(max(nx[0], nalpha[0]), nbeta[0]), flag = 0, ind[3];
++    double ldens[n];
++
++    for (i = 0; i < n; i++) {
++        ind[0] = i % nx[0];
++        ind[1] = i % nalpha[0];
++        ind[2] = i % nbeta[0];
++
++        /*Calculate whether alpha and beta are meaningful */
++        if (alpha[ind[1]] <= 0 || beta[ind[2]] <= 0) {
++            ldens[i] = NAN;
++            flag++;
++        }
++        /*Check whether x is greater than alpha */
++        else if (x[ind[0]] <= alpha[ind[1]]) {
++            ldens[i] = log(0);
++        }
++        else {
++            ldens[i] =
++                log(beta[ind[2]]) + beta[ind[2]] * log(alpha[ind[1]]) -
++                (beta[ind[2]] + 1) * log(x[ind[0]]);
++        }
++
++        if (lg[0] == 0) {
++            dens[i] = exp(ldens[i]);
++        }
++        else {
++            dens[i] = ldens[i];
++        }
++
++    }
++    /*Check whether NaNs exist */
++    if (flag > 0) {
++        warning("NaNs produced");
++    }
++
++}
+diff --git a/HW2/paretodensDotC.o b/HW2/paretodensDotC.o
+new file mode 100644
+index 0000000..0b10e72
+Binary files /dev/null and b/HW2/paretodensDotC.o differ
+diff --git a/HW2/paretodensDotC.so b/HW2/paretodensDotC.so
+new file mode 100755
+index 0000000..cd3bea7
+Binary files /dev/null and b/HW2/paretodensDotC.so differ
+
+commit eb3a3b5dbdd8ff1dcc816dab90c8a406f28e365f
+Author: Yiheng Liu <yiheng-liu@uiowa.edu>
+Date:   Sun Jan 29 21:34:05 2017 -0600
+
+    Files deleted
+
+diff --git a/HW2/HW1.docx b/HW2/HW1.docx
+deleted file mode 100644
+index 9a20ea8..0000000
+Binary files a/HW2/HW1.docx and /dev/null differ
+
+commit d1916d561c23328c9804daf189927d3b4bb10392
+Author: Yiheng Liu <yiheng-liu@uiowa.edu>
+Date:   Sun Jan 29 21:31:13 2017 -0600
+
+    Add dpareto.R in HW2
+
+diff --git a/HW1.tar.gz b/HW1.tar.gz
+new file mode 100644
+index 0000000..f7664e6
+Binary files /dev/null and b/HW1.tar.gz differ
+diff --git a/HW2/HW1.docx b/HW2/HW1.docx
+new file mode 100644
+index 0000000..9a20ea8
+Binary files /dev/null and b/HW2/HW1.docx differ
+diff --git a/HW2/dpareto.R b/HW2/dpareto.R
+new file mode 100644
+index 0000000..e601dd3
+--- /dev/null
++++ b/HW2/dpareto.R
+@@ -0,0 +1,22 @@
++dpareto <- function(x, alpha, beta, log = FALSE) {
++    
++    # Calculate the maximum length of inputs
++    L <- max(length(x), length(alpha), length(beta))
++    
++    # Align all the inputs
++    x <- rep(x, length.out = L)
++    alpha <- rep(alpha, length.out = L)
++    beta <- rep(beta, length.out = L)
++    
++    logdens <- ifelse(alpha <= 0 | beta <= 0,
++                      NaN,
++                      ifelse(x <= alpha,
++                             log(0),
++                             log(beta) + beta * log(alpha) - (beta + 1) * log(x)))
++    
++    # Check whether NaNs exist
++    if (sum(is.nan(logdens))) 
++        warning("NaNs produced")
++    
++    if (log) logdens else exp(logdens)
++}
+\ No newline at end of file
+
+commit bd7cf525dbc5f5fe76c4b945f393f69956870d76
+Author: Yiheng Liu <yiheng-liu@uiowa.edu>
+Date:   Mon Jan 23 15:16:07 2017 -0600
+
+    Add git log files
+
+diff --git a/HW1/hw1-gitlog.txt b/HW1/hw1-gitlog.txt
+new file mode 100644
+index 0000000..933527a
+--- /dev/null
++++ b/HW1/hw1-gitlog.txt
+@@ -0,0 +1,186 @@
++commit 0702cc2782a0134bf34e8982cea447fc3b478d8b
++Author: Yiheng Liu <yiheng-liu@uiowa.edu>
++Date:   Mon Jan 23 15:08:41 2017 -0600
++
++    Add HW1 writeup
++
++diff --git a/HW1/HW1.docx b/HW1/HW1.docx
++new file mode 100644
++index 0000000..9a20ea8
++Binary files /dev/null and b/HW1/HW1.docx differ
++diff --git a/HW1/HW1.pdf b/HW1/HW1.pdf
++new file mode 100644
++index 0000000..14c506a
++Binary files /dev/null and b/HW1/HW1.pdf differ
++
++commit 03f5add2b9186e44dc5f8f821004600e632d0abf
++Author: Yiheng Liu <yiheng-liu@uiowa.edu>
++Date:   Mon Jan 23 14:58:37 2017 -0600
++
++    Add dpareto function
++
++diff --git a/HW1/dpareto.r b/HW1/dpareto.r
++new file mode 100644
++index 0000000..7dccd9e
++--- /dev/null
+++++ b/HW1/dpareto.r
++@@ -0,0 +1,27 @@
+++dpareto <- function(x,alpha,beta){
+++  
+++  #Calculate the maximum length of inputs
+++  L <- max(length(x), length(alpha), length(beta))
+++  
+++  #Align all the inputs
+++  x <- rep(x,length.out = L)
+++  alpha <- rep(alpha,length.out = L)
+++  beta <- rep(beta,length.out = L)
+++  
+++  #Initialize the densities with NaN
+++  dens <- rep(NaN, length.out = L)
+++
+++  for (i in 1:L){
+++    if (alpha[i] <= 0 || beta[i] <= 0){
+++      warning("NaNs produced")
+++      next
+++    } else if (x[i] < alpha[i]){
+++      dens[i] <- 0
+++    } else{
+++      dens[i] <- beta[i]*alpha[i]^beta[i]/x[i]^(beta[i]+1)
+++    }
+++  }
+++  return(dens)
+++}
+++
+++
++
++commit e11a24425f04f2a7df586c0640bd45e3ba555dbb
++Author: Yiheng Liu <yiheng-liu@uiowa.edu>
++Date:   Sun Jan 22 21:58:51 2017 -0600
++
++    Add pareto density function programmed by C
++
++diff --git a/HW1/paretodens b/HW1/paretodens
++new file mode 100755
++index 0000000..1f49c22
++Binary files /dev/null and b/HW1/paretodens differ
++diff --git a/HW1/paretodens.c b/HW1/paretodens.c
++new file mode 100644
++index 0000000..4d5713d
++--- /dev/null
+++++ b/HW1/paretodens.c
++@@ -0,0 +1,34 @@
+++#include <stdio.h>
+++#include <math.h>
+++
+++/*Define parto density function*/
+++double paretodens(double x, double alpha, double beta) {
+++    /*Check whether alpha and beta are positve*/
+++    if (alpha <=0 || beta <= 0){
+++        printf("Warning message: The parameters are not meaningful! NaN produced!\n");
+++        return NAN;
+++    }
+++    /*Check whether x is greater than alpha*/
+++    else if (x < alpha){
+++        return 0;
+++    }
+++    else {
+++        return beta*pow(alpha,beta)/pow(x,beta+1);
+++    }
+++}
+++
+++int main() {
+++    double x,alpha,beta;
+++
+++    printf("Input x:\n");
+++    scanf("%lf",&x);
+++
+++    printf("Input alpha:\n");
+++    scanf("%lf",&alpha);
+++
+++    printf("Input beta:\n");
+++    scanf("%lf",&beta);
+++
+++    printf("The density is %lf.\n", paretodens(x,alpha,beta));
+++    return 0;
+++}
++diff --git a/HW1/paretodens.o b/HW1/paretodens.o
++new file mode 100644
++index 0000000..07ef60d
++Binary files /dev/null and b/HW1/paretodens.o differ
++
++commit 5f64ebb53b7436bb773fc116688642a2bd92cca8
++Author: Yiheng Liu <yiheng-liu@uiowa.edu>
++Date:   Sun Jan 22 18:59:30 2017 -0600
++
++     Update
++
++diff --git a/code.r b/code.r
++deleted file mode 100644
++index 49ec3f8..0000000
++--- a/code.r
+++++ /dev/null
++@@ -1,2 +0,0 @@
++-hello
++-c world
++\ No newline at end of file
++diff --git a/doc.txt b/doc.txt
++deleted file mode 100644
++index 7f33c13..0000000
++--- a/doc.txt
+++++ /dev/null
++@@ -1 +0,0 @@
++-This file documents the code for this project.
++\ No newline at end of file
++
++commit 1c9eca2d8c5c766b08402d4ad6a06e63c4a77734
++Merge: 8c388ae 388af1d
++Author: Yiheng Liu <yiheng-liu@uiowa.edu>
++Date:   Thu Jan 19 16:04:26 2017 -0600
++
++    Add documenttaion file
++
++commit 388af1d2bc5db748845edc1cf05b6b1d280ef088
++Author: Yiheng Liu <yiheng-liu@uiowa.edu>
++Date:   Thu Jan 19 15:53:59 2017 -0600
++
++    Add documentation file
++
++diff --git a/doc.txt b/doc.txt
++new file mode 100644
++index 0000000..7f33c13
++--- /dev/null
+++++ b/doc.txt
++@@ -0,0 +1 @@
+++This file documents the code for this project.
++\ No newline at end of file
++
++commit 8c388ae15e8b8e97b2b933c10ad46d286925624d
++Author: Yiheng Liu <yiheng-liu@uiowa.edu>
++Date:   Thu Jan 19 15:42:15 2017 -0600
++
++    hello
++
++diff --git a/code.r b/code.r
++new file mode 100644
++index 0000000..49ec3f8
++--- /dev/null
+++++ b/code.r
++@@ -0,0 +1,2 @@
+++hello
+++c world
++\ No newline at end of file
++
++commit 9fe14bce78f820ff396be39b549bc46903d44191
++Author: Tierney, Luke <luke-tierney@uiowa.edu>
++Date:   Thu Jan 19 10:54:54 2017 -0600
++
++    Initial commit
++
++diff --git a/README.md b/README.md
++new file mode 100644
++index 0000000..dab0a03
++--- /dev/null
+++++ b/README.md
++@@ -0,0 +1 @@
+++# yliu255
++\ No newline at end of file
+
+commit 0702cc2782a0134bf34e8982cea447fc3b478d8b
+Author: Yiheng Liu <yiheng-liu@uiowa.edu>
+Date:   Mon Jan 23 15:08:41 2017 -0600
+
+    Add HW1 writeup
+
+diff --git a/HW1/HW1.docx b/HW1/HW1.docx
+new file mode 100644
+index 0000000..9a20ea8
+Binary files /dev/null and b/HW1/HW1.docx differ
+diff --git a/HW1/HW1.pdf b/HW1/HW1.pdf
+new file mode 100644
+index 0000000..14c506a
+Binary files /dev/null and b/HW1/HW1.pdf differ
+
+commit 03f5add2b9186e44dc5f8f821004600e632d0abf
+Author: Yiheng Liu <yiheng-liu@uiowa.edu>
+Date:   Mon Jan 23 14:58:37 2017 -0600
+
+    Add dpareto function
+
+diff --git a/HW1/dpareto.r b/HW1/dpareto.r
+new file mode 100644
+index 0000000..7dccd9e
+--- /dev/null
++++ b/HW1/dpareto.r
+@@ -0,0 +1,27 @@
++dpareto <- function(x,alpha,beta){
++  
++  #Calculate the maximum length of inputs
++  L <- max(length(x), length(alpha), length(beta))
++  
++  #Align all the inputs
++  x <- rep(x,length.out = L)
++  alpha <- rep(alpha,length.out = L)
++  beta <- rep(beta,length.out = L)
++  
++  #Initialize the densities with NaN
++  dens <- rep(NaN, length.out = L)
++
++  for (i in 1:L){
++    if (alpha[i] <= 0 || beta[i] <= 0){
++      warning("NaNs produced")
++      next
++    } else if (x[i] < alpha[i]){
++      dens[i] <- 0
++    } else{
++      dens[i] <- beta[i]*alpha[i]^beta[i]/x[i]^(beta[i]+1)
++    }
++  }
++  return(dens)
++}
++
++
+
+commit e11a24425f04f2a7df586c0640bd45e3ba555dbb
+Author: Yiheng Liu <yiheng-liu@uiowa.edu>
+Date:   Sun Jan 22 21:58:51 2017 -0600
+
+    Add pareto density function programmed by C
+
+diff --git a/HW1/paretodens b/HW1/paretodens
+new file mode 100755
+index 0000000..1f49c22
+Binary files /dev/null and b/HW1/paretodens differ
+diff --git a/HW1/paretodens.c b/HW1/paretodens.c
+new file mode 100644
+index 0000000..4d5713d
+--- /dev/null
++++ b/HW1/paretodens.c
+@@ -0,0 +1,34 @@
++#include <stdio.h>
++#include <math.h>
++
++/*Define parto density function*/
++double paretodens(double x, double alpha, double beta) {
++    /*Check whether alpha and beta are positve*/
++    if (alpha <=0 || beta <= 0){
++        printf("Warning message: The parameters are not meaningful! NaN produced!\n");
++        return NAN;
++    }
++    /*Check whether x is greater than alpha*/
++    else if (x < alpha){
++        return 0;
++    }
++    else {
++        return beta*pow(alpha,beta)/pow(x,beta+1);
++    }
++}
++
++int main() {
++    double x,alpha,beta;
++
++    printf("Input x:\n");
++    scanf("%lf",&x);
++
++    printf("Input alpha:\n");
++    scanf("%lf",&alpha);
++
++    printf("Input beta:\n");
++    scanf("%lf",&beta);
++
++    printf("The density is %lf.\n", paretodens(x,alpha,beta));
++    return 0;
++}
+diff --git a/HW1/paretodens.o b/HW1/paretodens.o
+new file mode 100644
+index 0000000..07ef60d
+Binary files /dev/null and b/HW1/paretodens.o differ
+
+commit 5f64ebb53b7436bb773fc116688642a2bd92cca8
+Author: Yiheng Liu <yiheng-liu@uiowa.edu>
+Date:   Sun Jan 22 18:59:30 2017 -0600
+
+     Update
+
+diff --git a/code.r b/code.r
+deleted file mode 100644
+index 49ec3f8..0000000
+--- a/code.r
++++ /dev/null
+@@ -1,2 +0,0 @@
+-hello
+-c world
+\ No newline at end of file
+diff --git a/doc.txt b/doc.txt
+deleted file mode 100644
+index 7f33c13..0000000
+--- a/doc.txt
++++ /dev/null
+@@ -1 +0,0 @@
+-This file documents the code for this project.
+\ No newline at end of file
+
+commit 1c9eca2d8c5c766b08402d4ad6a06e63c4a77734
+Merge: 8c388ae 388af1d
+Author: Yiheng Liu <yiheng-liu@uiowa.edu>
+Date:   Thu Jan 19 16:04:26 2017 -0600
+
+    Add documenttaion file
+
+commit 388af1d2bc5db748845edc1cf05b6b1d280ef088
+Author: Yiheng Liu <yiheng-liu@uiowa.edu>
+Date:   Thu Jan 19 15:53:59 2017 -0600
+
+    Add documentation file
+
+diff --git a/doc.txt b/doc.txt
+new file mode 100644
+index 0000000..7f33c13
+--- /dev/null
++++ b/doc.txt
+@@ -0,0 +1 @@
++This file documents the code for this project.
+\ No newline at end of file
+
+commit 8c388ae15e8b8e97b2b933c10ad46d286925624d
+Author: Yiheng Liu <yiheng-liu@uiowa.edu>
+Date:   Thu Jan 19 15:42:15 2017 -0600
+
+    hello
+
+diff --git a/code.r b/code.r
+new file mode 100644
+index 0000000..49ec3f8
+--- /dev/null
++++ b/code.r
+@@ -0,0 +1,2 @@
++hello
++c world
+\ No newline at end of file
+
+commit 9fe14bce78f820ff396be39b549bc46903d44191
+Author: Tierney, Luke <luke-tierney@uiowa.edu>
+Date:   Thu Jan 19 10:54:54 2017 -0600
+
+    Initial commit
+
+diff --git a/README.md b/README.md
+new file mode 100644
+index 0000000..dab0a03
+--- /dev/null
++++ b/README.md
+@@ -0,0 +1 @@
++# yliu255
+\ No newline at end of file
