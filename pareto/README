@@ -1,1 +1,1 @@
-This is a simple package with a function to calcualte the density of pareto distribtuion.
+This is a simple package with three functions to calcualte the density, distribution function and quantile function for the Pareto distribtuion.

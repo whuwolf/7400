@@ -1,0 +1,90 @@
+\documentclass{article}
+
+% \VignetteIndexEntry{Using the pareto Package}
+
+\title{Using the \texttt{pareto} Package}
+\author{Yiheng Liu}
+
+\begin{document}
+\maketitle
+
+<<echo=false,results=hide>>=
+library(pareto)
+library(xtable)
+#N <- 5
+@ 
+
+\section{Introduction}
+The \texttt{pareto} package includes the function \texttt{dpareto}, \texttt{ppareto} and \texttt{qpareto} to give the density, distribution function and quantile function for the Pareto distribution according to the arguments.
+
+\section{Simple Examples}
+Some simple examples for \texttt{dpareto}:
+<<>>=
+dpareto(4, 2, 1)
+dpareto(4, 2, 1, log = TRUE)
+@
+
+\bigskip
+\noindent Some simple examples for \texttt{ppareto}:
+<<>>=
+ppareto(5, 2, 1)
+ppareto(5, 2, 1, lower.tail = FALSE)
+ppareto(5, 2, 1, lower.tail = FALSE, log.p = TRUE)
+@
+
+\bigskip
+\noindent Some simple examples for \texttt{qpareto}:
+<<>>=
+qpareto(0.6, 2, 1)
+qpareto(0.6, 2, 1, lower.tail = FALSE)
+qpareto(log(0.6), 2, 1, lower.tail = FALSE, log.p = TRUE)
+@
+
+\section{Vectorized Examples}
+The function is vectorized. If the numerical arguments are vectors of more than
+one element, then the result will be a vector of which the length is the maximum of the lengths of the numerical arguments. The numerical arguments are recycled to the length of the result. Only the first element of the logical argument is used.
+
+\bigskip
+\noindent Some vectorized examples for \texttt{dpareto}:
+<<>>=
+dpareto(1:5, 2, 1)
+dpareto(1:5, 2, 1, log = TRUE)
+@
+
+\bigskip
+\noindent Some vectorized examples for \texttt{ppareto}:
+<<>>=
+ppareto(1:5, 2, 1)
+ppareto(1:5, 2, 1, lower.tail = FALSE)
+ppareto(1:5, 2, 1, lower.tail = FALSE, log.p = TRUE)
+@
+
+\bigskip
+\noindent Some vectorized examples for \texttt{qpareto}:
+<<>>=
+qpareto(seq(0,1,0.2), 2, 1)
+qpareto(seq(0,1,0.2), 2, 1, lower.tail = FALSE)
+qpareto(log(seq(0,1,0.2)), 2, 1, lower.tail = FALSE, log.p = TRUE)
+@
+
+\bigskip
+\noindent A table of the results of \texttt{dpareto(1:5, 2, 1)} and \texttt{ppareto(1:5, 2, 1)} are given in Table~\ref{tab:pareto}.
+<<results=tex,echo=false>>=
+x <- c(1:5)
+m<-cbind(x, dpareto(x, 2, 1), ppareto(x, 2, 1))
+colnames(m)<-c("x", "dpareto", "ppareto")
+xtable(as.data.frame(m),align=rep("c",4),
+       caption="Results for dpareto(1:5, 2, 1) and ppareto(1:5, 2, 1)",
+       label="tab:pareto")
+@ 
+A graph of the quantile function is in Figure~\ref{fig:qpareto}.
+\begin{figure}
+  \centering
+<<fig=TRUE,width=5,height=5,echo=false>>=b
+plot(seq(0,0.99,0.001), qpareto(seq(0,0.99,0.001),2,1),xlab = "probability", ylab="quantile", type="l", col="red")
+@  
+  \caption{Plot of the quantile for pareto distribution with scale=2, shape=1}
+  \label{fig:qpareto}
+\end{figure}
+\end{document}
+

@@ -1,10 +1,11 @@
 Package: pareto
 Type: Package
-Title: Density Function for Pareto Distribution
-Version: 1.0-1
-Date: 2017-02-04
+Title: Pareto Distribution
+Version: 2.0-0
+Date: 2017-02-18
 Author: Yiheng Liu
 Maintainer: Yiheng Liu <yiheng-liu@uiowa.edu>
-Description: Density function for the pareto distribution with scale equal to alpha and shape equal to beta.
+Description: Density, distribution function and quantile function for the pareto distribution.
+Suggests: xtable
 License: GPL (>=2)
 

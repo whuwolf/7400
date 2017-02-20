@@ -1,1 +1,3 @@
 export(dpareto)
+export(ppareto)
+export(qpareto)
