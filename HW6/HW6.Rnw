@@ -1,11 +1,80 @@
-#Problem 1
+\documentclass[11pt]{article}
+\setlength{\topmargin}{-0.25in}
+\setlength{\oddsidemargin}{0.0in}
+\setlength{\evensidemargin}{0.0in}
+\setlength{\textwidth}{5.75in}
+\setlength{\textheight}{8.5in}
+\setlength{\parindent}{0in}
+\setlength{\parsep}{0in}
+\setlength{\topsep}{0in}
+\setlength{\parskip}{1.2ex}
+\usepackage{Sweave}
+\usepackage{amsmath}
+\usepackage{courier}
+\usepackage{graphicx}
+\begin{document}
+\SweaveOpts{concordance=TRUE}
+%\large
+%\begin{verbatim}
+%Name: ___________________________________
+%\end{verbatim}
+%\begin{center}
+%{\bf Computing in Statistics}, STAT:5400\\
+%Midterm 2, Fall 2015 \\
+%\end{center}
+%\normalsize
+\title{ STAT7400 HW6, 2017} 
+\author{Yiheng Liu}
+\date{\today}
+\maketitle
+
+<<echo=false,results=hide>>=
+#library(xtable)
+@ 
+%\vskip 0.2 in
+
+\section{Problem 1}
+\subsection{Log likelihood}
+
+The likelihood of this model is given by
+    \begin{align*}
+	%\label{eq:emc}
+	\mathcal{L}(\beta_0, \beta_1, \beta_2, \delta) &= \prod_{i=1}^{n} \frac{\gamma}{\alpha_i} \left(\frac{t_i}{\alpha_i}\right)^{\gamma-1}\exp\{-(t_i/\alpha_i)^\gamma\}\\
+	  &= \frac{\gamma^n}{\prod_{i=1}^{n}\alpha_i}\left(\prod_{i=1}^{n}\frac{t_i}{\alpha_i}\right)^{\gamma-1}\exp\{\sum_{i=1}^{n}-(t_i/\alpha_i)^\gamma\}
+	\end{align*}
+It follows that the log likelihood is given by
+    \begin{align*}
+	%\label{eq:emc}
+	\ell(\beta_0, \beta_1, \beta_2, \delta) &= n\log r-\log \prod_{i=1}^{n}\alpha_i+(\gamma-1)\log \prod_{i=1}^{n}\frac{t_i}{\alpha_i}-\sum_{i=1}^{n}\left(\frac{t_i}{\alpha_i}\right)^\gamma\\
+	  &= -n\log(r^{-1})-\sum_{i=1}^{n}\log \alpha_i+(\gamma-1)\sum_{i=1}^{n}(\log t_i-\log \alpha_i)-\sum_{i=1}^{n}\left(\frac{e^{\log t_i}}{e^{\log \alpha_i}}\right)^\gamma\\
+	  & (\text{Drop additive constant term} -\sum_{i=1}^{n}\log t_i)\\
+	  &= -n\log(r^{-1})+\gamma \sum_{i=1}^{n}(\log t_i-\log \alpha_i)-\sum_{i=1}^{n} e^{(\log t_i - \log \alpha_i)\gamma}\\
+	  &= -n\log \delta + \sum_{i=1}^{n}(z_i-e^{z_i})
+	\end{align*}
+where $\delta=1/\gamma$, $z_i=(\log t_i-\beta_0-\beta_1 x_i-\beta_2 u_i)/\delta$ and $\log \alpha_i = \beta_0+\beta_1 x_i+\beta_2 u_i$.
+
+
+\subsection{Estimate $\beta_i$ and $\delta$}
+To set the initials for optimization, try simple regression of $\log(t_i)$ on $x$ and $u$. The results are as follows
+
+<<echo=false>>=
 library(MASS)
 attach(leuk)
 u <- c(rep(1,17), rep(0,16))
 n <- 33
 lm.weibull <- lm(log(time)~log(wbc/10000)+u)
+#lm.weibull$coefficients
+#lm.weibull$residuals
 summary(lm.weibull)
+@
 
+Based on these information, the initials of $\beta_i$ and $\delta$ are chosen to be
+<<>>=
+c(2.4995, -0.5709, 0.9883, 1.249*sqrt(6)/pi)
+@
+
+With \texttt{optim}, the results of maximum likelihood estimates of $\beta_i$ and $\delta$ are as follows
+<<echo=false>>=
 f <- function(x){
     beta0 <- x[1]
     beta1 <- x[2]
@@ -17,8 +86,22 @@ f <- function(x){
 fit <- optim(c(2.4995, -0.5709, 0.9883, 1.249*sqrt(6)/pi), f, hessian = TRUE)
 fisher_info <- solve(fit$hessian)
 se <- sqrt(diag(fisher_info))
+fit$par
+@ 
+Based on the Hassian matrix returned by \texttt{optim}, the standard errors of these estimators are as follows
+<<echo=false>>=
+se
+@
 
-#Problem 2
+\section{Problem 2}
+It can be shown that the order of error for forward method and central method are $O(h)$ and $O(h^2)$ respectively. With this information, I analyzed the performance of \emph{Richardson extrapolation} for several different functions.
+
+\subsection{$f(x)=sin(x)$ at $x=1$}
+
+\subsubsection{forward}
+
+\begin{center}
+<<echo = FALSE, fig = TRUE>>=
 h <- 2^seq(-1,-64,-1)
 t <- c(2,10)
 r <- matrix(NA,length(h),length(t))
@@ -36,11 +119,20 @@ for (i in 1:length(t)){
 matplot(-log2(h),r-f1.true,type="l", ylab="error", main="f(x) = sin(x) at x = 1")
 lines(-log2(h), f1[,1]-f1.true, lty = 3, col = "green")
 legend("bottomleft",legend=c("t=2","t=10","original forward"),lty=c(1,2,3),col=c("black","red","green"))
+@
+\end{center}
 
+\begin{center}
+<<echo = FALSE, fig = TRUE >>=
 matplot(-log2(h[10:30]),r[10:30,]-f1.true,type="l", ylab="error", main="f(x) = sin(x) at x = 1")
 lines(-log2(h[10:30]), f1[10:30,1]-f1.true, lty = 3, col = "green")
 legend("bottomleft",legend=c("t=2","t=10","original forward"),lty=c(1,2,3),col=c("black","red","green"))
+@
+\end{center}
 
+\subsubsection{central}
+\begin{center}
+<<echo = FALSE, fig = TRUE>>=
 #1.2) central
 f1[,2] <- (sin(x+h)-sin(x-h))/(2*h) 
 for (i in 1:length(t)){
@@ -51,11 +143,22 @@ matplot(-log2(h),r-f1.true,type="l", ylab="error", main="f(x) = sin(x) at x = 1"
 lines(-log2(h), f1[,2]-f1.true, lty = 3, col = "green")
 legend("bottomleft",legend=c("t=2","t=10","original central"),lty=c(1,2,3),col=c("black","red","green"))
 
+@
+\end{center}
+
+\begin{center}
+<<echo = FALSE, fig = TRUE>>=
 matplot(-log2(h[10:30]),r[10:30,]-f1.true,type="l", ylab="error", main="f(x) = sin(x) at x = 1")
 lines(-log2(h[10:30]), f1[10:30,2]-f1.true, lty = 3, col = "green")
 legend("topleft",legend=c("t=2","t=10","original central"),lty=c(1,2,3),col=c("black","red","green"))
+@
+\end{center}
 
+\subsection{$f(x)=10000sin(x)$ at $x=1$}
 
+\subsubsection{forward}
+\begin{center}
+<<echo = FALSE, fig = TRUE>>=
 #2)f_2(x) = 10000sin(x) at x = 1 (10000cos(x))
 f2 <- matrix(NA,length(h),2)
 x <- 1
@@ -69,12 +172,21 @@ for (i in 1:length(t)){
 matplot(-log2(h),r-f2.true,type="l", ylab="error", main="f(x) = 10000sin(x) at x = 1")
 lines(-log2(h), f2[,1]-f2.true, lty = 3, col = "green")
 legend("bottomleft",legend=c("t=2","t=10","original forward"),lty=c(1,2,3),col=c("black","red","green"))
+@
+\end{center}
 
+\begin{center}
+<<echo = FALSE, fig = TRUE>>=
 matplot(-log2(h[10:30]),r[10:30,]-f2.true,type="l", ylab="error", main="f(x) = 10000sin(x) at x = 1")
 lines(-log2(h[10:30]), f2[10:30,1]-f2.true, lty = 3, col = "green")
 legend("bottomleft",legend=c("t=2","t=10","original forward"),lty=c(1,2,3),col=c("black","red","green"))
 
+@
+\end{center}
 
+\subsubsection{central}
+\begin{center}
+<<echo = FALSE, fig = TRUE>>=
 #2.2) central
 f2[,2] <- 10000*(sin(x+h)-sin(x-h))/(2*h) 
 for (i in 1:length(t)){
@@ -85,11 +197,22 @@ matplot(-log2(h),r-f2.true,type="l", ylab="error", main="f(x) = 10000sin(x) at x
 lines(-log2(h), f2[,2]-f2.true, lty = 3, col = "green")
 legend("bottomleft",legend=c("t=2","t=10","original central"),lty=c(1,2,3),col=c("black","red","green"))
 
+@
+\end{center}
+
+\begin{center}
+<<echo = FALSE, fig = TRUE>>=
 matplot(-log2(h[10:30]),r[10:30,]-f2.true,type="l", ylab="error", main="f(x) = 10000sin(x) at x = 1")
 lines(-log2(h[10:30]), f2[10:30,2]-f2.true, lty = 3, col = "green")
 legend("topleft",legend=c("t=2","t=10","original central"),lty=c(1,2,3),col=c("black","red","green"))
+@
+\end{center}
 
+\subsection{$f(x)=tan(x)$ at $x=1.59$}
 
+\subsubsection{forward}
+\begin{center}
+<<echo = FALSE, fig = TRUE>>=
 #3)f_3(x) = tan(x) at x = 1.59 (1/cos(x)^2)
 f3 <- matrix(NA,length(h),2)
 x <- 1.59
@@ -104,10 +227,21 @@ matplot(-log2(h),r-f3.true,type="l", ylab="error", main="f(x) = tan(x) at x = 1.
 lines(-log2(h), f3[,1]-f3.true, lty = 3, col = "green")
 legend("bottomleft",legend=c("t=2","t=10","original forward"),lty=c(1,2,3),col=c("black","red","green"))
 
+@
+\end{center}
+
+\begin{center}
+<<echo = FALSE, fig = TRUE>>=
 matplot(-log2(h[15:40]),r[15:40,]-f3.true,type="l", ylab="error", main="f(x) = tan(x) at x = 1.59")
 lines(-log2(h[15:40]), f3[15:40,1]-f3.true, lty = 3, col = "green")
 legend("topleft",legend=c("t=2","t=10","original forward"),lty=c(1,2,3),col=c("black","red","green"))
 
+@
+\end{center}
+
+\subsubsection{central}
+\begin{center}
+<<echo = FALSE, fig = TRUE>>=
 #3.2) central
 f3[,2] <- (tan(x+h)-tan(x-h))/(2*h) 
 for (i in 1:length(t)){
@@ -118,11 +252,25 @@ matplot(-log2(h),r-f3.true,type="l", ylab="error", main="f(x) = tan(x) at x = 1.
 lines(-log2(h), f3[,2]-f3.true, lty = 3, col = "green")
 legend("topright",legend=c("t=2","t=10","original central"),lty=c(1,2,3),col=c("black","red","green"))
 
+
+@
+\end{center}
+
+\begin{center}
+<<echo = FALSE, fig = TRUE>>=
 matplot(-log2(h[10:30]),r[10:30,]-f3.true,type="l", ylim = range(-0.005,0.005), ylab="error", main="f(x) = tan(x) at x = 1.59")
 lines(-log2(h[10:30]), f3[10:30,2]-f3.true, lty = 3, col = "green")
 legend("topright",legend=c("t=2","t=10","original central"),lty=c(1,2,3),col=c("black","red","green"))
 
 
+@
+\end{center}
+
+
+\subsection{$f(x)=\phi(x)$ at $x=0.5$}
+\subsubsection{forward}
+\begin{center}
+<<echo = FALSE, fig = TRUE>>=
 #4)f_4(x) = phi(x) at x = 0.5 (-x*phi(x))
 f4 <- matrix(NA,length(h),2)
 x <- 0.5
@@ -137,10 +285,24 @@ matplot(-log2(h),r-f4.true,type="l", ylab="error", main="f(x) = phi(x) at x = 0.
 lines(-log2(h), f4[,1]-f4.true, lty = 3, col = "green")
 legend("bottomleft",legend=c("t=2","t=10","original forward"),lty=c(1,2,3),col=c("black","red","green"))
 
+
+@
+\end{center}
+
+\begin{center}
+<<echo = FALSE, fig = TRUE>>=
 matplot(-log2(h[10:30]),r[10:30,]-f4.true,type="l", ylab="error", main="f(x) = phi(x) at x = 0.5")
 lines(-log2(h[10:30]), f4[10:30,1]-f4.true, lty = 3, col = "green")
 legend("bottomleft",legend=c("t=2","t=10","original forward"),lty=c(1,2,3),col=c("black","red","green"))
 
+@
+\end{center}
+
+
+
+\subsubsection{central}
+\begin{center}
+<<echo = FALSE, fig = TRUE>>=
 #4.2) central
 f4[,2] <- (dnorm(x+h)-dnorm(x-h))/(2*h)
 for (i in 1:length(t)){
@@ -151,11 +313,18 @@ matplot(-log2(h),r-f4.true,type="l", ylab="error", main="f(x) = phi(x) at x = 0.
 lines(-log2(h), f4[,2]-f4.true, lty = 3, col = "green")
 legend("topleft",legend=c("t=2","t=10","original central"),lty=c(1,2,3),col=c("black","red","green"))
 
+@
+\end{center}
+
+\begin{center}
+<<echo = FALSE, fig = TRUE>>=
 matplot(-log2(h[10:30]),r[10:30,]-f4.true,type="l", ylab="error", main="f(x) = phi(x) at x = 0.5")
 lines(-log2(h[10:30]), f4[10:30,2]-f4.true, lty = 3, col = "green")
 legend("bottomleft",legend=c("t=2","t=10","original central"),lty=c(1,2,3),col=c("black","red","green"))
+@
+\end{center}
+
+It can be seen that \emph{Richardson extrapolation} performs better when the step size $h$ is relatively large. In other words, it converges faster than the orginal forward and central methods. When the step size becomes small, the approximation errors of all methods will build up due to round-off errors from computers.
 
 
-
-
-
+\end{document}
