@@ -8,17 +8,18 @@ ppareto <- function(q, alpha, beta, lower.tail = TRUE, log.p = FALSE) {
     alpha <- rep(alpha, length.out = L)
     beta <- rep(beta, length.out = L)
     
-    cdfs <- ifelse(alpha <= 0 | beta <= 0, 
+    lp <- ifelse(alpha <= 0 | beta <= 0, 
                    NaN, 
-                   ifelse(q <= alpha, 0, 1 - (alpha/q)^beta))
+                   ifelse(q <= alpha, 0, beta * (log(alpha) - log(q))))
     
     # Check whether NaNs exist
-    if (sum(is.nan(cdfs))) 
+    if (sum(is.nan(lp))) 
         warning("NaNs produced")
     
     if (lower.tail) {
-        if (log.p) log(cdfs) else cdfs
+        p <- exp(lp)
+        if (log.p) log1p(-p) else 1 - p
     } else {
-        if (log.p) log(1 - cdfs) else 1 - cdfs
+        if (log.p) lp else exp(lp)
     }
 }

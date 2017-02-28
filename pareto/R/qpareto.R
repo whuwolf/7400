@@ -15,9 +15,9 @@ qpareto <- function(p, alpha, beta, lower.tail = TRUE, log.p = FALSE) {
                  ifelse(p < 0 | p > 1, 
                         NaN, 
                         if (lower.tail) {
-                            alpha * (1 - p)^(-1/beta)
+                            alpha / (1 - p)^(1/beta)
                         } else {
-                            alpha * p^(-1/beta)
+                            alpha / p^(1/beta)
                         }))
     
     # Check whether NaNs exist
