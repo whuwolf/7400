@@ -1,3 +1,4 @@
 export(dpareto)
 export(ppareto)
 export(qpareto)
+useDynLib(pareto)

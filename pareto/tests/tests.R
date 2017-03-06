@@ -1,53 +1,67 @@
 library(pareto)
-# test dpareto
-stopifnot(all.equal(dpareto(3, -2, 1), NaN))
-stopifnot(all.equal(dpareto(3, 2, -1), NaN))
-stopifnot(all.equal(dpareto(3, 2, 1), 0.2222222222))
-stopifnot(all.equal(dpareto(1, 2, 3), 0))
-stopifnot(all.equal(dpareto(3:5, 2, 1), c(0.2222222222, 0.125, 0.08)))
-stopifnot(all.equal(dpareto(1:5, 2, 1), c(0, 0, 0.2222222222, 0.125, 0.08)))
-stopifnot(all.equal(dpareto(6, 2:4, 1), 
-                    c(0.05555555556, 0.08333333333, 0.11111111111)))
-stopifnot(all.equal(log(dpareto(1:5, 2, 1)), dpareto(1:5, 2, 1, log = TRUE)))
-stopifnot(all.equal(dpareto(1:6, 1:2, 1), 
-                    c(0, 0, 0.11111111111, 0.125, 0.04, 0.05555555556)))
-stopifnot(all.equal(dpareto(1, 2, 1:2), c(0, 0)))
+stopifnot(tryCatch(is.na(dpareto(3,-2, 1)), error = function(e) TRUE))
+stopifnot(tryCatch(is.na(dpareto(3,2, -1)), error = function(e) TRUE))
+stopifnot(all.equal(dpareto(3,2,1), 0.2222222222))
+stopifnot(all.equal(dpareto(1,2,3), 0.0))
+stopifnot(all.equal(dpareto(3:5,2, 1), c(0.2222222222, 0.1250000, 0.0800000)))
+stopifnot(all.equal(dpareto(1:5,2, 1), c(0.0, 0.0, 0.2222222222, 0.1250000, 0.0800000)))
+stopifnot(all.equal(dpareto(6,2:4, 1), c(0.05555555556, 0.08333333333, 0.11111111111)))
+stopifnot(all.equal(log(dpareto(1:5,2, 1)), dpareto(1:5,2, 1, log = TRUE)))
+stopifnot(all.equal(dpareto(6,1,2:4), c(0.0092592593, 0.0023148148, 0.0005144033)))
+stopifnot(all.equal(dpareto(1:6,1:2, 1),
+                    c(0.0, 0.0, 0.11111111111, 0.125, 0.04, 0.05555555556)))
 
-# test ppareto
-stopifnot(all.equal(ppareto(3, -2, 1), NaN))
-stopifnot(all.equal(ppareto(3, 2, -1), NaN))
-stopifnot(all.equal(ppareto(3, 2, 1), 0.33333333333))
-stopifnot(all.equal(ppareto(1, 2, 3), 0))
-stopifnot(all.equal(ppareto(3:5, 2, 1), c(0.33333333333, 0.5, 0.6)))
-stopifnot(all.equal(ppareto(1:5, 2, 1), c(0, 0, 0.33333333333, 0.5, 0.6)))
-stopifnot(all.equal(ppareto(1:5, 2, 1, lower.tail = FALSE), 
-                    c(1, 1, 0.66666666667, 0.5, 0.4)))
-stopifnot(all.equal(ppareto(6, 2:4, 1), c(0.66666666667, 0.5, 0.33333333333)))
-stopifnot(all.equal(log(ppareto(1:5, 2, 1)), ppareto(1:5, 2, 1, log.p = TRUE)))
-stopifnot(all.equal(log(ppareto(1:5, 2, 1, lower.tail = FALSE)), 
-                    ppareto(1:5, 2, 1, lower.tail = FALSE, log.p = TRUE)))
-stopifnot(all.equal(ppareto(1:6, 1:2, 1), 
-                    c(0, 0, 0.66666666667, 0.5, 0.8, 0.66666666667)))
-stopifnot(all.equal(ppareto(1, 2, 1:2), c(0, 0)))
+myppareto <- function(x, a, b, lower.tail = TRUE, log.p = FALSE) {
+    a <- ifelse(a <= 0, NaN, a)
+    b <- ifelse(b <= 0, NaN, b)
+    x <- ifelse(x <= a, a, x)
+    lp <- b * (log(a) - log(x))
+    if (lower.tail) {
+        p <- exp(lp)
+        if (log.p) log1p(-p)
+        else 1 - p
+    }
+    else {
+        if (log.p) lp
+        else exp(lp)
+    }
+}
 
-# test qpareto
-stopifnot(all.equal(qpareto(0.5, -2, 1), NaN))
-stopifnot(all.equal(qpareto(0.5, 2, -1), NaN))
-stopifnot(all.equal(qpareto(3, 2, 1), NaN))
-stopifnot(all.equal(qpareto(-1, 2, 1), NaN))
-stopifnot(all.equal(qpareto(0.5, 2, 1), 4))
-stopifnot(all.equal(qpareto(1, 2, 3), Inf))
-stopifnot(all.equal(qpareto(0, 2, 3), 2))
-stopifnot(all.equal(qpareto(seq(0, 1, 0.2), 2, 1), 
-                    c(2, 2.5, 3.33333333333, 5, 10, Inf)))
-stopifnot(all.equal(qpareto(seq(0, 1, 0.2), 2, 1, lower.tail = FALSE), 
-                    c(Inf, 10, 5, 3.33333333333, 2.5, 2)))
-stopifnot(all.equal(qpareto(0.2, 2:4, 1), c(2.5, 3.75, 5)))
-stopifnot(all.equal(qpareto(seq(0, 1, 0.2), 2, 1), 
-                    qpareto(log(seq(0, 1, 0.2)), 2, 1, log.p = TRUE)))
-stopifnot(all.equal(qpareto(seq(0, 1, 0.2), 2, 1, lower.tail = FALSE), 
-                    qpareto(log(seq(0, 1, 0.2)), 2, 1, 
-                            lower.tail = FALSE, log.p = TRUE)))
-stopifnot(all.equal(qpareto(seq(0, 1, 0.2), 1:2, 1), 
-                    c(1, 2.5, 1.66666666667, 5, 5, Inf)))
-stopifnot(all.equal(qpareto(0, 2, 1:2), c(2, 2)))
+myqpareto <- function(p, a, b, lower.tail = TRUE, log.p = FALSE) {
+    if (log.p) p <- exp(p)
+    if (lower.tail) p <- 1 - p
+    a <- ifelse(a <= 0, NaN, a)
+    b <- ifelse(b <= 0, NaN, b)
+    p <- ifelse(p < 0 | p > 1, NaN, p)
+    a / p^(1/b)
+}
+
+stopifnot(tryCatch(is.na(ppareto(3,-2, 1)), error = function(e) TRUE))
+stopifnot(tryCatch(is.na(ppareto(3,2, -1)), error = function(e) TRUE))
+stopifnot(all.equal(ppareto(3:5,2, 1), myppareto(3:5,2, 1)))
+stopifnot(all.equal(ppareto(1:5,2, 1), myppareto(1:5,2, 1)))
+stopifnot(all.equal(ppareto(6,2:4, 1), myppareto(6,2:4, 1)))
+stopifnot(all.equal(ppareto(6,1,2:4), myppareto(6,1,2:4)))
+stopifnot(all.equal(ppareto(6,1,2:4, log.p = TRUE),
+                    myppareto(6,1,2:4, log.p = TRUE)))
+stopifnot(all.equal(ppareto(6,1,2:4, log.p = TRUE, lower.tail = FALSE),
+                    myppareto(6,1,2:4, log.p = TRUE, lower.tail = FALSE)))
+stopifnot(all.equal(ppareto(10, 1, 20, log.p = TRUE, lower.tail = FALSE),
+                    myppareto(10, 1, 20, log.p = TRUE, lower.tail = FALSE)))
+
+stopifnot(tryCatch(is.na(qpareto(0.5,-2, 1)), error = function(e) TRUE))
+stopifnot(tryCatch(is.na(qpareto(0.5,2, -1)), error = function(e) TRUE))
+stopifnot(tryCatch(is.na(qpareto(-1,2, 1)), error = function(e) TRUE))
+stopifnot(tryCatch(is.na(qpareto(2,2, 1)), error = function(e) TRUE))
+stopifnot(all.equal(qpareto((3:5)/6,2, 1), myqpareto((3:5)/6,2, 1)))
+stopifnot(all.equal(qpareto((1:5)/6,2, 1), myqpareto((1:5)/6,2, 1)))
+stopifnot(all.equal(qpareto(0.25,2:4, 1), myqpareto(0.25,2:4, 1)))
+stopifnot(all.equal(qpareto(0.25,1,2:4), myqpareto(0.25,1,2:4)))
+stopifnot(all.equal(qpareto(log(0.25),1,2:4, log.p = TRUE),
+                    myqpareto(log(0.25),1,2:4, log.p = TRUE)))
+stopifnot(all.equal(qpareto(0.25,1,2:4, lower.tail = FALSE),
+                    myqpareto(0.25,1,2:4, lower.tail = FALSE)))
+stopifnot(all.equal(qpareto(log(0.25),1,2:4, log.p = TRUE,
+                            lower.tail = FALSE),
+                    myqpareto(log(0.25),1,2:4, log.p = TRUE,
+                              lower.tail = FALSE)))

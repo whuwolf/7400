@@ -64,7 +64,7 @@ ppareto(1:5, 2, 1, lower.tail = FALSE, log.p = TRUE)
 <<>>=
 qpareto(seq(0,1,0.2), 2, 1)
 qpareto(seq(0,1,0.2), 2, 1, lower.tail = FALSE)
-qpareto(log(seq(0,1,0.2)), 2, 1, lower.tail = FALSE, log.p = TRUE)
+#qpareto(log(seq(0,1,0.2)), 2, 1, lower.tail = FALSE, log.p = TRUE)
 @
 
 \bigskip
