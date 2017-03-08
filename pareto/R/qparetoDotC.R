@@ -9,7 +9,7 @@ qpareto <- function(p, alpha, beta, lower.tail = TRUE, log.p = FALSE) {
                  as.double(alpha), as.integer(nalpha), 
                  as.double(beta), as.integer(nbeta),
                  qs = double(n), as.integer(lower.tail), as.integer(log.p),
-                 PACKAGE="pareto")
+                 NAOK = TRUE, PACKAGE="pareto")
     result$qs    
 }
 

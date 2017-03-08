@@ -14,18 +14,7 @@ void paretoquantDotC(double *p, int *np, double *alpha, int *nalpha,
 
     if (lg[0] == 1) {
         for (i = 0; i < np[0]; i++) {
-            if (R_FINITE(p[i])){
-                p[i] = exp(p[i]);
-            }
-            else if (ISNAN(p[i])) {
-                p[i] = NAN;
-            }
-            else if (p[i] == R_PosInf) {
-                p[i] = R_PosInf;
-            }
-            else if (p[i] == R_NegInf) {
-                p[i] = R_NegInf;
-            }
+            p[i] = exp(p[i]);
         }
     }
 

@@ -8,6 +8,7 @@ dpareto <- function(x, alpha, beta, log = FALSE) {
                  as.double(x), as.integer(nx),
                  as.double(alpha), as.integer(nalpha), 
                  as.double(beta), as.integer(nbeta),
-                 dens = double(n), as.integer(log),PACKAGE="pareto")
+                 dens = double(n), as.integer(log),NAOK = TRUE,
+                 PACKAGE="pareto")
     result$dens
 }

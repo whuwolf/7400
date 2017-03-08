@@ -1,11 +1,11 @@
 Package: pareto
 Type: Package
 Title: Pareto Distribution
-Version: 2.0-0
-Date: 2017-02-18
+Version: 3.0-0
+Date: 2017-03-05
 Author: Yiheng Liu
 Maintainer: Yiheng Liu <yiheng-liu@uiowa.edu>
-Description: Density, distribution function and quantile function for the pareto distribution.
+Description: Density, distribution function and quantile function for the pareto distribution with C code.
 Suggests: xtable
 License: GPL (>=2)
 

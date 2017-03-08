@@ -9,6 +9,6 @@ ppareto <- function(q, alpha, beta, lower.tail = TRUE, log.p = FALSE) {
                  as.double(alpha), as.integer(nalpha), 
                  as.double(beta), as.integer(nbeta),
                  p = double(n), as.integer(lower.tail), as.integer(log.p),
-                 PACKAGE="pareto")
+                 NAOK = TRUE, PACKAGE="pareto")
     result$p    
 }
