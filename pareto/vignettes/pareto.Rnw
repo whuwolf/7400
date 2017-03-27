@@ -15,7 +15,7 @@ library(xtable)
 @ 
 
 \section{Introduction}
-The \texttt{pareto} package includes the function \texttt{dpareto}, \texttt{ppareto} and \texttt{qpareto} to give the density, distribution function and quantile function for the Pareto distribution according to the arguments.
+The \texttt{pareto} package includes the functions \texttt{dpareto}, \texttt{ppareto} and \texttt{qpareto} to give the density, distribution function and quantile function for the Pareto distribution according to the arguments. Parallel computation using Open MP is supported via functions \texttt{p.dpareto}, \texttt{p.ppareto} and \texttt{p.qpareto}.
 
 \section{Simple Examples}
 Some simple examples for \texttt{dpareto}:

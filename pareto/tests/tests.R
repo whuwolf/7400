@@ -4,12 +4,16 @@ stopifnot(tryCatch(is.na(dpareto(3,2, -1)), error = function(e) TRUE))
 stopifnot(all.equal(dpareto(3,2,1), 0.2222222222))
 stopifnot(all.equal(dpareto(1,2,3), 0.0))
 stopifnot(all.equal(dpareto(3:5,2, 1), c(0.2222222222, 0.1250000, 0.0800000)))
-stopifnot(all.equal(dpareto(1:5,2, 1), c(0.0, 0.0, 0.2222222222, 0.1250000, 0.0800000)))
-stopifnot(all.equal(dpareto(6,2:4, 1), c(0.05555555556, 0.08333333333, 0.11111111111)))
+stopifnot(all.equal(dpareto(1:5,2, 1), 
+                    c(0.0, 0.0, 0.2222222222, 0.1250000, 0.0800000)))
+stopifnot(all.equal(dpareto(6,2:4, 1), 
+                    c(0.05555555556, 0.08333333333, 0.11111111111)))
 stopifnot(all.equal(log(dpareto(1:5,2, 1)), dpareto(1:5,2, 1, log = TRUE)))
-stopifnot(all.equal(dpareto(6,1,2:4), c(0.0092592593, 0.0023148148, 0.0005144033)))
+stopifnot(all.equal(dpareto(6,1,2:4), 
+                    c(0.0092592593, 0.0023148148, 0.0005144033)))
 stopifnot(all.equal(dpareto(1:6,1:2, 1),
                     c(0.0, 0.0, 0.11111111111, 0.125, 0.04, 0.05555555556)))
+stopifnot(all.equal(p.dpareto(1:10^6, 2, 1, P = 2), dpareto(1:10^6, 2, 1)))
 
 myppareto <- function(x, a, b, lower.tail = TRUE, log.p = FALSE) {
     a <- ifelse(a <= 0, NaN, a)
@@ -48,6 +52,8 @@ stopifnot(all.equal(ppareto(6,1,2:4, log.p = TRUE, lower.tail = FALSE),
                     myppareto(6,1,2:4, log.p = TRUE, lower.tail = FALSE)))
 stopifnot(all.equal(ppareto(10, 1, 20, log.p = TRUE, lower.tail = FALSE),
                     myppareto(10, 1, 20, log.p = TRUE, lower.tail = FALSE)))
+stopifnot(all.equal(p.ppareto(1:10^6, 2, 1, log.p = TRUE, P = 2), 
+                    ppareto(1:10^6, 2, 1, log.p = TRUE)))
 
 stopifnot(tryCatch(is.na(qpareto(0.5,-2, 1)), error = function(e) TRUE))
 stopifnot(tryCatch(is.na(qpareto(0.5,2, -1)), error = function(e) TRUE))
@@ -65,3 +71,15 @@ stopifnot(all.equal(qpareto(log(0.25),1,2:4, log.p = TRUE,
                             lower.tail = FALSE),
                     myqpareto(log(0.25),1,2:4, log.p = TRUE,
                               lower.tail = FALSE)))
+stopifnot(all.equal(p.qpareto(log(seq(0,1,10^(-6))), 2, 1, 
+                              lower.tail = FALSE, log.p = TRUE, P = 2), 
+                    qpareto(log(seq(0,1,10^(-6))), 2, 1, 
+                              lower.tail = FALSE, log.p = TRUE)))
+
+
+
+
+
+
+
+

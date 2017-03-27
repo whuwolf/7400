@@ -1,4 +1,4 @@
-export(dpareto)
-export(ppareto)
-export(qpareto)
+export(dpareto, p.dpareto)
+export(ppareto, p.ppareto)
+export(qpareto, p.qpareto)
 useDynLib(pareto)
