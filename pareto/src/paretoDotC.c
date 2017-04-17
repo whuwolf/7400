@@ -10,7 +10,7 @@ static void paretodensDotC(double *x, int *nx, double *alpha, int *nalpha,
                     double *beta, int *nbeta, double *dens, int *lg)
 {
     /*Calculate the maximum input length */
-    int i, n = max(max(nx[0], nalpha[0]), nbeta[0]), flag = 0, ind[3];
+    int i, n = max(max(nx[0], nalpha[0]), nbeta[0]), naflag = FALSE, ind[3];
     /*double ldens[n];*/
 
     for (i = 0; i < n; i++) {
@@ -21,7 +21,6 @@ static void paretodensDotC(double *x, int *nx, double *alpha, int *nalpha,
         /*Calculate whether alpha and beta are meaningful */
         if (alpha[ind[1]] <= 0 || beta[ind[2]] <= 0) {
             dens[i] = NAN;
-            flag++;
         }
         /*Check whether x is greater than alpha */
         else if (x[ind[0]] <= alpha[ind[1]]) {
@@ -36,10 +35,12 @@ static void paretodensDotC(double *x, int *nx, double *alpha, int *nalpha,
         if (lg[0] == 0) {
             dens[i] = exp(dens[i]);
         }
+        if (ISNAN(dens[i]))
+            naflag = TRUE;
 
     }
     /*Check whether NaNs exist */
-    if (flag > 0) {
+    if (naflag) {
         warning("NaNs produced");
     }
 
@@ -94,7 +95,7 @@ static void paretoquantDotC(double *p, int *np, double *alpha, int *nalpha,
                     double *beta, int *nbeta, double *qs, int *lt, int *lg)
 {
     /*Calculate the maximum input length */
-    int i, n = max(max(np[0], nalpha[0]), nbeta[0]), flag = 0, ind[3];
+    int i, n = max(max(np[0], nalpha[0]), nbeta[0]), naflag = FALSE, ind[3];
     /*double ldens[n];*/
 
     if (lg[0] == 1) {
@@ -111,12 +112,10 @@ static void paretoquantDotC(double *p, int *np, double *alpha, int *nalpha,
         /*Calculate whether alpha and beta are meaningful */
         if (alpha[ind[1]] <= 0 || beta[ind[2]] <= 0) {
             qs[i] = NAN;
-            flag++;
         }
         /*Check whether x is greater than alpha */
         else if (p[ind[0]] < 0 || p[ind[0]] >1) {
             qs[i] = NAN;
-            flag++;
         }
         else if (lt[0] == 1) {
             qs[i] = alpha[ind[1]]/R_pow(1 - p[ind[0]], 1/beta[ind[2]]);
@@ -124,16 +123,18 @@ static void paretoquantDotC(double *p, int *np, double *alpha, int *nalpha,
         else {
             qs[i] = alpha[ind[1]]/R_pow(p[ind[0]], 1/beta[ind[2]]);
         }
+        if (ISNAN(qs[i]))
+            naflag = TRUE;
 
     }
     /*Check whether NaNs exist */
-    if (flag > 0) {
+    if (naflag) {
         warning("NaNs produced");
     }
 
 }
 
-void paretoquantDotC_p(double *p, int *np, double *alpha, int *nalpha,
+static void paretoquantDotC_p(double *p, int *np, double *alpha, int *nalpha,
                     double *beta, int *nbeta, double *qs, int *lt, int *lg, int *P)
 {
     /*Calculate the maximum input length */
@@ -180,11 +181,11 @@ void paretoquantDotC_p(double *p, int *np, double *alpha, int *nalpha,
 
 }
 
-void paretocdfDotC(double *q, int *nq, double *alpha, int *nalpha,
+static void paretocdfDotC(double *q, int *nq, double *alpha, int *nalpha,
                     double *beta, int *nbeta, double *p, int *lt, int *lg)
 {
     /*Calculate the maximum input length */
-    int i, n = max(max(nq[0], nalpha[0]), nbeta[0]), flag = 0, ind[3];
+    int i, n = max(max(nq[0], nalpha[0]), nbeta[0]), naflag = FALSE, ind[3];
     /*double lp[n];*/
 
     for (i = 0; i < n; i++) {
@@ -195,7 +196,6 @@ void paretocdfDotC(double *q, int *nq, double *alpha, int *nalpha,
         /*Calculate whether alpha and beta are meaningful */
         if (alpha[ind[1]] <= 0 || beta[ind[2]] <= 0) {
             p[i] = NAN;
-            flag++;
         }
         /*Check whether x is greater than alpha */
         else if (q[ind[0]] <= alpha[ind[1]]) {
@@ -204,6 +204,8 @@ void paretocdfDotC(double *q, int *nq, double *alpha, int *nalpha,
         else {
             p[i] = beta[ind[2]] * (log(alpha[ind[1]]) - log(q[ind[0]]));
         }
+        if (ISNAN(p[i]))
+            naflag = TRUE;
 
     }
 
@@ -229,7 +231,7 @@ void paretocdfDotC(double *q, int *nq, double *alpha, int *nalpha,
 
 
     /*Check whether NaNs exist */
-    if (flag > 0) {
+    if (naflag) {
         warning("NaNs produced");
     }
 
@@ -237,7 +239,7 @@ void paretocdfDotC(double *q, int *nq, double *alpha, int *nalpha,
 
 
 
-void paretocdfDotC_p(double *q, int *nq, double *alpha, int *nalpha,
+static void paretocdfDotC_p(double *q, int *nq, double *alpha, int *nalpha,
                     double *beta, int *nbeta, double *p, int *lt, int *lg, int *P)
 {
     /*Calculate the maximum input length */
@@ -297,6 +299,37 @@ void paretocdfDotC_p(double *q, int *nq, double *alpha, int *nalpha,
 }
 
 
+static void paretoramDotC(double *n, double *alpha, int *nalpha,
+                    double *beta, int *nbeta, double *r)
+{
+    /*Calculate the maximum input length */
+    int i, ind[2], naflag = FALSE;
+
+    GetRNGstate();
+    for (i = 0; i < n[0]; i++) {
+
+        ind[0] = i % nalpha[0];
+        ind[1] = i % nbeta[0];
+
+        if (alpha[ind[0]] > 0 && beta[ind[1]] > 0) {
+            r[i] =  alpha[ind[0]]/R_pow(unif_rand(), 1/beta[ind[1]]);
+        }
+        else {
+            r[i] = NAN;
+        }
+
+        if (ISNAN(r[i]))
+            naflag = TRUE;
+
+    }
+    PutRNGstate();
+
+    /*Check whether NaNs exist */
+    if (naflag) {
+        warning("NaNs produced");
+    }
+
+}
 
 /* This defines a data structure for registering the routine
    `addone'. It records the number of arguments, which allows some
@@ -308,6 +341,7 @@ static R_CMethodDef DotCEntries[] = {
     {"qparetoDotC_p", (DL_FUNC) paretoquantDotC_p, 10},
     {"pparetoDotC", (DL_FUNC) paretocdfDotC, 9},
     {"pparetoDotC_p", (DL_FUNC) paretocdfDotC_p, 10},
+    {"rparetoDotC", (DL_FUNC) paretoramDotC, 6},
     {NULL}
 };
 

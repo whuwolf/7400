@@ -6,6 +6,7 @@
 \author{Yiheng Liu}
 
 \begin{document}
+\SweaveOpts{concordance=TRUE}
 \maketitle
 
 <<echo=false,results=hide>>=
@@ -15,7 +16,7 @@ library(xtable)
 @ 
 
 \section{Introduction}
-The \texttt{pareto} package includes the functions \texttt{dpareto}, \texttt{ppareto} and \texttt{qpareto} to give the density, distribution function and quantile function for the Pareto distribution according to the arguments. Parallel computation using Open MP is supported via functions \texttt{p.dpareto}, \texttt{p.ppareto} and \texttt{p.qpareto}.
+The \texttt{pareto} package includes the functions \texttt{dpareto}, \texttt{ppareto} ,\texttt{qpareto} and \texttt{rpareto} to give the density, distribution function ,quantile function and random generation for the Pareto distribution according to the arguments. Parallel computation using Open MP is supported via functions \texttt{p.dpareto}, \texttt{p.ppareto} and \texttt{p.qpareto}.
 
 \section{Simple Examples}
 Some simple examples for \texttt{dpareto}:
@@ -38,6 +39,13 @@ ppareto(5, 2, 1, lower.tail = FALSE, log.p = TRUE)
 qpareto(0.6, 2, 1)
 qpareto(0.6, 2, 1, lower.tail = FALSE)
 qpareto(log(0.6), 2, 1, lower.tail = FALSE, log.p = TRUE)
+@
+
+\bigskip
+\noindent Some simple examples for \texttt{rpareto}:
+<<>>=
+rpareto(1,3,-2)
+rpareto(1,3,2)
 @
 
 \section{Vectorized Examples}
@@ -65,6 +73,13 @@ ppareto(1:5, 2, 1, lower.tail = FALSE, log.p = TRUE)
 qpareto(seq(0,1,0.2), 2, 1)
 qpareto(seq(0,1,0.2), 2, 1, lower.tail = FALSE)
 qpareto(log(seq(0,1,0.2)), 2, 1, lower.tail = FALSE, log.p = TRUE)
+@
+
+\bigskip
+\noindent Some vectorized examples for \texttt{rpareto}:
+<<>>=
+rpareto(4,c(100,1),2)
+rpareto(c(NA,1,99), 3, 2)
 @
 
 \bigskip

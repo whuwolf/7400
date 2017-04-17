@@ -76,10 +76,27 @@ stopifnot(all.equal(p.qpareto(log(seq(0,1,10^(-6))), 2, 1,
                     qpareto(log(seq(0,1,10^(-6))), 2, 1, 
                               lower.tail = FALSE, log.p = TRUE)))
 
+#Bad parameters
+stopifnot(is.na(rpareto(1, 3, -2)))
+stopifnot(is.na(rcpareto(1, 3, -2)))
 
+stopifnot(is.na(rpareto(1, -3, 2)))
+stopifnot(is.na(rcpareto(1, -3, 2)))
 
+# Check reproducability
+set.seed(100)
+a <- rpareto(c(NA,1,99), 3, 2)
+set.seed(100)
+b <- rpareto(3, 3, 2)
+stopifnot(a == b)
 
+set.seed(100)
+a <- rcpareto(c(NA,1,99), 3, 2)
+set.seed(100)
+b <- rcpareto(3, 3, 2)
+stopifnot(a == b)
 
-
-
+## Check length
+stopifnot(length(rpareto(c(NA,1,99), 5, 9)) == 3)
+stopifnot(length(rcpareto(c(NA,1,99), 5, 9)) == 3)
 

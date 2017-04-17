@@ -1,0 +1,86 @@
+\documentclass[11pt]{article}
+\setlength{\topmargin}{-0.25in}
+\setlength{\oddsidemargin}{0.0in}
+\setlength{\evensidemargin}{0.0in}
+\setlength{\textwidth}{5.75in}
+\setlength{\textheight}{8.5in}
+\setlength{\parindent}{0in}
+\setlength{\parsep}{0in}
+\setlength{\topsep}{0in}
+\setlength{\parskip}{1.2ex}
+\usepackage{Sweave}
+\usepackage{amsmath}
+\usepackage{courier}
+\usepackage{graphicx}
+\begin{document}
+\SweaveOpts{concordance=TRUE}
+%\large
+%\begin{verbatim}
+%Name: ___________________________________
+%\end{verbatim}
+%\begin{center}
+%{\bf Computing in Statistics}, STAT:5400\\
+%Midterm 2, Fall 2015 \\
+%\end{center}
+%\normalsize
+\title{STAT7400 HW10, 2017} 
+\author{Yiheng Liu}
+\date{Apr 17, 2017}
+\maketitle
+
+\section*{Problem 1}
+\begin{enumerate}
+\item[(a)] With \texttt{runif}, uniform random numbers can be generated. Then I can use \texttt{qpareto} to generate pareto random numbers by Inverse CDF method. Some examples of \texttt{rpareto} are shown below.
+<<>>=
+library(pareto)
+rpareto(1,3,-2)
+rpareto(1,3,2)
+rpareto(4,c(100,1),2)
+
+#Check reproducability
+set.seed(100)
+a <- rpareto(c(NA,1,99), 3, 2)
+set.seed(100)
+b <- rpareto(3, 3, 2)
+all.equal(a,b)
+@
+
+\begin{center}
+<<fig = TRUE>>=
+#Check qq-plot
+qqplot(ppareto(rpareto(10^6,3,2),3,2), seq(0,1, length.out = 10^6), 
+       type = "l", main = "QQ plot of rpareto")
+@
+\end{center}
+
+\item[(b)] With \texttt{unif\_rand}, uniform random numbers can be generated in C. Then I can use Inverse CDF method to generate pareto random numbers. R function \texttt{rcpareto} is defined to call my C code through .C interface. Some examples of \texttt{rcpareto} are shown below.
+<<>>=
+rcpareto(1,3,-2)
+rcpareto(1,3,2)
+rcpareto(4,c(100,1),2)
+
+#Check reproducability
+set.seed(100)
+a <- rcpareto(c(NA,1,99), 3, 2)
+set.seed(100)
+b <- rcpareto(3, 3, 2)
+all.equal(a,b)
+@
+
+\begin{center}
+<<fig = TRUE>>=
+#Check qq-plot
+qqplot(ppareto(rcpareto(10^6,3,2),3,2), seq(0,1, length.out = 10^6), 
+       type = "l", main = "QQ plot of rcpareto")
+@
+\end{center}
+
+It is expected that C should be more efficient than R. The comparison of two functions are as follows.
+<<>>=
+#Compare efficiency of two functions
+system.time(rpareto(10^6, 3, 2))
+system.time(rcpareto(10^6, 3, 2))
+@
+\end{enumerate}
+
+\end{document}

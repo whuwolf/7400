@@ -1,1 +1,1 @@
-This is a simple package with three functions to calcualte the density, distribution function and quantile function for the Pareto distribtuion.
+This is a simple package to calcualte the density, distribution function ,quantile function and random numbers for the Pareto distribtuion. Parallel compuation is implemented via Open MP.

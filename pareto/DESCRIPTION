@@ -1,11 +1,12 @@
 Package: pareto
 Type: Package
 Title: Pareto Distribution
-Version: 4.0-0
-Date: 2017-03-26
+Version: 5.0-0
+Date: 2017-04-16
 Author: Yiheng Liu
 Maintainer: Yiheng Liu <yiheng-liu@uiowa.edu>
-Description: Density, distribution function and quantile function for the pareto distribution with C code. Parallel computation using Open MP is supported.
+Description: Density, distribution function ,quantile function and random generation for the pareto distribution with C code. Parallel computation using Open MP is supported.
 Suggests: xtable
+Imports: stats
 License: GPL (>=2)
 
