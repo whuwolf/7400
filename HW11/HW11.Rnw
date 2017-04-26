@@ -1,0 +1,95 @@
+\documentclass[11pt]{article}
+\setlength{\topmargin}{-0.25in}
+\setlength{\oddsidemargin}{0.0in}
+\setlength{\evensidemargin}{0.0in}
+\setlength{\textwidth}{5.75in}
+\setlength{\textheight}{8.5in}
+\setlength{\parindent}{0in}
+\setlength{\parsep}{0in}
+\setlength{\topsep}{0in}
+\setlength{\parskip}{1.2ex}
+\usepackage{Sweave}
+\usepackage{amsmath}
+\usepackage{courier}
+\usepackage{graphicx}
+\begin{document}
+\SweaveOpts{concordance=TRUE}
+%\large
+%\begin{verbatim}
+%Name: ___________________________________
+%\end{verbatim}
+%\begin{center}
+%{\bf Computing in Statistics}, STAT:5400\\
+%Midterm 2, Fall 2015 \\
+%\end{center}
+%\normalsize
+\title{ STAT7400 HW11, 2017} 
+\author{Yiheng Liu}
+\date{Apr 23, 2017}
+\maketitle
+
+\section*{Problem 1}
+\begin{enumerate}
+\item[(a)] The basic function that produces estimated bias and standard error for \texttt{gam} estimator is given below.
+
+<<>>=
+library(mgcv)
+
+m <- function(x) {
+    1 - sin(5 * x)^2 * exp(-4 * x)
+}
+
+#R is simulation replications
+#n is sample size
+#s is error standard deviation
+gamsim <- function(R, n, s) {
+    x <- (1 : n) / (n + 1)
+    yhat <- sapply(seq_len(R), function(i) {
+        y <- rnorm(n, m(x), s)
+        gam(y ~ s(x))$fitted
+    })
+    eb <- rowMeans(yhat) - m(x)
+    ese <- apply(yhat, 1, sd)
+    cbind(eb, ese)
+}
+@
+
+\item[(b)] A parallelized version that runs \texttt{gamsim} on the nodes in the cluster and merges the results.
+<<>>=
+library(parallel)
+
+mergeBiases <- function(b, n, RR) rowMeans(matrix(b, n, length(RR)))
+mergeSDs <- function(s, n, RR) {
+    sqrt(rowSums(matrix(s^2, n, length(RR))*(RR[1]-1))/(sum(RR) - 1))
+}
+
+pgamsim <- function(cl, R, n, s) {
+    nw <- length(cl)
+    RR <- rep(R / nw, nw)
+    val <- do.call(rbind, parLapply(cl, RR, gamsim, n, s))
+    eb <- mergeBiases(val[ ,"eb"], n, RR)
+    ese <- mergeSDs(val[ ,"ese"], n, RR)
+    cbind(eb, ese)
+}
+@
+
+\item[(c)] Run \texttt{pgamsim} for $n = 50$, $\sigma = 0.2$, and $R = 10,000$ on a cluster of 2 workers. Compared to \texttt{gamsim}, the parallel approach significantly reduces the elapsed time. Besides, identical results are acquired with the same seed.
+<<>>=
+cl <- makeCluster(2)
+clusterExport(cl, c("m"))
+clusterEvalQ(cl, library(mgcv))
+
+clusterSetRNGStream(cl, 123)
+system.time(val1 <- pgamsim(cl, 10000, 50, 0.2))
+system.time(val <- gamsim(10000, 50, 0.2))
+
+clusterSetRNGStream(cl, 123)
+val2 <- pgamsim(cl, 10000, 50, 0.2)
+identical(val1, val2)
+stopCluster(cl)
+@
+
+\end{enumerate}
+
+
+\end{document}
