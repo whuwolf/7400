@@ -1,0 +1,11 @@
+Package: class2
+Type: Package
+Title: Common Methods for Classification
+Version: 1.0-0
+Date: 2017-05-05
+Author: Yiheng Liu
+Maintainer: Yiheng Liu <yiheng-liu@uiowa.edu>
+Description: Three functions for classification, including Naive Bayes, Logistic Regression, and LDA.
+Imports: MASS
+License: GPL (>=2)
+
